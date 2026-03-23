@@ -395,14 +395,12 @@
 <nav>
   <a href="index.html" class="nav-logo">Library of <em>Morenita</em></a>
   <ul class="nav-links">
-    <li><a href="index.html">Archive</a></li>
-    <li><a href="observatory.html">Observatory</a></li>
+    <li><a href="index.html" class="active">Archive</a></li>
+    <li><a href="idea-web.html">Idea Web</a></li>
     <li><a href="academy.html">Academy</a></li>
-    <li><a href="write.html">Write</a></li>
     <li><a href="builder.html">Create</a></li>
-    <li><a href="profile.html">Profile</a></li>
   </ul>
-  <div class="nav-actions" id="nav-actions">
+  <div class="nav-actions">
     <a href="auth.html" class="btn-ghost">Sign In</a>
     <a href="auth.html" class="btn-solid">Join</a>
   </div>
@@ -636,56 +634,6 @@ document.querySelectorAll('.filter-tab').forEach(tab => {
     this.classList.add('active');
   });
 });
-</script>
-
-<script type="module">
-import { supabase, getCurrentUser, signOut } from './supabase.js'
-
-const ROLE_LABELS = {
-  librarian: '⬡ Librarian',
-  curator:   '◈ Curator',
-  fellow:    '✦ Fellow',
-  reader:    '◻ Reader',
-}
-
-async function initNav() {
-  const user = await getCurrentUser()
-  const profile = user?.profile
-  const navActions = document.getElementById('nav-actions')
-
-  if (user && profile) {
-    const roleLabel = ROLE_LABELS[profile.role] || '◻ Reader'
-    navActions.innerHTML = `
-      <span style="font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-faint);">${roleLabel}</span>
-      <span style="font-size:13px;color:var(--ink-muted);font-family:'EB Garamond',serif;">${profile.display_name || profile.email}</span>
-      <button class="btn-solid" id="signout-btn">Sign Out</button>
-    `
-    document.getElementById('signout-btn').onclick = async () => {
-      await supabase.auth.signOut()
-      window.location.reload()
-    }
-
-    // Librarian bar
-    if (profile.role === 'librarian' || profile.role === 'curator') {
-      const bar = document.createElement('div')
-      bar.style.cssText = 'background:rgba(139,74,42,0.06);border-bottom:1px solid rgba(139,74,42,0.12);padding:7px 40px;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--sienna);display:flex;align-items:center;gap:24px;'
-      bar.innerHTML = `<span>⬡ Librarian View</span><a href="#" style="color:var(--sienna);text-decoration:none;opacity:0.7;">Review Submissions →</a><a href="#" style="color:var(--sienna);text-decoration:none;opacity:0.7;">Approve Tracks →</a>`
-      document.querySelector('nav').after(bar)
-    }
-
-    // Reader scroll badge
-    if (profile.role === 'reader') {
-      const remaining = Math.max(0, 20 - (profile.scroll_count_this_week || 0))
-      const color = remaining > 10 ? '#5A9E6A' : remaining > 5 ? '#C49A3C' : '#9B4A3A'
-      const badge = document.createElement('div')
-      badge.style.cssText = `position:fixed;bottom:24px;right:24px;background:var(--ink);color:rgba(247,243,238,0.8);font-size:10px;letter-spacing:0.08em;text-transform:uppercase;padding:8px 14px;border-radius:2px;z-index:200;display:flex;align-items:center;gap:8px;`
-      badge.innerHTML = `<span style="width:6px;height:6px;border-radius:50%;background:${color};display:inline-block;"></span>${remaining} pages this week`
-      document.body.appendChild(badge)
-    }
-  }
-}
-
-initNav()
 </script>
 </body>
 </html>

@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Write · Library of Morenita</title>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Figtree:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream: #F7F3EE;
+  --parchment: #EDE8E0;
+  --ink: #1C1A17;
+  --ink-muted: #5C5750;
+  --ink-faint: #9B968D;
+  --sienna: #8B4A2A;
+  --sienna-light: #C47A55;
+  --sage: #5A6B55;
+  --gold: #C49A3C;
+  --border: rgba(28,26,23,0.12);
+  --border-strong: rgba(28,26,23,0.25);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { font-family:'Figtree',sans-serif; background:var(--cream); color:var(--ink); }
+
+/* NAV */
+.grid-banner { background:var(--ink); color:rgba(247,243,238,0.7); font-size:10px; letter-spacing:0.08em; text-transform:uppercase; padding:7px 32px; display:flex; align-items:center; justify-content:space-between; }
+.grid-dot { width:6px;height:6px;border-radius:50%;background:#5A9E6A;display:inline-block;margin-right:7px; }
+nav { background:var(--cream); border-bottom:1px solid var(--border); padding:0 40px; display:flex; align-items:center; justify-content:space-between; height:60px; position:sticky; top:0; z-index:100; }
+.nav-logo { font-family:'EB Garamond',serif; font-size:17px; color:var(--ink); text-decoration:none; letter-spacing:0.03em; }
+.nav-logo em { font-style:italic; color:var(--sienna); }
+.nav-links { display:flex; gap:28px; list-style:none; }
+.nav-links a { font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-muted); text-decoration:none; transition:color 0.2s; }
+.nav-links a:hover, .nav-links a.active { color:var(--ink); }
+.nav-actions { display:flex; align-items:center; gap:12px; }
+.btn-ghost { background:none; border:1px solid var(--border-strong); color:var(--ink); font-family:'Figtree',sans-serif; font-size:12px; letter-spacing:0.06em; text-transform:uppercase; padding:8px 18px; cursor:pointer; border-radius:2px; text-decoration:none; transition:all 0.2s; }
+.btn-ghost:hover { background:var(--ink); color:var(--cream); }
+.btn-solid { background:var(--ink); border:1px solid var(--ink); color:var(--cream); font-family:'Figtree',sans-serif; font-size:12px; letter-spacing:0.06em; text-transform:uppercase; padding:8px 18px; cursor:pointer; border-radius:2px; text-decoration:none; transition:all 0.2s; }
+.btn-solid:hover { background:var(--sienna); border-color:var(--sienna); }
+
+/* LAYOUT */
+.write-layout {
+  display:grid;
+  grid-template-columns:1fr 300px;
+  gap:0;
+  max-width:1100px;
+  margin:0 auto;
+  padding:48px 40px;
+  min-height:calc(100vh - 93px);
+}
+
+/* EDITOR */
+.editor-area { padding-right:48px; border-right:1px solid var(--border); }
+
+.editor-eyebrow {
+  font-size:10px; letter-spacing:0.12em; text-transform:uppercase;
+  color:var(--sienna); margin-bottom:20px; display:flex; align-items:center; gap:12px;
+}
+.editor-eyebrow::after { content:''; flex:1; height:1px; background:rgba(139,74,42,0.2); }
+
+.title-input {
+  width:100%;
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(32px,4vw,52px);
+  font-weight:300;
+  color:var(--ink);
+  border:none;
+  background:none;
+  outline:none;
+  line-height:1.1;
+  margin-bottom:16px;
+  resize:none;
+}
+.title-input::placeholder { color:rgba(28,26,23,0.2); font-style:italic; }
+
+.excerpt-input {
+  width:100%;
+  font-family:'EB Garamond',serif;
+  font-size:19px;
+  color:var(--ink-muted);
+  border:none;
+  background:none;
+  outline:none;
+  line-height:1.6;
+  font-style:italic;
+  margin-bottom:32px;
+  resize:none;
+  border-bottom:1px solid var(--border);
+  padding-bottom:24px;
+}
+.excerpt-input::placeholder { color:rgba(28,26,23,0.2); }
+
+.toolbar {
+  display:flex;
+  gap:4px;
+  margin-bottom:20px;
+  padding-bottom:16px;
+  border-bottom:1px solid var(--border);
+  flex-wrap:wrap;
+}
+.tool-btn {
+  background:none;
+  border:1px solid var(--border);
+  color:var(--ink-muted);
+  font-size:12px;
+  padding:5px 12px;
+  cursor:pointer;
+  border-radius:2px;
+  font-family:'Figtree',sans-serif;
+  transition:all 0.2s;
+}
+.tool-btn:hover { background:var(--ink); color:var(--cream); border-color:var(--ink); }
+
+.body-input {
+  width:100%;
+  min-height:420px;
+  font-family:'EB Garamond',serif;
+  font-size:18px;
+  color:var(--ink);
+  border:none;
+  background:none;
+  outline:none;
+  line-height:1.8;
+  resize:none;
+}
+.body-input::placeholder { color:rgba(28,26,23,0.18); font-style:italic; }
+
+.word-count {
+  font-size:11px;
+  color:var(--ink-faint);
+  letter-spacing:0.06em;
+  margin-top:16px;
+  padding-top:16px;
+  border-top:1px solid var(--border);
+}
+
+/* SIDEBAR */
+.editor-sidebar { padding-left:40px; }
+
+.sidebar-section { margin-bottom:32px; }
+.sidebar-label {
+  font-size:10px; letter-spacing:0.12em; text-transform:uppercase;
+  color:var(--ink-faint); margin-bottom:12px; display:block;
+}
+
+.field-input, .field-select {
+  width:100%; border:1px solid var(--border); background:#fff; color:var(--ink);
+  font-family:'EB Garamond',serif; font-size:16px; padding:9px 12px;
+  border-radius:2px; outline:none; transition:border-color 0.2s;
+}
+.field-input:focus, .field-select:focus { border-color:var(--sienna-light); }
+.field-select { cursor:pointer; font-style:normal; font-family:'Figtree',sans-serif; font-size:13px; }
+
+/* Tags */
+.tags-wrap {
+  display:flex; flex-wrap:wrap; gap:6px; margin-top:10px;
+}
+.tag-chip {
+  font-size:10px; letter-spacing:0.08em; text-transform:uppercase;
+  border:1px solid var(--border); padding:4px 10px; border-radius:2px;
+  cursor:pointer; transition:all 0.2s; color:var(--ink-muted);
+  background:none; font-family:'Figtree',sans-serif;
+}
+.tag-chip.selected {
+  background:var(--sienna); border-color:var(--sienna); color:#fff;
+}
+
+/* Status badge */
+.status-badge {
+  display:inline-flex; align-items:center; gap:6px;
+  font-size:10px; letter-spacing:0.08em; text-transform:uppercase;
+  padding:5px 12px; border-radius:2px; margin-bottom:20px;
+}
+.status-badge.draft { background:rgba(196,154,60,0.1); color:var(--gold); border:1px solid rgba(196,154,60,0.3); }
+.status-badge.submitted { background:rgba(74,107,138,0.1); color:#4A6B8A; border:1px solid rgba(74,107,138,0.3); }
+.status-badge.published { background:rgba(90,107,85,0.1); color:var(--sage); border:1px solid rgba(90,107,85,0.3); }
+
+/* Action buttons */
+.action-btns { display:flex; flex-direction:column; gap:8px; }
+.action-btn {
+  width:100%; padding:11px; border-radius:2px; cursor:pointer;
+  font-family:'Figtree',sans-serif; font-size:11px; letter-spacing:0.1em;
+  text-transform:uppercase; border:none; transition:all 0.2s;
+}
+.action-btn.primary { background:var(--ink); color:var(--cream); }
+.action-btn.primary:hover { background:var(--sienna); }
+.action-btn.secondary { background:none; border:1px solid var(--border-strong); color:var(--ink); }
+.action-btn.secondary:hover { background:var(--ink); color:var(--cream); }
+.action-btn.publish { background:var(--sage); color:#fff; }
+.action-btn.publish:hover { background:#4A5A45; }
+.action-btn:disabled { opacity:0.4; cursor:not-allowed; }
+
+/* Toast */
+.toast {
+  position:fixed; bottom:32px; left:50%; transform:translateX(-50%);
+  background:var(--ink); color:var(--cream); font-size:12px;
+  letter-spacing:0.06em; padding:12px 24px; border-radius:2px;
+  z-index:300; opacity:0; transition:opacity 0.3s;
+  pointer-events:none;
+}
+.toast.show { opacity:1; }
+
+/* Access denied */
+.access-denied {
+  display:none; text-align:center; padding:120px 40px;
+  max-width:500px; margin:0 auto;
+}
+.access-denied h2 { font-family:'Cormorant Garamond',serif; font-size:36px; font-weight:300; margin-bottom:12px; }
+.access-denied p { font-family:'EB Garamond',serif; font-size:17px; color:var(--ink-muted); font-style:italic; }
+
+@media(max-width:800px) {
+  .write-layout { grid-template-columns:1fr; padding:24px 20px; }
+  .editor-area { padding-right:0; border-right:none; border-bottom:1px solid var(--border); padding-bottom:32px; margin-bottom:32px; }
+  .editor-sidebar { padding-left:0; }
+}
+</style>
+</head>
+<body>
+
+<div class="grid-banner">
+  <span><span class="grid-dot"></span>Grid: Moderate · Library of Morenita</span>
+  <span style="color:rgba(247,243,238,0.35);" id="autosave-status">Draft saved automatically</span>
+</div>
+
+<nav>
+  <a href="index.html" class="nav-logo">Library of <em>Morenita</em></a>
+  <ul class="nav-links">
+    <li><a href="index.html">Archive</a></li>
+    <li><a href="observatory.html">Observatory</a></li>
+    <li><a href="academy.html">Academy</a></li>
+    <li><a href="write.html">Write</a></li>
+    <li><a href="builder.html">Create</a></li>
+    <li><a href="profile.html">Profile</a></li>
+  </ul>
+  <div class="nav-actions" id="nav-actions">
+    <a href="auth.html" class="btn-ghost">Sign In</a>
+    <a href="auth.html" class="btn-solid">Join</a>
+  </div>
+</nav>
+
+<!-- Access denied state (shown for readers) -->
+<div class="access-denied" id="access-denied">
+  <h2>This space is for <em style="color:var(--sienna)">Fellows</em></h2>
+  <p>Writing is reserved for Fellows and Curators. Apply to become a Fellow to contribute to the archive.</p>
+  <br>
+  <a href="index.html" class="btn-solid" style="display:inline-block;margin-top:16px;">Return to Archive</a>
+</div>
+
+<!-- Write layout -->
+<div class="write-layout" id="write-layout" style="display:none;">
+
+  <!-- Editor -->
+  <div class="editor-area">
+    <div class="editor-eyebrow">New Article</div>
+
+    <textarea class="title-input" id="art-title" rows="2"
+      placeholder="The title of your piece…" oninput="autoResize(this); scheduleSave()"></textarea>
+
+    <textarea class="excerpt-input" id="art-excerpt" rows="2"
+      placeholder="A one or two sentence description — the reader's first impression…"
+      oninput="autoResize(this); scheduleSave()"></textarea>
+
+    <div class="toolbar">
+      <button class="tool-btn" onclick="wrapText('**','**')"><b>B</b></button>
+      <button class="tool-btn" onclick="wrapText('*','*')"><em>I</em></button>
+      <button class="tool-btn" onclick="insertBlock('\n\n> ')">Quote</button>
+      <button class="tool-btn" onclick="insertBlock('\n\n## ')">Heading</button>
+      <button class="tool-btn" onclick="insertBlock('\n\n--- ')">Divider</button>
+    </div>
+
+    <textarea class="body-input" id="art-body"
+      placeholder="Begin writing here. Your words become part of the archive…"
+      oninput="updateWordCount(); scheduleSave()"></textarea>
+
+    <div class="word-count" id="word-count">0 words</div>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="editor-sidebar">
+
+    <div class="sidebar-section">
+      <span class="sidebar-label">Status</span>
+      <div class="status-badge draft" id="status-badge">◌ Draft</div>
+    </div>
+
+    <div class="sidebar-section">
+      <span class="sidebar-label">Article Type</span>
+      <select class="field-select" id="art-type">
+        <option value="article">Article</option>
+        <option value="quote">Quote / Excerpt</option>
+        <option value="image">Image / Work</option>
+      </select>
+    </div>
+
+    <div class="sidebar-section">
+      <span class="sidebar-label">Read Time</span>
+      <input class="field-input" id="art-readtime" type="text" placeholder="e.g. 8 min read">
+    </div>
+
+    <div class="sidebar-section">
+      <span class="sidebar-label">Tags <span style="color:var(--ink-faint);font-size:9px;">(select all that apply)</span></span>
+      <div class="tags-wrap" id="tags-wrap"></div>
+    </div>
+
+    <div class="sidebar-section">
+      <span class="sidebar-label">Actions</span>
+      <div class="action-btns">
+        <button class="action-btn secondary" onclick="saveDraft()">Save Draft</button>
+        <button class="action-btn primary" onclick="submitForReview()" id="submit-btn">Submit for Review</button>
+        <button class="action-btn publish" onclick="publishDirect()" id="publish-btn" style="display:none;">Publish Now</button>
+      </div>
+      <p style="font-size:11px;color:var(--ink-faint);margin-top:12px;line-height:1.5;" id="submit-note">
+        Submitted articles are reviewed by a Librarian before publishing.
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { supabase, getCurrentUser } from './supabase.js'
+
+const TAGS = ['philosophy','africa','diaspora','fashion-history','textiles','herbalism','beauty-ritual','art-history','music','literature','architecture','spirituality','science','resistance','feminism','nature']
+
+let currentUser = null
+let currentProfile = null
+let currentArticleId = null
+let selectedTags = []
+let saveTimer = null
+
+// ── INIT ──
+async function init() {
+  currentUser = await getCurrentUser()
+  currentProfile = currentUser?.profile
+
+  // Auth nav
+  const navActions = document.getElementById('nav-actions')
+  if (currentUser && currentProfile) {
+    const ROLE_LABELS = { librarian:'⬡ Librarian', curator:'◈ Curator', fellow:'✦ Fellow', reader:'◻ Reader' }
+    navActions.innerHTML = `
+      <span style="font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-faint);">${ROLE_LABELS[currentProfile.role]||'◻ Reader'}</span>
+      <span style="font-size:13px;color:var(--ink-muted);font-family:'EB Garamond',serif;">${currentProfile.display_name||currentProfile.email}</span>
+      <button class="btn-solid" onclick="import('./supabase.js').then(m=>m.supabase.auth.signOut()).then(()=>location.href='index.html')">Sign Out</button>
+    `
+  }
+
+  // Check access
+  if (!currentUser) {
+    window.location.href = 'auth.html'
+    return
+  }
+
+  const role = currentProfile?.role
+  if (role === 'reader') {
+    document.getElementById('access-denied').style.display = 'block'
+    return
+  }
+
+  document.getElementById('write-layout').style.display = 'grid'
+
+  // Librarians and curators can publish directly
+  if (role === 'librarian' || role === 'curator') {
+    document.getElementById('publish-btn').style.display = 'block'
+    document.getElementById('submit-note').textContent = 'As a Librarian you can publish directly or save as draft.'
+  }
+
+  // Build tag chips
+  const wrap = document.getElementById('tags-wrap')
+  TAGS.forEach(tag => {
+    const btn = document.createElement('button')
+    btn.className = 'tag-chip'
+    btn.textContent = tag
+    btn.onclick = () => toggleTag(tag, btn)
+    wrap.appendChild(btn)
+  })
+
+  // Check for edit mode (url param ?id=xxx)
+  const params = new URLSearchParams(window.location.search)
+  if (params.get('id')) loadArticle(params.get('id'))
+}
+
+// ── TAG TOGGLE ──
+window.toggleTag = function(tag, btn) {
+  if (selectedTags.includes(tag)) {
+    selectedTags = selectedTags.filter(t => t !== tag)
+    btn.classList.remove('selected')
+  } else {
+    selectedTags.push(tag)
+    btn.classList.add('selected')
+  }
+  scheduleSave()
+}
+
+// ── SAVE DRAFT ──
+window.saveDraft = async function() {
+  const title = document.getElementById('art-title').value.trim()
+  const excerpt = document.getElementById('art-excerpt').value.trim()
+  const body = document.getElementById('art-body').value.trim()
+  const type = document.getElementById('art-type').value
+  const readTime = document.getElementById('art-readtime').value.trim()
+
+  if (!title) { showToast('Add a title first'); return }
+
+  const payload = {
+    title, excerpt, body, type,
+    read_time: readTime,
+    tags: selectedTags,
+    author_id: currentUser.id,
+    status: 'draft'
+  }
+
+  let error
+  if (currentArticleId) {
+    ;({ error } = await supabase.from('articles').update(payload).eq('id', currentArticleId))
+  } else {
+    const { data, error: err } = await supabase.from('articles').insert(payload).select().single()
+    error = err
+    if (data) {
+      currentArticleId = data.id
+      window.history.replaceState({}, '', `?id=${data.id}`)
+    }
+  }
+
+  if (error) { showToast('Error saving: ' + error.message); return }
+  showToast('Draft saved')
+  updateStatus('draft')
+  document.getElementById('autosave-status').textContent = 'Saved ' + new Date().toLocaleTimeString()
+}
+
+// ── SUBMIT FOR REVIEW ──
+window.submitForReview = async function() {
+  await saveDraft()
+  if (!currentArticleId) return
+
+  const { error } = await supabase.from('articles')
+    .update({ status: 'submitted' })
+    .eq('id', currentArticleId)
+
+  if (error) { showToast('Error: ' + error.message); return }
+  showToast('Submitted for Librarian review ✓')
+  updateStatus('submitted')
+  document.getElementById('submit-btn').disabled = true
+}
+
+// ── PUBLISH DIRECTLY (Librarian/Curator) ──
+window.publishDirect = async function() {
+  await saveDraft()
+  if (!currentArticleId) return
+
+  const { error } = await supabase.from('articles')
+    .update({ status: 'published', published_at: new Date().toISOString() })
+    .eq('id', currentArticleId)
+
+  if (error) { showToast('Error: ' + error.message); return }
+  showToast('Published to the archive ✓')
+  updateStatus('published')
+}
+
+// ── LOAD EXISTING ARTICLE ──
+async function loadArticle(id) {
+  const { data } = await supabase.from('articles').select('*').eq('id', id).single()
+  if (!data) return
+  currentArticleId = id
+  document.getElementById('art-title').value = data.title || ''
+  document.getElementById('art-excerpt').value = data.excerpt || ''
+  document.getElementById('art-body').value = data.body || ''
+  document.getElementById('art-type').value = data.type || 'article'
+  document.getElementById('art-readtime').value = data.read_time || ''
+  selectedTags = data.tags || []
+  selectedTags.forEach(tag => {
+    document.querySelectorAll('.tag-chip').forEach(btn => {
+      if (btn.textContent === tag) btn.classList.add('selected')
+    })
+  })
+  updateStatus(data.status)
+  updateWordCount()
+}
+
+// ── AUTO SAVE ──
+window.scheduleSave = function() {
+  clearTimeout(saveTimer)
+  saveTimer = setTimeout(saveDraft, 3000)
+}
+
+// ── UTILS ──
+function updateStatus(status) {
+  const badge = document.getElementById('status-badge')
+  const labels = { draft:'◌ Draft', submitted:'◎ Under Review', approved:'◉ Approved', published:'● Published' }
+  badge.textContent = labels[status] || status
+  badge.className = 'status-badge ' + (status === 'published' ? 'published' : status === 'submitted' ? 'submitted' : 'draft')
+}
+
+window.updateWordCount = function() {
+  const text = document.getElementById('art-body').value
+  const count = text.trim() ? text.trim().split(/\s+/).length : 0
+  const mins = Math.ceil(count / 200)
+  document.getElementById('word-count').textContent = `${count.toLocaleString()} words · ~${mins} min read`
+}
+
+window.autoResize = function(el) {
+  el.style.height = 'auto'
+  el.style.height = el.scrollHeight + 'px'
+}
+
+window.wrapText = function(before, after) {
+  const ta = document.getElementById('art-body')
+  const start = ta.selectionStart
+  const end = ta.selectionEnd
+  const selected = ta.value.substring(start, end)
+  ta.value = ta.value.substring(0, start) + before + selected + after + ta.value.substring(end)
+  ta.focus()
+  updateWordCount()
+}
+
+window.insertBlock = function(text) {
+  const ta = document.getElementById('art-body')
+  const pos = ta.selectionStart
+  ta.value = ta.value.substring(0, pos) + text + ta.value.substring(pos)
+  ta.focus()
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast')
+  t.textContent = msg
+  t.classList.add('show')
+  setTimeout(() => t.classList.remove('show'), 2500)
+}
+
+init()
+</script>
+</body>
+</html>

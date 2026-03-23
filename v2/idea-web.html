@@ -338,11 +338,11 @@
   <a href="index.html" class="nav-logo">Library of <em>Morenita</em></a>
   <ul class="nav-links">
     <li><a href="index.html">Archive</a></li>
-    <li><a href="observatory.html">Observatory</a></li>
+    <li><a href="index.html#collections">My Issues</a></li>
+    <li><a href="index.html#profile">Portfolio</a></li>
+    <li><a href="idea-web.html" class="active">Idea Web</a></li>
     <li><a href="academy.html">Academy</a></li>
-    <li><a href="write.html">Write</a></li>
     <li><a href="builder.html">Create</a></li>
-    <li><a href="profile.html">Profile</a></li>
   </ul>
 </nav>
 
@@ -1018,38 +1018,6 @@ window.addEventListener('resize', () => {
   simulation.force('center', d3.forceCenter(W2/2, H2/2));
   simulation.alpha(0.1).restart();
 });
-</script>
-
-<script type="module">
-import { supabase, getCurrentUser } from './supabase.js'
-const ROLE_LABELS = { librarian:'⬡ Librarian', curator:'◈ Curator', fellow:'✦ Fellow', reader:'◻ Reader' }
-async function initNav() {
-  const user = await getCurrentUser()
-  const profile = user?.profile
-  const navActions = document.getElementById('nav-actions')
-  if (!navActions) return
-  if (user && profile) {
-    const rl = ROLE_LABELS[profile.role] || '◻ Reader'
-    const dn = profile.display_name || profile.email
-    navActions.innerHTML = `
-      <span style="font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-faint);">${rl}</span>
-      <span style="font-size:13px;color:var(--ink-muted);font-family:'EB Garamond',serif;">${dn}</span>
-      <button class="btn-solid" id="so-btn">Sign Out</button>
-    `
-    document.getElementById('so-btn').onclick = async () => {
-      await supabase.auth.signOut(); location.href = 'index.html'
-    }
-    if (profile.role === 'librarian' || profile.role === 'curator') {
-      const bar = document.createElement('div')
-      bar.style.cssText = 'background:rgba(139,74,42,0.06);border-bottom:1px solid rgba(139,74,42,0.12);padding:7px 40px;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--sienna);display:flex;align-items:center;gap:24px;'
-      bar.innerHTML = '<span>⬡ Librarian View</span>'
-      document.querySelector('nav').after(bar)
-    }
-  } else {
-    if (navActions) navActions.innerHTML = '<a href="auth.html" class="btn-ghost">Sign In</a><a href="auth.html" class="btn-solid">Join</a>'
-  }
-}
-initNav()
 </script>
 </body>
 </html>
