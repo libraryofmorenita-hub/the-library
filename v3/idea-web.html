@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Idea Web · Library of Morenita</title>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Figtree:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<style>
+  :root {
+    --cream: #F7F3EE;
+    --parchment: #EDE8E0;
+    --ink: #1C1A17;
+    --ink-muted: #5C5750;
+    --ink-faint: #9B968D;
+    --sienna: #8B4A2A;
+    --sienna-light: #C47A55;
+    --sage: #5A6B55;
+    --sage-light: #8BA683;
+    --gold: #C49A3C;
+    --gold-light: #DDB96A;
+    --border: rgba(28,26,23,0.12);
+    --border-strong: rgba(28,26,23,0.25);
+    --void: #0E0D0B;
+    --star: #F7F3EE;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; overflow: hidden; }
+
+  body {
+    font-family: 'Figtree', sans-serif;
+    background: var(--void);
+    color: var(--star);
+  }
+
+  /* ── GRID BANNER ── */
+  .grid-banner {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    background: rgba(14,13,11,0.9);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid rgba(247,243,238,0.08);
+    color: rgba(247,243,238,0.6);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 7px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 200;
+  }
+  .grid-dot { width:7px; height:7px; border-radius:50%; background:#5A9E6A; display:inline-block; margin-right:8px; }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 33px; left: 0; right: 0;
+    background: rgba(14,13,11,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(247,243,238,0.08);
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+    z-index: 100;
+  }
+  .nav-logo {
+    font-family: 'EB Garamond', serif;
+    font-size: 17px;
+    color: var(--star);
+    text-decoration: none;
+    letter-spacing: 0.03em;
+  }
+  .nav-logo em { font-style: italic; color: var(--sienna-light); }
+  .nav-links { display:flex; gap:28px; list-style:none; }
+  .nav-links a {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(247,243,238,0.45);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover, .nav-links a.active { color: rgba(247,243,238,0.9); }
+
+  /* ── CANVAS ── */
+  #web-canvas {
+    position: fixed;
+    inset: 0;
+    top: 93px;
+    width: 100%;
+    height: calc(100% - 93px);
+  }
+
+  /* ── NODE TOOLTIP / CARD ── */
+  #node-card {
+    position: fixed;
+    right: 32px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 280px;
+    background: rgba(14,13,11,0.95);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(247,243,238,0.12);
+    border-radius: 4px;
+    padding: 28px 24px;
+    z-index: 150;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+  #node-card.visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(-50%) translateX(0);
+  }
+  .card-type {
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--sienna-light);
+    margin-bottom: 12px;
+  }
+  .card-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 300;
+    line-height: 1.2;
+    color: var(--star);
+    margin-bottom: 10px;
+  }
+  .card-excerpt {
+    font-family: 'EB Garamond', serif;
+    font-size: 15px;
+    color: rgba(247,243,238,0.55);
+    line-height: 1.6;
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+  .card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 20px;
+  }
+  .card-tag {
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(247,243,238,0.4);
+    border: 1px solid rgba(247,243,238,0.15);
+    padding: 3px 8px;
+    border-radius: 2px;
+  }
+  .card-action {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--sienna-light);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(196,122,85,0.3);
+    padding-bottom: 2px;
+    transition: color 0.2s;
+  }
+  .card-close {
+    position: absolute;
+    top: 16px; right: 16px;
+    background: none;
+    border: none;
+    color: rgba(247,243,238,0.3);
+    font-size: 16px;
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.2s;
+  }
+  .card-close:hover { color: rgba(247,243,238,0.8); }
+
+  /* ── LEGEND ── */
+  #legend {
+    position: fixed;
+    left: 32px;
+    bottom: 32px;
+    z-index: 150;
+    background: rgba(14,13,11,0.85);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(247,243,238,0.1);
+    border-radius: 4px;
+    padding: 16px 20px;
+  }
+  .legend-title {
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(247,243,238,0.35);
+    margin-bottom: 12px;
+  }
+  .legend-items { display: flex; flex-direction: column; gap: 8px; }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 11px;
+    color: rgba(247,243,238,0.55);
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+  .legend-item:hover { color: rgba(247,243,238,0.9); }
+  .legend-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .legend-item.dimmed { opacity: 0.3; }
+
+  /* ── CONTROLS ── */
+  #controls {
+    position: fixed;
+    left: 32px;
+    top: 120px;
+    z-index: 150;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .ctrl-btn {
+    width: 36px; height: 36px;
+    background: rgba(14,13,11,0.85);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(247,243,238,0.1);
+    border-radius: 3px;
+    color: rgba(247,243,238,0.5);
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+  .ctrl-btn:hover {
+    background: rgba(247,243,238,0.08);
+    color: rgba(247,243,238,0.9);
+  }
+
+  /* ── SEARCH ── */
+  #web-search {
+    position: fixed;
+    top: 120px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 150;
+    display: flex;
+    gap: 0;
+    width: 340px;
+  }
+  #web-search input {
+    flex: 1;
+    background: rgba(14,13,11,0.9);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(247,243,238,0.12);
+    border-right: none;
+    color: var(--star);
+    font-family: 'EB Garamond', serif;
+    font-size: 16px;
+    font-style: italic;
+    padding: 9px 16px;
+    outline: none;
+    border-radius: 2px 0 0 2px;
+  }
+  #web-search input::placeholder { color: rgba(247,243,238,0.25); }
+  #web-search button {
+    background: var(--sienna);
+    border: 1px solid var(--sienna);
+    color: #fff;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 9px 14px;
+    cursor: pointer;
+    font-family: 'Figtree', sans-serif;
+    border-radius: 0 2px 2px 0;
+    transition: background 0.2s;
+  }
+  #web-search button:hover { background: var(--sienna-light); }
+
+  /* ── STATS ── */
+  #web-stats {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    z-index: 150;
+    font-size: 11px;
+    color: rgba(247,243,238,0.2);
+    letter-spacing: 0.06em;
+    text-align: right;
+    line-height: 1.8;
+  }
+
+  /* ── TOOLTIP ── */
+  .hover-label {
+    position: fixed;
+    background: rgba(14,13,11,0.9);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(247,243,238,0.12);
+    color: rgba(247,243,238,0.85);
+    font-family: 'EB Garamond', serif;
+    font-size: 14px;
+    padding: 6px 12px;
+    border-radius: 2px;
+    pointer-events: none;
+    z-index: 300;
+    opacity: 0;
+    transition: opacity 0.15s;
+    max-width: 220px;
+    line-height: 1.4;
+  }
+
+  /* Node pulse animation */
+  @keyframes pulse {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+  }
+
+  svg .node-article { cursor: pointer; }
+  svg .node-tag { cursor: pointer; }
+</style>
+</head>
+<body>
+
+<div class="grid-banner">
+  <span><span class="grid-dot"></span>Grid: Moderate · Library of Morenita</span>
+  <span>Idea Web — <em style="font-family:'EB Garamond',serif; font-style:italic; color:rgba(247,243,238,0.5);">click any node to explore its constellation</em></span>
+</div>
+
+<nav>
+  <a href="index.html" class="nav-logo">Library of <em>Morenita</em></a>
+  <ul class="nav-links">
+    <li><a href="index.html">Archive</a></li>
+    <li><a href="observatory.html">Observatory</a></li>
+    <li><a href="academy.html">Academy</a></li>
+    <li><a href="write.html">Write</a></li>
+    <li><a href="builder.html">Create</a></li>
+    <li><a href="profile.html">Profile</a></li>
+  </ul>
+</nav>
+
+<div id="web-search">
+  <input type="text" placeholder="Search the constellation…" id="search-input">
+  <button onclick="searchWeb()">Find</button>
+</div>
+
+<div id="controls">
+  <button class="ctrl-btn" onclick="zoomIn()" title="Zoom in">+</button>
+  <button class="ctrl-btn" onclick="zoomOut()" title="Zoom out">−</button>
+  <button class="ctrl-btn" onclick="resetZoom()" title="Reset">⌂</button>
+</div>
+
+<svg id="web-canvas"></svg>
+
+<!-- Node detail card -->
+<div id="node-card">
+  <button class="card-close" onclick="closeCard()">✕</button>
+  <div class="card-type" id="card-type">Article</div>
+  <div class="card-title" id="card-title">Title</div>
+  <div class="card-excerpt" id="card-excerpt">Excerpt</div>
+  <div class="card-tags" id="card-tags"></div>
+  <a href="#" class="card-action" id="card-action">Read → </a>
+</div>
+
+<div id="legend">
+  <div class="legend-title">Node Types</div>
+  <div class="legend-items">
+    <div class="legend-item" onclick="filterType('article')">
+      <div class="legend-dot" style="background:#C47A55;"></div>
+      <span>Articles</span>
+    </div>
+    <div class="legend-item" onclick="filterType('quote')">
+      <div class="legend-dot" style="background:#DDB96A;"></div>
+      <span>Quotes</span>
+    </div>
+    <div class="legend-item" onclick="filterType('image')">
+      <div class="legend-dot" style="background:#8BA683;"></div>
+      <span>Images / Works</span>
+    </div>
+    <div class="legend-item" onclick="filterType('tag')">
+      <div class="legend-dot" style="background:rgba(247,243,238,0.2); border:1px solid rgba(247,243,238,0.3);"></div>
+      <span>Topic Tags</span>
+    </div>
+    <div class="legend-item" style="margin-top:4px; cursor:default;" onclick="filterType(null)">
+      <div class="legend-dot" style="background:transparent; border:1px dashed rgba(247,243,238,0.2);"></div>
+      <span style="color:rgba(247,243,238,0.3);">Show all</span>
+    </div>
+  </div>
+</div>
+
+<div id="web-stats">
+  <div id="stat-nodes">— nodes</div>
+  <div id="stat-links">— connections</div>
+</div>
+
+<div class="hover-label" id="hover-label"></div>
+
+<script>
+// ─────────────────────────────────────────────
+// DATA: Articles, Quotes, Images + Tag nodes
+// ─────────────────────────────────────────────
+const TAXONOMY = [
+  'philosophy','africa','diaspora','fashion-history','textiles',
+  'herbalism','beauty-ritual','art-history','music','literature',
+  'architecture','spirituality','science','resistance','feminism','nature'
+];
+
+const ARTICLES = [
+  {
+    id:'a1', type:'article',
+    title:'Ubuntu — I am because we are',
+    excerpt:'The Nguni Bantu philosophy that places communal being at the center of personhood.',
+    tags:['philosophy','africa','diaspora','spirituality'],
+    readTime:'8 min'
+  },
+  {
+    id:'a2', type:'article',
+    title:'The garment as living archive',
+    excerpt:'West African textile traditions — aso-oke, kente, bogolanfini — weaving cosmology into cloth.',
+    tags:['fashion-history','textiles','africa','art-history','resistance'],
+    readTime:'11 min'
+  },
+  {
+    id:'a3', type:'article',
+    title:'Rose hip, hibiscus, and the pharmacopeia of grandmothers',
+    excerpt:'Before the apothecary, there was the kitchen windowsill crowded with small jars.',
+    tags:['herbalism','beauty-ritual','nature','feminism','science'],
+    readTime:'12 min'
+  },
+  {
+    id:'a4', type:'article',
+    title:'The Harlem Renaissance and the aesthetics of self-determination',
+    excerpt:'How Black artists in 1920s New York built a visual language of liberation.',
+    tags:['art-history','diaspora','resistance','literature','music'],
+    readTime:'15 min'
+  },
+  {
+    id:'a5', type:'article',
+    title:'Indigo — the color that crossed oceans',
+    excerpt:'From Yoruba adire to Japanese shibori, indigo dye as shared human inheritance.',
+    tags:['textiles','fashion-history','africa','science','nature'],
+    readTime:'9 min'
+  },
+  {
+    id:'a6', type:'article',
+    title:'Sacred geometry in Moroccan architecture',
+    excerpt:'The zellige, the muqarnas, the mashrabiya — pattern as spiritual practice.',
+    tags:['architecture','africa','spirituality','art-history','philosophy'],
+    readTime:'13 min'
+  },
+  {
+    id:'a7', type:'article',
+    title:'The cello as infrastructure — music and emotional labor',
+    excerpt:'How low strings hold the emotional foundation that allows the melody to soar.',
+    tags:['music','philosophy','feminism'],
+    readTime:'6 min'
+  },
+  {
+    id:'a8', type:'article',
+    title:'Octavia Butler and the speculative Black imagination',
+    excerpt:'Science fiction as a tool of liberation — imagining the world that must exist.',
+    tags:['literature','science','resistance','diaspora','feminism'],
+    readTime:'14 min'
+  },
+  {
+    id:'a9', type:'article',
+    title:'Forest bathing — shinrin-yoku and ancestral grounding practices',
+    excerpt:'The Japanese practice of being in nature — and its echoes in African earth traditions.',
+    tags:['nature','spirituality','science','herbalism'],
+    readTime:'7 min'
+  },
+  {
+    id:'a10', type:'article',
+    title:'The feminist history of quilting circles',
+    excerpt:'How women encoded resistance, memory, and coded maps into domestic textile work.',
+    tags:['feminism','textiles','resistance','art-history','literature'],
+    readTime:'10 min'
+  },
+  {
+    id:'a11', type:'article',
+    title:'Griots and the oral architecture of memory',
+    excerpt:'West African keepers of history — the body as library, the voice as archive.',
+    tags:['africa','literature','music','philosophy','diaspora'],
+    readTime:'11 min'
+  },
+  {
+    id:'a12', type:'article',
+    title:'Decolonizing the botanical: plant knowledge and epistemic justice',
+    excerpt:'Who gets credited for knowing? A history of stolen plant science.',
+    tags:['herbalism','science','resistance','feminism','nature'],
+    readTime:'16 min'
+  },
+  {
+    id:'a13', type:'article',
+    title:'The beauty economy of West Africa',
+    excerpt:'Shea, black soap, and the global industry built on uncompensated ancestral knowledge.',
+    tags:['beauty-ritual','africa','diaspora','economics','resistance'],
+    readTime:'10 min'
+  },
+  {
+    id:'a14', type:'article',
+    title:'Wabi-sabi — the Japanese aesthetics of impermanence',
+    excerpt:'Finding beauty in the broken, the weathered, the incomplete.',
+    tags:['philosophy','art-history','nature','architecture'],
+    readTime:'8 min'
+  },
+];
+
+const QUOTES = [
+  {
+    id:'q1', type:'quote',
+    title:'"The function of art is to imagine what is possible"',
+    excerpt:'bell hooks on creative work as a site of liberation',
+    tags:['art-history','literature','resistance','feminism'],
+    author:'bell hooks'
+  },
+  {
+    id:'q2', type:'quote',
+    title:'"In order to write about life, first you must live it"',
+    excerpt:'Ernest Hemingway on the inseparability of experience and expression',
+    tags:['literature','philosophy'],
+    author:'Hemingway'
+  },
+  {
+    id:'q3', type:'quote',
+    title:'"Not everything that is faced can be changed, but nothing can be changed until it is faced"',
+    excerpt:'James Baldwin on the necessity of confrontation',
+    tags:['resistance','diaspora','philosophy','literature'],
+    author:'James Baldwin'
+  },
+  {
+    id:'q4', type:'quote',
+    title:'"The earth has music for those who listen"',
+    excerpt:'On attentiveness as a form of spiritual receptivity',
+    tags:['nature','spirituality','music','philosophy'],
+    author:'George Santayana'
+  },
+  {
+    id:'q5', type:'quote',
+    title:'"Caring for myself is not self-indulgence, it is self-preservation"',
+    excerpt:'Audre Lorde reclaims wellness as a political act',
+    tags:['feminism','beauty-ritual','resistance','spirituality'],
+    author:'Audre Lorde'
+  },
+];
+
+const IMAGES = [
+  {
+    id:'i1', type:'image',
+    title:'Indigo & Resistance',
+    excerpt:'Textile work exploring the politics of natural dye.',
+    tags:['textiles','resistance','art-history','africa'],
+    medium:'Textile · 2025'
+  },
+  {
+    id:'i2', type:'image',
+    title:'Botanical Grimoire Vol. I',
+    excerpt:'Mixed media collage — herbarium meets magical text.',
+    tags:['herbalism','nature','beauty-ritual','spirituality'],
+    medium:'Mixed media · 2025'
+  },
+  {
+    id:'i3', type:'image',
+    title:'Roots & Ritual photography series',
+    excerpt:'Portraits exploring ancestral beauty practices.',
+    tags:['beauty-ritual','diaspora','feminism','nature'],
+    medium:'Photography · 2024'
+  },
+  {
+    id:'i4', type:'image',
+    title:'Aso-oke Study',
+    excerpt:'Research into the symbolic grammar of Yoruba weaving.',
+    tags:['textiles','africa','fashion-history','art-history'],
+    medium:'Research · 2024'
+  },
+];
+
+// Build graph nodes
+const TYPE_COLORS = {
+  article: '#C47A55',
+  quote:   '#DDB96A',
+  image:   '#8BA683',
+  tag:     'rgba(247,243,238,0.15)',
+};
+const TYPE_RADII = {
+  article: 9,
+  quote:   7,
+  image:   8,
+  tag:     22,
+};
+
+// Create tag nodes
+const allItems = [...ARTICLES, ...QUOTES, ...IMAGES];
+const usedTags = [...new Set(allItems.flatMap(d => d.tags))];
+
+const tagNodes = usedTags.map(t => ({
+  id: 'tag-' + t,
+  type: 'tag',
+  label: t,
+  title: t,
+  tags: [t],
+  connections: allItems.filter(d => d.tags.includes(t)).length,
+}));
+
+const allNodes = [...allItems, ...tagNodes];
+
+// Create links: article/quote/image → each of its tags
+const links = [];
+allItems.forEach(item => {
+  item.tags.forEach(tag => {
+    if (usedTags.includes(tag)) {
+      links.push({ source: item.id, target: 'tag-' + tag, strength: 0.3 });
+    }
+  });
+});
+
+// ─────────────────────────────────────────────
+// D3 SETUP
+// ─────────────────────────────────────────────
+const canvas = document.getElementById('web-canvas');
+const W = canvas.clientWidth;
+const H = canvas.clientHeight;
+
+const svg = d3.select('#web-canvas')
+  .attr('width', W)
+  .attr('height', H);
+
+// Defs: glow filter, radial gradient bg
+const defs = svg.append('defs');
+
+// Glow filter
+const glow = defs.append('filter').attr('id','glow').attr('x','-50%').attr('y','-50%').attr('width','200%').attr('height','200%');
+glow.append('feGaussianBlur').attr('stdDeviation','3.5').attr('result','coloredBlur');
+const feMerge = glow.append('feMerge');
+feMerge.append('feMergeNode').attr('in','coloredBlur');
+feMerge.append('feMergeNode').attr('in','SourceGraphic');
+
+// Strong glow for selected
+const glowStrong = defs.append('filter').attr('id','glow-strong').attr('x','-100%').attr('y','-100%').attr('width','300%').attr('height','300%');
+glowStrong.append('feGaussianBlur').attr('stdDeviation','8').attr('result','coloredBlur');
+const feMerge2 = glowStrong.append('feMerge');
+feMerge2.append('feMergeNode').attr('in','coloredBlur');
+feMerge2.append('feMergeNode').attr('in','SourceGraphic');
+
+// Background radial gradient
+const radialGrad = defs.append('radialGradient')
+  .attr('id','bg-grad').attr('cx','50%').attr('cy','50%').attr('r','70%');
+radialGrad.append('stop').attr('offset','0%').attr('stop-color','#1C1917');
+radialGrad.append('stop').attr('offset','100%').attr('stop-color','#0E0D0B');
+
+svg.append('rect').attr('width','100%').attr('height','100%').attr('fill','url(#bg-grad)');
+
+// Add subtle star field
+const starGroup = svg.append('g').attr('class','stars');
+d3.range(120).forEach(() => {
+  starGroup.append('circle')
+    .attr('cx', Math.random() * W)
+    .attr('cy', Math.random() * H)
+    .attr('r', Math.random() * 1.2)
+    .attr('fill', 'rgba(247,243,238,' + (Math.random() * 0.25 + 0.05) + ')');
+});
+
+// Main groups
+const g = svg.append('g').attr('class','main-g');
+const linkGroup = g.append('g').attr('class','links');
+const nodeGroup = g.append('g').attr('class','nodes');
+const labelGroup = g.append('g').attr('class','labels');
+
+// Zoom
+const zoom = d3.zoom()
+  .scaleExtent([0.3, 4])
+  .on('zoom', (event) => {
+    g.attr('transform', event.transform);
+  });
+svg.call(zoom);
+
+// Force simulation
+const simulation = d3.forceSimulation(allNodes)
+  .force('link', d3.forceLink(links)
+    .id(d => d.id)
+    .distance(d => {
+      const src = allNodes.find(n => n.id === (typeof d.source === 'object' ? d.source.id : d.source));
+      return src && src.type === 'tag' ? 90 : 110;
+    })
+    .strength(d => d.strength || 0.3)
+  )
+  .force('charge', d3.forceManyBody()
+    .strength(d => d.type === 'tag' ? -400 : -200)
+  )
+  .force('center', d3.forceCenter(W / 2, H / 2))
+  .force('collision', d3.forceCollide().radius(d => TYPE_RADII[d.type] + 18))
+  .alphaDecay(0.015);
+
+// Draw links
+const linkEls = linkGroup.selectAll('line')
+  .data(links)
+  .join('line')
+  .attr('stroke', 'rgba(247,243,238,0.06)')
+  .attr('stroke-width', 1);
+
+// Draw tag background circles (halos)
+const tagHalos = nodeGroup.selectAll('.tag-halo')
+  .data(allNodes.filter(d => d.type === 'tag'))
+  .join('circle')
+  .attr('class','tag-halo')
+  .attr('r', d => TYPE_RADII[d.type] + 12)
+  .attr('fill','none')
+  .attr('stroke', 'rgba(247,243,238,0.04)')
+  .attr('stroke-width', 1);
+
+// Draw nodes
+const nodeEls = nodeGroup.selectAll('.node')
+  .data(allNodes)
+  .join('circle')
+  .attr('class', d => 'node node-' + d.type)
+  .attr('r', d => TYPE_RADII[d.type])
+  .attr('fill', d => {
+    if (d.type === 'tag') return 'rgba(247,243,238,0.08)';
+    return TYPE_COLORS[d.type];
+  })
+  .attr('stroke', d => {
+    if (d.type === 'tag') return 'rgba(247,243,238,0.2)';
+    return 'rgba(247,243,238,0.3)';
+  })
+  .attr('stroke-width', d => d.type === 'tag' ? 1 : 1.5)
+  .style('filter', d => d.type !== 'tag' ? 'url(#glow)' : 'none')
+  .style('cursor','pointer')
+  .call(drag(simulation));
+
+// Draw tag labels
+const tagLabelEls = labelGroup.selectAll('.tag-label')
+  .data(allNodes.filter(d => d.type === 'tag'))
+  .join('text')
+  .attr('class','tag-label')
+  .text(d => d.label)
+  .attr('font-family','Figtree, sans-serif')
+  .attr('font-size','9px')
+  .attr('letter-spacing','0.1em')
+  .attr('text-transform','uppercase')
+  .attr('fill','rgba(247,243,238,0.4)')
+  .attr('text-anchor','middle')
+  .attr('dy','0.35em')
+  .style('pointer-events','none')
+  .style('user-select','none');
+
+// ── Interactions ──
+const hoverLabel = document.getElementById('hover-label');
+let activeNode = null;
+
+nodeEls
+  .on('mouseover', function(event, d) {
+    if (d.type === 'tag') return;
+    hoverLabel.textContent = d.title;
+    hoverLabel.style.opacity = '1';
+
+    d3.select(this)
+      .transition().duration(150)
+      .attr('r', TYPE_RADII[d.type] * 1.5)
+      .style('filter','url(#glow-strong)');
+
+    // Highlight connected links
+    linkEls
+      .attr('stroke', l => {
+        const src = typeof l.source === 'object' ? l.source.id : l.source;
+        const tgt = typeof l.target === 'object' ? l.target.id : l.target;
+        return (src === d.id || tgt === d.id)
+          ? TYPE_COLORS[d.type] || 'rgba(247,243,238,0.5)'
+          : 'rgba(247,243,238,0.04)';
+      })
+      .attr('stroke-width', l => {
+        const src = typeof l.source === 'object' ? l.source.id : l.source;
+        const tgt = typeof l.target === 'object' ? l.target.id : l.target;
+        return (src === d.id || tgt === d.id) ? 1.5 : 0.8;
+      });
+  })
+  .on('mousemove', function(event) {
+    hoverLabel.style.left = (event.clientX + 14) + 'px';
+    hoverLabel.style.top = (event.clientY - 8) + 'px';
+  })
+  .on('mouseout', function(event, d) {
+    if (d.type === 'tag') return;
+    hoverLabel.style.opacity = '0';
+    if (d.id !== (activeNode && activeNode.id)) {
+      d3.select(this)
+        .transition().duration(200)
+        .attr('r', TYPE_RADII[d.type])
+        .style('filter', d.type !== 'tag' ? 'url(#glow)' : 'none');
+    }
+    if (!activeNode) {
+      linkEls
+        .attr('stroke','rgba(247,243,238,0.06)')
+        .attr('stroke-width',1);
+    }
+  })
+  .on('click', function(event, d) {
+    event.stopPropagation();
+
+    if (d.type === 'tag') {
+      // Filter by tag: highlight all connected
+      const connectedIds = new Set();
+      links.forEach(l => {
+        const src = typeof l.source === 'object' ? l.source.id : l.source;
+        const tgt = typeof l.target === 'object' ? l.target.id : l.target;
+        if (src === d.id || tgt === d.id) {
+          connectedIds.add(src);
+          connectedIds.add(tgt);
+        }
+      });
+      nodeEls.attr('opacity', n => connectedIds.has(n.id) ? 1 : 0.1);
+      tagHalos.attr('opacity', n => connectedIds.has(n.id) ? 1 : 0.1);
+      tagLabelEls.attr('opacity', n => connectedIds.has(n.id) ? 1 : 0.1);
+      linkEls
+        .attr('stroke', l => {
+          const src = typeof l.source === 'object' ? l.source.id : l.source;
+          const tgt = typeof l.target === 'object' ? l.target.id : l.target;
+          return (src === d.id || tgt === d.id) ? 'rgba(247,243,238,0.3)' : 'rgba(247,243,238,0.02)';
+        })
+        .attr('stroke-width', l => {
+          const src = typeof l.source === 'object' ? l.source.id : l.source;
+          const tgt = typeof l.target === 'object' ? l.target.id : l.target;
+          return (src === d.id || tgt === d.id) ? 1.5 : 0.5;
+        });
+      return;
+    }
+
+    activeNode = d;
+
+    // Highlight constellation
+    const connectedTags = new Set(d.tags.map(t => 'tag-' + t));
+    const siblings = new Set();
+    allItems.forEach(item => {
+      if (item.id !== d.id && item.tags.some(t => d.tags.includes(t))) {
+        siblings.add(item.id);
+      }
+    });
+    const highlight = new Set([d.id, ...connectedTags, ...siblings]);
+
+    nodeEls.attr('opacity', n => highlight.has(n.id) ? 1 : 0.12);
+    tagHalos.attr('opacity', n => highlight.has(n.id) ? 1 : 0.05);
+    tagLabelEls.attr('opacity', n => highlight.has(n.id) ? 1 : 0.05);
+    linkEls
+      .attr('stroke', l => {
+        const src = typeof l.source === 'object' ? l.source.id : l.source;
+        const tgt = typeof l.target === 'object' ? l.target.id : l.target;
+        return (src === d.id || tgt === d.id) ? TYPE_COLORS[d.type] : 'rgba(247,243,238,0.02)';
+      })
+      .attr('stroke-width', l => {
+        const src = typeof l.source === 'object' ? l.source.id : l.source;
+        const tgt = typeof l.target === 'object' ? l.target.id : l.target;
+        return (src === d.id || tgt === d.id) ? 2 : 0.5;
+      });
+
+    // Show card
+    document.getElementById('card-type').textContent = 
+      d.type === 'article' ? 'Article · ' + (d.readTime || '') :
+      d.type === 'quote' ? 'Quote · ' + (d.author || '') :
+      'Work · ' + (d.medium || '');
+    document.getElementById('card-title').textContent = d.title;
+    document.getElementById('card-excerpt').textContent = d.excerpt || '';
+    const tagsEl = document.getElementById('card-tags');
+    tagsEl.innerHTML = '';
+    (d.tags || []).forEach(t => {
+      const span = document.createElement('span');
+      span.className = 'card-tag';
+      span.textContent = t;
+      span.style.cursor = 'pointer';
+      span.onclick = () => {
+        const tagNode = allNodes.find(n => n.id === 'tag-' + t);
+        if (tagNode) tagNode.__click && tagNode.__click();
+      };
+      tagsEl.appendChild(span);
+    });
+    const card = document.getElementById('node-card');
+    card.classList.add('visible');
+
+    d3.select(this)
+      .transition().duration(200)
+      .attr('r', TYPE_RADII[d.type] * 1.6)
+      .style('filter','url(#glow-strong)');
+  });
+
+// Click on background to reset
+svg.on('click', () => {
+  activeNode = null;
+  closeCard();
+  nodeEls.attr('opacity',1);
+  tagHalos.attr('opacity',1);
+  tagLabelEls.attr('opacity',1);
+  linkEls.attr('stroke','rgba(247,243,238,0.06)').attr('stroke-width',1);
+  nodeEls.transition().duration(200)
+    .attr('r', d => TYPE_RADII[d.type])
+    .style('filter', d => d.type !== 'tag' ? 'url(#glow)' : 'none');
+});
+
+// Simulation tick
+simulation.on('tick', () => {
+  linkEls
+    .attr('x1', d => d.source.x)
+    .attr('y1', d => d.source.y)
+    .attr('x2', d => d.target.x)
+    .attr('y2', d => d.target.y);
+
+  nodeEls
+    .attr('cx', d => d.x)
+    .attr('cy', d => d.y);
+
+  tagHalos
+    .attr('cx', d => d.x)
+    .attr('cy', d => d.y);
+
+  tagLabelEls
+    .attr('x', d => d.x)
+    .attr('y', d => d.y);
+});
+
+// Stats
+document.getElementById('stat-nodes').textContent = allNodes.length + ' nodes';
+document.getElementById('stat-links').textContent = links.length + ' connections';
+
+// Drag behavior
+function drag(sim) {
+  return d3.drag()
+    .on('start', (event, d) => {
+      if (!event.active) sim.alphaTarget(0.3).restart();
+      d.fx = d.x; d.fy = d.y;
+    })
+    .on('drag', (event, d) => {
+      d.fx = event.x; d.fy = event.y;
+    })
+    .on('end', (event, d) => {
+      if (!event.active) sim.alphaTarget(0);
+      d.fx = null; d.fy = null;
+    });
+}
+
+// Close card
+function closeCard() {
+  document.getElementById('node-card').classList.remove('visible');
+  activeNode = null;
+  nodeEls.attr('opacity',1);
+  tagHalos.attr('opacity',1);
+  tagLabelEls.attr('opacity',1);
+  linkEls.attr('stroke','rgba(247,243,238,0.06)').attr('stroke-width',1);
+  nodeEls.transition().duration(200)
+    .attr('r', d => TYPE_RADII[d.type])
+    .style('filter', d => d.type !== 'tag' ? 'url(#glow)' : 'none');
+}
+window.closeCard = closeCard;
+
+// Filter by type
+function filterType(type) {
+  document.querySelectorAll('.legend-item').forEach(el => el.classList.remove('dimmed'));
+  if (!type) {
+    nodeEls.attr('opacity',1);
+    tagHalos.attr('opacity',1);
+    tagLabelEls.attr('opacity',1);
+    linkEls.attr('stroke','rgba(247,243,238,0.06)').attr('stroke-width',1);
+    return;
+  }
+  nodeEls.attr('opacity', d => {
+    if (d.type === 'tag') return 1;
+    return d.type === type ? 1 : 0.1;
+  });
+}
+window.filterType = filterType;
+
+// Zoom controls
+function zoomIn() { svg.transition().call(zoom.scaleBy, 1.4); }
+function zoomOut() { svg.transition().call(zoom.scaleBy, 0.7); }
+function resetZoom() { svg.transition().call(zoom.transform, d3.zoomIdentity.translate(0,0).scale(1)); }
+window.zoomIn = zoomIn;
+window.zoomOut = zoomOut;
+window.resetZoom = resetZoom;
+
+// Search
+function searchWeb() {
+  const query = document.getElementById('search-input').value.toLowerCase().trim();
+  if (!query) { svg.dispatch('click'); return; }
+
+  const matched = new Set();
+  allNodes.forEach(n => {
+    if (
+      (n.title && n.title.toLowerCase().includes(query)) ||
+      (n.label && n.label.toLowerCase().includes(query)) ||
+      (n.tags && n.tags.some(t => t.includes(query))) ||
+      (n.excerpt && n.excerpt.toLowerCase().includes(query))
+    ) {
+      matched.add(n.id);
+    }
+  });
+
+  nodeEls.attr('opacity', d => matched.has(d.id) ? 1 : 0.08);
+  tagHalos.attr('opacity', d => matched.has(d.id) ? 1 : 0.05);
+  tagLabelEls.attr('opacity', d => matched.has(d.id) ? 1 : 0.05);
+}
+window.searchWeb = searchWeb;
+
+document.getElementById('search-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') searchWeb();
+  if (e.key === 'Escape') {
+    document.getElementById('search-input').value = '';
+    svg.dispatch('click');
+  }
+});
+
+// Handle resize
+window.addEventListener('resize', () => {
+  const W2 = canvas.clientWidth;
+  const H2 = canvas.clientHeight;
+  svg.attr('width', W2).attr('height', H2);
+  simulation.force('center', d3.forceCenter(W2/2, H2/2));
+  simulation.alpha(0.1).restart();
+});
+</script>
+
+<script type="module">
+import { supabase, getCurrentUser } from './supabase.js'
+const ROLE_LABELS = { librarian:'⬡ Librarian', curator:'◈ Curator', fellow:'✦ Fellow', reader:'◻ Reader' }
+async function initNav() {
+  const user = await getCurrentUser()
+  const profile = user?.profile
+  const navActions = document.getElementById('nav-actions')
+  if (!navActions) return
+  if (user && profile) {
+    const rl = ROLE_LABELS[profile.role] || '◻ Reader'
+    const dn = profile.display_name || profile.email
+    navActions.innerHTML = `
+      <span style="font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-faint);">${rl}</span>
+      <span style="font-size:13px;color:var(--ink-muted);font-family:'EB Garamond',serif;">${dn}</span>
+      <button class="btn-solid" id="so-btn">Sign Out</button>
+    `
+    document.getElementById('so-btn').onclick = async () => {
+      await supabase.auth.signOut(); location.href = 'index.html'
+    }
+    if (profile.role === 'librarian' || profile.role === 'curator') {
+      const bar = document.createElement('div')
+      bar.style.cssText = 'background:rgba(139,74,42,0.06);border-bottom:1px solid rgba(139,74,42,0.12);padding:7px 40px;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--sienna);display:flex;align-items:center;gap:24px;'
+      bar.innerHTML = '<span>⬡ Librarian View</span>'
+      document.querySelector('nav').after(bar)
+    }
+  } else {
+    if (navActions) navActions.innerHTML = '<a href="auth.html" class="btn-ghost">Sign In</a><a href="auth.html" class="btn-solid">Join</a>'
+  }
+}
+initNav()
+</script>
+</body>
+</html>

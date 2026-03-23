@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Morenita Observatory · Library of Morenita</title>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Figtree:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<style>
+:root {
+  --cream:#F7F3EE; --parchment:#EDE8E0; --ink:#1C1A17;
+  --ink-muted:#5C5750; --ink-faint:#9B968D;
+  --sienna:#8B4A2A; --sienna-light:#C47A55;
+  --sage:#5A6B55; --sage-light:#8BA683;
+  --gold:#C49A3C; --gold-light:#DDB96A;
+  --border:rgba(28,26,23,0.12); --border-strong:rgba(28,26,23,0.25);
+  --void:#0C0B09;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{width:100%;height:100%;overflow:hidden;}
+body{font-family:'Figtree',sans-serif;background:var(--void);color:var(--cream);}
+
+/* ── BANNER ── */
+.grid-banner{position:fixed;top:0;left:0;right:0;background:rgba(14,13,11,0.9);backdrop-filter:blur(8px);border-bottom:1px solid rgba(247,243,238,0.08);color:rgba(247,243,238,0.6);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;padding:7px 32px;display:flex;align-items:center;justify-content:space-between;z-index:200;}
+.grid-dot{width:7px;height:7px;border-radius:50%;background:#5A9E6A;display:inline-block;margin-right:8px;}
+
+/* ── NAV ── */
+nav{position:fixed;top:33px;left:0;right:0;background:rgba(14,13,11,0.92);backdrop-filter:blur(12px);border-bottom:1px solid rgba(247,243,238,0.08);padding:0 40px;display:flex;align-items:center;justify-content:space-between;height:60px;z-index:100;}
+.nav-logo{font-family:'EB Garamond',serif;font-size:17px;color:var(--cream);text-decoration:none;letter-spacing:0.03em;}
+.nav-logo em{font-style:italic;color:var(--sienna-light);}
+.nav-links{display:flex;gap:28px;list-style:none;}
+.nav-links a{font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:rgba(247,243,238,0.45);text-decoration:none;transition:color 0.2s;}
+.nav-links a:hover,.nav-links a.active{color:rgba(247,243,238,0.9);}
+.nav-actions{display:flex;align-items:center;gap:12px;}
+.btn-ghost{background:none;border:1px solid rgba(247,243,238,0.2);color:rgba(247,243,238,0.7);font-family:'Figtree',sans-serif;font-size:12px;letter-spacing:0.06em;text-transform:uppercase;padding:7px 16px;cursor:pointer;border-radius:2px;text-decoration:none;transition:all 0.2s;}
+.btn-ghost:hover{background:rgba(247,243,238,0.1);color:rgba(247,243,238,1);}
+.btn-solid{background:var(--sienna);border:1px solid var(--sienna);color:#fff;font-family:'Figtree',sans-serif;font-size:12px;letter-spacing:0.06em;text-transform:uppercase;padding:7px 16px;cursor:pointer;border-radius:2px;text-decoration:none;transition:all 0.2s;}
+.btn-solid:hover{background:var(--sienna-light);border-color:var(--sienna-light);}
+
+/* ── VIEW TOGGLE ── */
+.view-toggle{position:fixed;top:58px;left:50%;transform:translateX(-50%);z-index:150;display:flex;gap:0;margin-top:40px;}
+.view-btn{background:rgba(14,13,11,0.85);backdrop-filter:blur(8px);border:1px solid rgba(247,243,238,0.1);color:rgba(247,243,238,0.45);font-family:'Figtree',sans-serif;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;padding:8px 20px;cursor:pointer;transition:all 0.25s;}
+.view-btn:first-child{border-radius:2px 0 0 2px;}
+.view-btn:last-child{border-right:1px solid rgba(247,243,238,0.1);border-radius:0 2px 2px 0;}
+.view-btn.active{background:rgba(139,74,42,0.3);border-color:rgba(196,122,85,0.4);color:rgba(247,243,238,0.9);}
+
+/* ── CANVAS ── */
+#web-canvas{position:fixed;inset:0;top:93px;width:100%;height:calc(100% - 93px);}
+
+/* ── NODE CARD ── */
+#node-card{position:fixed;right:32px;top:50%;transform:translateY(-50%);width:290px;background:rgba(14,13,11,0.96);backdrop-filter:blur(16px);border:1px solid rgba(247,243,238,0.12);border-radius:4px;padding:28px 24px;z-index:150;opacity:0;pointer-events:none;transition:opacity 0.3s ease;}
+#node-card.visible{opacity:1;pointer-events:auto;}
+.card-type{font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--sienna-light);margin-bottom:12px;}
+.card-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;line-height:1.2;color:var(--cream);margin-bottom:10px;}
+.card-excerpt{font-family:'EB Garamond',serif;font-size:15px;color:rgba(247,243,238,0.55);line-height:1.6;font-style:italic;margin-bottom:16px;}
+.card-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px;}
+.card-tag{font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(247,243,238,0.4);border:1px solid rgba(247,243,238,0.15);padding:3px 8px;border-radius:2px;cursor:pointer;transition:all 0.2s;}
+.card-tag:hover{border-color:var(--sienna-light);color:var(--sienna-light);}
+.card-actions{display:flex;gap:8px;}
+.card-action{font-size:10px;letter-spacing:0.08em;text-transform:uppercase;padding:7px 14px;border-radius:2px;cursor:pointer;font-family:'Figtree',sans-serif;transition:all 0.2s;border:none;}
+.card-action.read{background:var(--sienna);color:#fff;}
+.card-action.read:hover{background:var(--sienna-light);}
+.card-action.save{background:rgba(247,243,238,0.08);color:rgba(247,243,238,0.6);border:1px solid rgba(247,243,238,0.12);}
+.card-action.save:hover{background:rgba(247,243,238,0.15);color:rgba(247,243,238,0.9);}
+.card-close{position:absolute;top:16px;right:16px;background:none;border:none;color:rgba(247,243,238,0.3);font-size:16px;cursor:pointer;line-height:1;transition:color 0.2s;}
+.card-close:hover{color:rgba(247,243,238,0.8);}
+
+/* ── LEGEND ── */
+#legend{position:fixed;left:32px;bottom:32px;z-index:150;background:rgba(14,13,11,0.85);backdrop-filter:blur(8px);border:1px solid rgba(247,243,238,0.1);border-radius:4px;padding:16px 20px;}
+.legend-title{font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(247,243,238,0.35);margin-bottom:12px;}
+.legend-item{display:flex;align-items:center;gap:10px;font-size:11px;color:rgba(247,243,238,0.55);cursor:pointer;transition:color 0.2s;margin-bottom:7px;}
+.legend-item:last-child{margin-bottom:0;}
+.legend-item:hover{color:rgba(247,243,238,0.9);}
+.legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+
+/* ── CONTROLS ── */
+#controls{position:fixed;left:32px;top:120px;z-index:150;display:flex;flex-direction:column;gap:6px;}
+.ctrl-btn{width:36px;height:36px;background:rgba(14,13,11,0.85);backdrop-filter:blur(8px);border:1px solid rgba(247,243,238,0.1);border-radius:3px;color:rgba(247,243,238,0.5);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;}
+.ctrl-btn:hover{background:rgba(247,243,238,0.08);color:rgba(247,243,238,0.9);}
+
+/* ── SEARCH ── */
+#web-search{position:fixed;top:110px;left:50%;transform:translateX(-50%);z-index:150;display:flex;gap:0;width:340px;}
+#web-search input{flex:1;background:rgba(14,13,11,0.9);backdrop-filter:blur(8px);border:1px solid rgba(247,243,238,0.12);border-right:none;color:var(--cream);font-family:'EB Garamond',serif;font-size:16px;font-style:italic;padding:9px 16px;outline:none;border-radius:2px 0 0 2px;}
+#web-search input::placeholder{color:rgba(247,243,238,0.25);}
+#web-search button{background:var(--sienna);border:1px solid var(--sienna);color:#fff;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;padding:9px 14px;cursor:pointer;font-family:'Figtree',sans-serif;border-radius:0 2px 2px 0;transition:background 0.2s;}
+#web-search button:hover{background:var(--sienna-light);}
+
+/* ── STATS ── */
+#web-stats{position:fixed;bottom:32px;right:32px;z-index:150;font-size:11px;color:rgba(247,243,238,0.2);letter-spacing:0.06em;text-align:right;line-height:1.8;}
+
+/* ── HOVER LABEL ── */
+.hover-label{position:fixed;background:rgba(14,13,11,0.9);backdrop-filter:blur(4px);border:1px solid rgba(247,243,238,0.12);color:rgba(247,243,238,0.85);font-family:'EB Garamond',serif;font-size:14px;padding:6px 12px;border-radius:2px;pointer-events:none;z-index:300;opacity:0;transition:opacity 0.15s;max-width:220px;line-height:1.4;}
+
+/* ── LOADING ── */
+#loading{position:fixed;inset:0;top:93px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;z-index:50;}
+.loading-title{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;color:rgba(247,243,238,0.6);}
+.loading-sub{font-family:'EB Garamond',serif;font-size:15px;color:rgba(247,243,238,0.25);font-style:italic;}
+.loading-dots{display:flex;gap:6px;}
+.loading-dot{width:5px;height:5px;border-radius:50%;background:var(--sienna-light);animation:dotPulse 1.2s ease-in-out infinite;}
+.loading-dot:nth-child(2){animation-delay:0.2s;}
+.loading-dot:nth-child(3){animation-delay:0.4s;}
+@keyframes dotPulse{0%,100%{opacity:0.2;transform:scale(0.8);}50%{opacity:1;transform:scale(1.2);}}
+
+/* ════════════════════════════════
+   MAGAZINE FLIP VIEW
+════════════════════════════════ */
+#flip-view{position:fixed;inset:0;top:93px;background:var(--void);z-index:40;display:none;overflow:hidden;}
+#flip-view.active{display:flex;flex-direction:column;}
+
+.flip-progress{height:2px;background:rgba(247,243,238,0.08);position:relative;flex-shrink:0;}
+.flip-progress-fill{height:100%;background:linear-gradient(90deg,var(--sienna),var(--sienna-light));transition:width 0.4s ease;}
+
+.flip-stage{flex:1;display:flex;align-items:center;justify-content:center;padding:60px 40px;position:relative;overflow:hidden;}
+
+.flip-card{width:100%;max-width:680px;animation:flipIn 0.5s ease;}
+@keyframes flipIn{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+
+/* Quote card */
+.flip-quote{text-align:center;padding:40px 0;}
+.flip-quote-mark{font-family:'Cormorant Garamond',serif;font-size:80px;color:rgba(196,122,85,0.2);line-height:0.8;margin-bottom:24px;}
+.flip-quote-text{font-family:'Cormorant Garamond',serif;font-size:clamp(24px,3.5vw,40px);font-weight:300;font-style:italic;color:rgba(247,243,238,0.9);line-height:1.3;margin-bottom:24px;}
+.flip-quote-author{font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(247,243,238,0.3);}
+
+/* Article card */
+.flip-article{padding:0;}
+.flip-article-tag{font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--sienna-light);margin-bottom:20px;display:flex;align-items:center;gap:12px;}
+.flip-article-tag::after{content:'';flex:1;height:1px;background:rgba(196,122,85,0.2);}
+.flip-article-title{font-family:'Cormorant Garamond',serif;font-size:clamp(32px,4.5vw,56px);font-weight:300;line-height:1.05;color:rgba(247,243,238,0.95);margin-bottom:20px;}
+.flip-article-title em{font-style:italic;color:var(--sienna-light);}
+.flip-article-excerpt{font-family:'EB Garamond',serif;font-size:20px;color:rgba(247,243,238,0.55);line-height:1.65;font-style:italic;margin-bottom:28px;}
+.flip-article-meta{font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:rgba(247,243,238,0.2);display:flex;gap:16px;align-items:center;}
+
+/* Tag card */
+.flip-tag{text-align:center;padding:60px 0;}
+.flip-tag-word{font-family:'Cormorant Garamond',serif;font-size:clamp(48px,8vw,100px);font-weight:300;color:rgba(247,243,238,0.08);letter-spacing:0.05em;margin-bottom:16px;}
+.flip-tag-count{font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(247,243,238,0.2);}
+.flip-tag-nodes{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:24px;}
+.flip-tag-node{font-size:12px;color:rgba(247,243,238,0.5);border:1px solid rgba(247,243,238,0.12);padding:5px 14px;border-radius:2px;cursor:pointer;transition:all 0.2s;}
+.flip-tag-node:hover{border-color:var(--sienna-light);color:var(--sienna-light);}
+
+/* Flip nav */
+.flip-nav{display:flex;align-items:center;justify-content:center;gap:20px;padding:24px;flex-shrink:0;border-top:1px solid rgba(247,243,238,0.06);}
+.flip-nav-btn{background:none;border:1px solid rgba(247,243,238,0.15);color:rgba(247,243,238,0.5);font-family:'Figtree',sans-serif;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;padding:9px 24px;cursor:pointer;border-radius:2px;transition:all 0.2s;}
+.flip-nav-btn:hover{background:rgba(247,243,238,0.08);color:rgba(247,243,238,0.9);}
+.flip-nav-btn:disabled{opacity:0.2;cursor:default;}
+.flip-counter{font-size:11px;letter-spacing:0.08em;color:rgba(247,243,238,0.2);}
+.flip-read-btn{background:var(--sienna);border:1px solid var(--sienna);color:#fff;font-family:'Figtree',sans-serif;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;padding:9px 24px;cursor:pointer;border-radius:2px;transition:all 0.2s;}
+.flip-read-btn:hover{background:var(--sienna-light);}
+
+@keyframes vizAnim{0%{transform:scaleY(0.3);}100%{transform:scaleY(1);}}
+</style>
+</head>
+<body>
+
+<div class="grid-banner">
+  <span><span class="grid-dot"></span>Morenita Observatory</span>
+  <span style="font-family:'EB Garamond',serif;font-style:italic;color:rgba(247,243,238,0.3);font-size:13px;">every idea, connected</span>
+</div>
+
+<nav>
+  <a href="index.html" class="nav-logo">Library of <em>Morenita</em></a>
+  <ul class="nav-links">
+    <li><a href="index.html">Archive</a></li>
+    <li><a href="observatory.html" class="active">Observatory</a></li>
+    <li><a href="academy.html">Academy</a></li>
+    <li><a href="write.html">Write</a></li>
+    <li><a href="builder.html">Create</a></li>
+  </ul>
+  <div class="nav-actions" id="nav-actions">
+    <a href="auth.html" class="btn-ghost">Sign In</a>
+    <a href="auth.html" class="btn-solid">Join</a>
+  </div>
+</nav>
+
+<!-- View Toggle -->
+<div class="view-toggle">
+  <button class="view-btn active" id="btn-web" onclick="setView('web')">✦ Observatory</button>
+  <button class="view-btn" id="btn-flip" onclick="setView('flip')">◻ Magazine Flip</button>
+</div>
+
+<!-- Search -->
+<div id="web-search">
+  <input type="text" placeholder="Search the constellation…" id="search-input">
+  <button onclick="searchWeb()">Find</button>
+</div>
+
+<!-- Controls -->
+<div id="controls">
+  <button class="ctrl-btn" onclick="zoomIn()">+</button>
+  <button class="ctrl-btn" onclick="zoomOut()">−</button>
+  <button class="ctrl-btn" onclick="resetZoom()">⌂</button>
+</div>
+
+<!-- Loading -->
+<div id="loading">
+  <div class="loading-title">Mapping the constellation</div>
+  <div class="loading-sub">Gathering ideas from the archive…</div>
+  <div class="loading-dots">
+    <div class="loading-dot"></div>
+    <div class="loading-dot"></div>
+    <div class="loading-dot"></div>
+  </div>
+</div>
+
+<!-- Web Canvas -->
+<svg id="web-canvas" style="display:none;"></svg>
+
+<!-- Node Card -->
+<div id="node-card">
+  <button class="card-close" onclick="closeCard()">✕</button>
+  <div class="card-type" id="card-type"></div>
+  <div class="card-title" id="card-title"></div>
+  <div class="card-excerpt" id="card-excerpt"></div>
+  <div class="card-tags" id="card-tags"></div>
+  <div class="card-actions">
+    <button class="card-action read" id="card-read">Read →</button>
+    <button class="card-action save" id="card-save" onclick="saveArticle()">+ Save</button>
+  </div>
+</div>
+
+<!-- Legend -->
+<div id="legend">
+  <div class="legend-title">Node Types</div>
+  <div class="legend-item" onclick="filterType('article')"><div class="legend-dot" style="background:#C47A55;"></div><span>Articles</span></div>
+  <div class="legend-item" onclick="filterType('quote')"><div class="legend-dot" style="background:#DDB96A;"></div><span>Quotes</span></div>
+  <div class="legend-item" onclick="filterType('image')"><div class="legend-dot" style="background:#8BA683;"></div><span>Works</span></div>
+  <div class="legend-item" onclick="filterType('tag')"><div class="legend-dot" style="background:rgba(247,243,238,0.15);border:1px solid rgba(247,243,238,0.3);"></div><span>Tags</span></div>
+  <div class="legend-item" onclick="filterType(null)" style="margin-top:4px;"><div class="legend-dot" style="background:transparent;border:1px dashed rgba(247,243,238,0.2);"></div><span style="color:rgba(247,243,238,0.3);">Show all</span></div>
+</div>
+
+<!-- Stats -->
+<div id="web-stats">
+  <div id="stat-nodes">— nodes</div>
+  <div id="stat-links">— connections</div>
+</div>
+
+<div class="hover-label" id="hover-label"></div>
+
+<!-- ═══════════════════════════════
+     MAGAZINE FLIP VIEW
+═══════════════════════════════ -->
+<div id="flip-view">
+  <div class="flip-progress"><div class="flip-progress-fill" id="flip-progress-fill"></div></div>
+  <div class="flip-stage" id="flip-stage"></div>
+  <div class="flip-nav">
+    <button class="flip-nav-btn" id="flip-prev" onclick="flipPrev()">← Previous</button>
+    <span class="flip-counter" id="flip-counter">1 of —</span>
+    <button class="flip-nav-btn" id="flip-next" onclick="flipNext()">Next →</button>
+  </div>
+</div>
+
+<script type="module">
+import { supabase, getCurrentUser } from './supabase.js'
+
+// ── FALLBACK DATA (shown while DB loads or if empty) ──
+const FALLBACK = [
+  { id:'f1', type:'article', title:'Ubuntu — I am because we are', excerpt:'The Nguni Bantu philosophy that places communal being at the center of personhood.', tags:['philosophy','africa','diaspora','spirituality'], read_time:'8 min' },
+  { id:'f2', type:'article', title:'The garment as living archive', excerpt:'West African textile traditions — aso-oke, kente, bogolanfini — encoding cosmology in cloth.', tags:['fashion-history','textiles','africa','art-history','resistance'], read_time:'11 min' },
+  { id:'f3', type:'article', title:'Rose hip, hibiscus, and the pharmacopeia of grandmothers', excerpt:'Before the apothecary, there was the kitchen windowsill.', tags:['herbalism','beauty-ritual','nature','feminism','science'], read_time:'12 min' },
+  { id:'f4', type:'article', title:'The Harlem Renaissance and self-determination', excerpt:'How Black artists in 1920s New York built a visual language of liberation.', tags:['art-history','diaspora','resistance','literature','music'], read_time:'15 min' },
+  { id:'f5', type:'article', title:'Indigo — the color that crossed oceans', excerpt:'From Yoruba adire to Japanese shibori, indigo as shared human inheritance.', tags:['textiles','fashion-history','africa','science','nature'], read_time:'9 min' },
+  { id:'f6', type:'article', title:'Sacred geometry in Moroccan architecture', excerpt:'The zellige, the muqarnas — pattern as spiritual practice.', tags:['architecture','africa','spirituality','art-history','philosophy'], read_time:'13 min' },
+  { id:'f7', type:'article', title:'The cello as infrastructure', excerpt:'How low strings hold the emotional foundation that allows the melody to soar.', tags:['music','philosophy','feminism'], read_time:'6 min' },
+  { id:'f8', type:'article', title:'Octavia Butler and the speculative Black imagination', excerpt:'Science fiction as a tool of liberation.', tags:['literature','science','resistance','diaspora','feminism'], read_time:'14 min' },
+  { id:'q1', type:'quote', title:'"The function of art is to imagine what is possible"', excerpt:'bell hooks on creative work as a site of liberation', tags:['art-history','literature','resistance','feminism'], author:'bell hooks' },
+  { id:'q2', type:'quote', title:'"Not everything that is faced can be changed"', excerpt:'James Baldwin on the necessity of confrontation', tags:['resistance','diaspora','philosophy','literature'], author:'James Baldwin' },
+  { id:'q3', type:'quote', title:'"Caring for myself is not self-indulgence"', excerpt:'Audre Lorde reclaims wellness as a political act', tags:['feminism','beauty-ritual','resistance','spirituality'], author:'Audre Lorde' },
+  { id:'i1', type:'image', title:'Indigo & Resistance', excerpt:'Textile work exploring the politics of natural dye.', tags:['textiles','resistance','art-history','africa'], medium:'Textile · 2025' },
+  { id:'i2', type:'image', title:'Botanical Grimoire Vol. I', excerpt:'Mixed media collage — herbarium meets magical text.', tags:['herbalism','nature','beauty-ritual','spirituality'], medium:'Mixed media · 2025' },
+]
+
+const TAXONOMY = ['philosophy','africa','diaspora','fashion-history','textiles','herbalism','beauty-ritual','art-history','music','literature','architecture','spirituality','science','resistance','feminism','nature']
+const TYPE_COLORS = { article:'#C47A55', quote:'#DDB96A', image:'#8BA683', tag:'rgba(247,243,238,0.08)' }
+const TYPE_RADII = { article:9, quote:7, image:8, tag:22 }
+
+let allNodes = [], links = [], simulation, svg, g, nodeEls, linkEls, tagHalos, tagLabelEls
+let currentUser = null, activeNode = null
+let flipItems = [], flipIndex = 0
+
+// ── LOAD DATA ──
+async function loadData() {
+  currentUser = await getCurrentUser()
+  initNavUI()
+
+  let items = []
+  try {
+    const { data, error } = await supabase
+      .from('articles')
+      .select('id, title, excerpt, type, tags, read_time, status')
+      .eq('status', 'published')
+    if (!error && data && data.length > 0) {
+      items = data
+    } else {
+      items = FALLBACK
+    }
+  } catch(e) {
+    items = FALLBACK
+  }
+
+  buildGraph(items)
+}
+
+// ── BUILD GRAPH ──
+function buildGraph(items) {
+  const usedTags = [...new Set(items.flatMap(d => d.tags || []))]
+  const tagNodes = usedTags.map(t => ({
+    id:'tag-'+t, type:'tag', label:t, title:t, tags:[t],
+    connections: items.filter(d => (d.tags||[]).includes(t)).length
+  }))
+  allNodes = [...items, ...tagNodes]
+  links = []
+  items.forEach(item => {
+    (item.tags||[]).forEach(tag => {
+      if (usedTags.includes(tag)) links.push({ source:item.id, target:'tag-'+tag, strength:0.3 })
+    })
+  })
+
+  document.getElementById('loading').style.display = 'none'
+  document.getElementById('web-canvas').style.display = 'block'
+  flipItems = items
+
+  initGraph()
+  initFlip()
+
+  document.getElementById('stat-nodes').textContent = allNodes.length + ' nodes'
+  document.getElementById('stat-links').textContent = links.length + ' connections'
+}
+
+// ── INIT GRAPH ──
+function initGraph() {
+  const canvas = document.getElementById('web-canvas')
+  const W = canvas.clientWidth, H = canvas.clientHeight
+  svg = d3.select('#web-canvas').attr('width',W).attr('height',H)
+
+  const defs = svg.append('defs')
+  const glow = defs.append('filter').attr('id','glow').attr('x','-50%').attr('y','-50%').attr('width','200%').attr('height','200%')
+  glow.append('feGaussianBlur').attr('stdDeviation','3.5').attr('result','coloredBlur')
+  const fm = glow.append('feMerge'); fm.append('feMergeNode').attr('in','coloredBlur'); fm.append('feMergeNode').attr('in','SourceGraphic')
+  const glowS = defs.append('filter').attr('id','glow-strong').attr('x','-100%').attr('y','-100%').attr('width','300%').attr('height','300%')
+  glowS.append('feGaussianBlur').attr('stdDeviation','8').attr('result','coloredBlur')
+  const fm2 = glowS.append('feMerge'); fm2.append('feMergeNode').attr('in','coloredBlur'); fm2.append('feMergeNode').attr('in','SourceGraphic')
+
+  const radialGrad = defs.append('radialGradient').attr('id','bg-grad').attr('cx','50%').attr('cy','50%').attr('r','70%')
+  radialGrad.append('stop').attr('offset','0%').attr('stop-color','#1C1917')
+  radialGrad.append('stop').attr('offset','100%').attr('stop-color','#0C0B09')
+  svg.append('rect').attr('width','100%').attr('height','100%').attr('fill','url(#bg-grad)')
+
+  const starG = svg.append('g')
+  d3.range(140).forEach(()=>{
+    starG.append('circle').attr('cx',Math.random()*W).attr('cy',Math.random()*H)
+      .attr('r',Math.random()*1.2).attr('fill','rgba(247,243,238,'+(Math.random()*0.2+0.03)+')')
+  })
+
+  g = svg.append('g')
+  const lG = g.append('g'), nG = g.append('g'), labG = g.append('g')
+
+  linkEls = lG.selectAll('line').data(links).join('line')
+    .attr('stroke','rgba(247,243,238,0.06)').attr('stroke-width',1)
+
+  tagHalos = nG.selectAll('.tag-halo').data(allNodes.filter(d=>d.type==='tag')).join('circle')
+    .attr('class','tag-halo').attr('r',d=>TYPE_RADII[d.type]+12)
+    .attr('fill','none').attr('stroke','rgba(247,243,238,0.04)').attr('stroke-width',1)
+
+  nodeEls = nG.selectAll('.node').data(allNodes).join('circle')
+    .attr('class',d=>'node node-'+d.type)
+    .attr('r',d=>TYPE_RADII[d.type])
+    .attr('fill',d=>d.type==='tag'?'rgba(247,243,238,0.08)':TYPE_COLORS[d.type])
+    .attr('stroke',d=>d.type==='tag'?'rgba(247,243,238,0.2)':'rgba(247,243,238,0.3)')
+    .attr('stroke-width',d=>d.type==='tag'?1:1.5)
+    .style('filter',d=>d.type!=='tag'?'url(#glow)':'none')
+    .style('cursor','pointer')
+    .call(drag(simulation))
+
+  tagLabelEls = labG.selectAll('.tag-label').data(allNodes.filter(d=>d.type==='tag')).join('text')
+    .attr('class','tag-label').text(d=>d.label)
+    .attr('font-family','Figtree,sans-serif').attr('font-size','9px')
+    .attr('letter-spacing','0.1em').attr('fill','rgba(247,243,238,0.4)')
+    .attr('text-anchor','middle').attr('dy','0.35em')
+    .style('pointer-events','none').style('user-select','none')
+
+  const hoverLabel = document.getElementById('hover-label')
+
+  nodeEls.on('mouseover',function(event,d){
+    if(d.type==='tag') return
+    hoverLabel.textContent=d.title; hoverLabel.style.opacity='1'
+    d3.select(this).transition().duration(150).attr('r',TYPE_RADII[d.type]*1.5).style('filter','url(#glow-strong)')
+    linkEls.attr('stroke',l=>{
+      const s=typeof l.source==='object'?l.source.id:l.source
+      const t=typeof l.target==='object'?l.target.id:l.target
+      return(s===d.id||t===d.id)?TYPE_COLORS[d.type]:'rgba(247,243,238,0.03)'
+    }).attr('stroke-width',l=>{
+      const s=typeof l.source==='object'?l.source.id:l.source
+      const t=typeof l.target==='object'?l.target.id:l.target
+      return(s===d.id||t===d.id)?1.5:0.5
+    })
+  })
+  .on('mousemove',function(event){ hoverLabel.style.left=(event.clientX+14)+'px'; hoverLabel.style.top=(event.clientY-8)+'px' })
+  .on('mouseout',function(event,d){
+    if(d.type==='tag') return
+    hoverLabel.style.opacity='0'
+    if(d.id!==(activeNode&&activeNode.id)){
+      d3.select(this).transition().duration(200).attr('r',TYPE_RADII[d.type]).style('filter',d.type!=='tag'?'url(#glow)':'none')
+    }
+    if(!activeNode){ linkEls.attr('stroke','rgba(247,243,238,0.06)').attr('stroke-width',1) }
+  })
+  .on('click',function(event,d){
+    event.stopPropagation()
+    if(d.type==='tag'){
+      const connected=new Set()
+      links.forEach(l=>{
+        const s=typeof l.source==='object'?l.source.id:l.source
+        const t=typeof l.target==='object'?l.target.id:l.target
+        if(s===d.id||t===d.id){connected.add(s);connected.add(t)}
+      })
+      nodeEls.attr('opacity',n=>connected.has(n.id)?1:0.08)
+      tagHalos.attr('opacity',n=>connected.has(n.id)?1:0.05)
+      tagLabelEls.attr('opacity',n=>connected.has(n.id)?1:0.05)
+      linkEls.attr('stroke',l=>{
+        const s=typeof l.source==='object'?l.source.id:l.source
+        const t=typeof l.target==='object'?l.target.id:l.target
+        return(s===d.id||t===d.id)?'rgba(247,243,238,0.3)':'rgba(247,243,238,0.02)'
+      }).attr('stroke-width',l=>{
+        const s=typeof l.source==='object'?l.source.id:l.source
+        const t=typeof l.target==='object'?l.target.id:l.target
+        return(s===d.id||t===d.id)?1.5:0.5
+      })
+      return
+    }
+    activeNode=d
+    const connected=new Set([...( d.tags||[]).map(t=>'tag-'+t)])
+    const siblings=new Set()
+    allNodes.forEach(n=>{ if(n.id!==d.id&&n.type!=='tag'&&(n.tags||[]).some(t=>(d.tags||[]).includes(t))) siblings.add(n.id) })
+    const highlight=new Set([d.id,...connected,...siblings])
+    nodeEls.attr('opacity',n=>highlight.has(n.id)?1:0.1)
+    tagHalos.attr('opacity',n=>highlight.has(n.id)?1:0.05)
+    tagLabelEls.attr('opacity',n=>highlight.has(n.id)?1:0.05)
+    linkEls.attr('stroke',l=>{
+      const s=typeof l.source==='object'?l.source.id:l.source
+      const t=typeof l.target==='object'?l.target.id:l.target
+      return(s===d.id||t===d.id)?TYPE_COLORS[d.type]:'rgba(247,243,238,0.02)'
+    }).attr('stroke-width',l=>{
+      const s=typeof l.source==='object'?l.source.id:l.source
+      const t=typeof l.target==='object'?l.target.id:l.target
+      return(s===d.id||t===d.id)?2:0.5
+    })
+    document.getElementById('card-type').textContent = d.type==='article'?'Article · '+(d.read_time||''):d.type==='quote'?'Quote · '+(d.author||''):'Work · '+(d.medium||'')
+    document.getElementById('card-title').textContent = d.title
+    document.getElementById('card-excerpt').textContent = d.excerpt||''
+    const tagsEl=document.getElementById('card-tags')
+    tagsEl.innerHTML=''
+    ;(d.tags||[]).forEach(t=>{ const s=document.createElement('span'); s.className='card-tag'; s.textContent=t; tagsEl.appendChild(s) })
+    document.getElementById('card-read').onclick = () => { if(d.id) window.location.href='article.html?id='+d.id }
+    document.getElementById('node-card').classList.add('visible')
+    d3.select(this).transition().duration(200).attr('r',TYPE_RADII[d.type]*1.6).style('filter','url(#glow-strong)')
+  })
+
+  svg.on('click',()=>{ activeNode=null; closeCard(); resetHighlight() })
+
+  simulation = d3.forceSimulation(allNodes)
+    .force('link',d3.forceLink(links).id(d=>d.id).distance(110).strength(0.3))
+    .force('charge',d3.forceManyBody().strength(d=>d.type==='tag'?-400:-200))
+    .force('center',d3.forceCenter(W/2,H/2))
+    .force('collision',d3.forceCollide().radius(d=>TYPE_RADII[d.type]+18))
+    .alphaDecay(0.015)
+
+  simulation.on('tick',()=>{
+    linkEls.attr('x1',d=>d.source.x).attr('y1',d=>d.source.y).attr('x2',d=>d.target.x).attr('y2',d=>d.target.y)
+    nodeEls.attr('cx',d=>d.x).attr('cy',d=>d.y)
+    tagHalos.attr('cx',d=>d.x).attr('cy',d=>d.y)
+    tagLabelEls.attr('x',d=>d.x).attr('y',d=>d.y)
+  })
+
+  const zoom = d3.zoom().scaleExtent([0.3,4]).on('zoom',event=>g.attr('transform',event.transform))
+  svg.call(zoom)
+  window.__zoom = zoom
+
+  window.zoomIn = ()=>svg.transition().call(zoom.scaleBy,1.4)
+  window.zoomOut = ()=>svg.transition().call(zoom.scaleBy,0.7)
+  window.resetZoom = ()=>svg.transition().call(zoom.transform,d3.zoomIdentity)
+}
+
+function drag(sim){
+  return d3.drag()
+    .on('start',(event,d)=>{ if(!event.active&&sim) sim.alphaTarget(0.3).restart(); d.fx=d.x;d.fy=d.y })
+    .on('drag',(event,d)=>{ d.fx=event.x;d.fy=event.y })
+    .on('end',(event,d)=>{ if(!event.active&&sim) sim.alphaTarget(0); d.fx=null;d.fy=null })
+}
+
+function resetHighlight(){
+  nodeEls.attr('opacity',1); tagHalos.attr('opacity',1); tagLabelEls.attr('opacity',1)
+  linkEls.attr('stroke','rgba(247,243,238,0.06)').attr('stroke-width',1)
+  nodeEls.transition().duration(200).attr('r',d=>TYPE_RADII[d.type]).style('filter',d=>d.type!=='tag'?'url(#glow)':'none')
+}
+
+window.closeCard = function(){
+  document.getElementById('node-card').classList.remove('visible')
+  activeNode=null; resetHighlight()
+}
+window.filterType = function(type){
+  if(!type){ resetHighlight(); return }
+  nodeEls.attr('opacity',d=>d.type===type||d.type==='tag'?1:0.08)
+}
+window.searchWeb = function(){
+  const q=document.getElementById('search-input').value.toLowerCase().trim()
+  if(!q){ resetHighlight(); return }
+  const matched=new Set()
+  allNodes.forEach(n=>{ if((n.title&&n.title.toLowerCase().includes(q))||(n.label&&n.label.toLowerCase().includes(q))||(n.tags&&n.tags.some(t=>t.includes(q)))) matched.add(n.id) })
+  nodeEls.attr('opacity',d=>matched.has(d.id)?1:0.06)
+  tagHalos.attr('opacity',d=>matched.has(d.id)?1:0.03)
+  tagLabelEls.attr('opacity',d=>matched.has(d.id)?1:0.03)
+}
+document.getElementById('search-input').addEventListener('keydown',e=>{ if(e.key==='Enter') searchWeb(); if(e.key==='Escape'){ document.getElementById('search-input').value=''; resetHighlight() } })
+
+window.saveArticle = async function(){
+  if(!currentUser||!activeNode) return
+  const btn=document.getElementById('card-save')
+  const { error } = await supabase.from('saves').upsert({ user_id:currentUser.id, article_id:activeNode.id })
+  if(!error){ btn.textContent='✓ Saved'; btn.style.color='var(--sage-light)' }
+}
+
+// ═══════════════════════════
+// MAGAZINE FLIP
+// ═══════════════════════════
+function initFlip(){
+  // Build flip deck: interleave articles, quotes, tag splash cards
+  const deck = []
+  let qi = 0, ai = 0
+  const quotes = flipItems.filter(i=>i.type==='quote')
+  const articles = flipItems.filter(i=>i.type!=='quote')
+  const tags = [...new Set(flipItems.flatMap(i=>i.tags||[]))]
+
+  // Every 3 articles insert a quote or tag card
+  articles.forEach((art,i)=>{
+    deck.push({ kind:'article', data:art })
+    if((i+1)%3===0){
+      if(qi < quotes.length){ deck.push({ kind:'quote', data:quotes[qi++] }) }
+      else if(tags[Math.floor(i/3)]){ deck.push({ kind:'tag', tag:tags[Math.floor(i/3)], items:articles.filter(a=>(a.tags||[]).includes(tags[Math.floor(i/3)])) }) }
+    }
+  })
+  flipItems = deck
+  renderFlipCard()
+}
+
+function renderFlipCard(){
+  const stage = document.getElementById('flip-stage')
+  const item = flipItems[flipIndex]
+  if(!item) return
+
+  // Progress
+  const pct = ((flipIndex+1)/flipItems.length)*100
+  document.getElementById('flip-progress-fill').style.width=pct+'%'
+  document.getElementById('flip-counter').textContent=(flipIndex+1)+' of '+flipItems.length
+  document.getElementById('flip-prev').disabled = flipIndex===0
+  document.getElementById('flip-next').disabled = flipIndex===flipItems.length-1
+
+  let html = ''
+  if(item.kind==='quote'){
+    const d=item.data
+    html=`<div class="flip-card flip-quote">
+      <div class="flip-quote-mark">"</div>
+      <div class="flip-quote-text">${d.title.replace(/"/g,'').replace(/"/g,'')}</div>
+      <div class="flip-quote-author">${d.author||d.excerpt||''}</div>
+    </div>`
+  } else if(item.kind==='tag'){
+    const related = (item.items||[]).slice(0,6)
+    html=`<div class="flip-card flip-tag">
+      <div class="flip-tag-word">${item.tag}</div>
+      <div class="flip-tag-count">${(item.items||[]).length} pieces in this constellation</div>
+      <div class="flip-tag-nodes">${related.map(a=>`<div class="flip-tag-node">${a.title}</div>`).join('')}</div>
+    </div>`
+  } else {
+    const d=item.data
+    const tagsHtml=(d.tags||[]).map(t=>`<span style="color:rgba(247,243,238,0.3);font-size:10px;letter-spacing:0.08em;border:1px solid rgba(247,243,238,0.1);padding:2px 8px;border-radius:2px;">${t}</span>`).join('')
+    html=`<div class="flip-card flip-article">
+      <div class="flip-article-tag">${(d.tags||['archive'])[0]}</div>
+      <div class="flip-article-title">${d.title}</div>
+      <div class="flip-article-excerpt">${d.excerpt||''}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px;">${tagsHtml}</div>
+      <div class="flip-article-meta">
+        <span>${d.read_time||''}</span>
+        ${d.id?`<button class="flip-read-btn" onclick="location.href='article.html?id=${d.id}'">Read full article →</button>`:''}
+      </div>
+    </div>`
+  }
+
+  stage.innerHTML = html
+}
+
+window.flipNext = function(){ if(flipIndex<flipItems.length-1){ flipIndex++; renderFlipCard() } }
+window.flipPrev = function(){ if(flipIndex>0){ flipIndex--; renderFlipCard() } }
+
+// Keyboard navigation
+document.addEventListener('keydown',e=>{
+  if(document.getElementById('flip-view').classList.contains('active')){
+    if(e.key==='ArrowRight'||e.key==='ArrowDown') flipNext()
+    if(e.key==='ArrowLeft'||e.key==='ArrowUp') flipPrev()
+  }
+})
+
+// ═══════════════════════════
+// VIEW TOGGLE
+// ═══════════════════════════
+window.setView = function(view){
+  document.getElementById('btn-web').classList.toggle('active',view==='web')
+  document.getElementById('btn-flip').classList.toggle('active',view==='flip')
+  document.getElementById('flip-view').classList.toggle('active',view==='flip')
+  document.getElementById('web-canvas').style.display = view==='web'?'block':'none'
+  document.getElementById('node-card').classList.remove('visible')
+  document.getElementById('legend').style.display = view==='web'?'block':'none'
+  document.getElementById('controls').style.display = view==='web'?'flex':'none'
+  document.getElementById('web-search').style.display = view==='web'?'flex':'none'
+  document.getElementById('web-stats').style.display = view==='web'?'block':'none'
+}
+
+// ═══════════════════════════
+// AUTH NAV
+// ═══════════════════════════
+function initNavUI(){
+  const navActions=document.getElementById('nav-actions')
+  const profile=currentUser?.profile
+  if(currentUser&&profile){
+    const ROLE_LABELS={librarian:'⬡ Librarian',curator:'◈ Curator',fellow:'✦ Fellow',reader:'◻ Reader'}
+    navActions.innerHTML=`
+      <span style="font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:rgba(247,243,238,0.3);">${ROLE_LABELS[profile.role]||'◻ Reader'}</span>
+      <span style="font-size:13px;color:rgba(247,243,238,0.6);font-family:'EB Garamond',serif;">${profile.display_name||profile.email}</span>
+      <button class="btn-solid" id="so-btn">Sign Out</button>
+    `
+    document.getElementById('so-btn').onclick=async()=>{ await supabase.auth.signOut(); location.href='index.html' }
+  }
+}
+
+loadData()
+</script>
+</body>
+</html>

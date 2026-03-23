@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Profile · Library of Morenita</title>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Figtree:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<style>
+:root {
+  --cream:#F7F3EE; --parchment:#EDE8E0; --ink:#1C1A17;
+  --ink-muted:#5C5750; --ink-faint:#9B968D;
+  --sienna:#8B4A2A; --sienna-light:#C47A55;
+  --sage:#5A6B55; --sage-light:#8BA683;
+  --gold:#C49A3C; --gold-light:#DDB96A;
+  --border:rgba(28,26,23,0.12); --border-strong:rgba(28,26,23,0.25);
+  --void:#0C0B09;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Figtree',sans-serif;background:var(--cream);color:var(--ink);}
+
+/* ── BANNER & NAV ── */
+.grid-banner{background:var(--ink);color:rgba(247,243,238,0.7);font-size:10px;letter-spacing:0.08em;text-transform:uppercase;padding:7px 32px;display:flex;align-items:center;justify-content:space-between;}
+.grid-dot{width:6px;height:6px;border-radius:50%;background:#5A9E6A;display:inline-block;margin-right:7px;}
+nav{background:var(--cream);border-bottom:1px solid var(--border);padding:0 40px;display:flex;align-items:center;justify-content:space-between;height:60px;position:sticky;top:0;z-index:100;}
+.nav-logo{font-family:'EB Garamond',serif;font-size:17px;color:var(--ink);text-decoration:none;letter-spacing:0.03em;}
+.nav-logo em{font-style:italic;color:var(--sienna);}
+.nav-links{display:flex;gap:28px;list-style:none;}
+.nav-links a{font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-muted);text-decoration:none;transition:color 0.2s;}
+.nav-links a:hover,.nav-links a.active{color:var(--ink);}
+.nav-actions{display:flex;align-items:center;gap:12px;}
+.btn-ghost{background:none;border:1px solid var(--border-strong);color:var(--ink);font-family:'Figtree',sans-serif;font-size:12px;letter-spacing:0.06em;text-transform:uppercase;padding:8px 18px;cursor:pointer;border-radius:2px;text-decoration:none;transition:all 0.2s;}
+.btn-ghost:hover{background:var(--ink);color:var(--cream);}
+.btn-solid{background:var(--ink);border:1px solid var(--ink);color:var(--cream);font-family:'Figtree',sans-serif;font-size:12px;letter-spacing:0.06em;text-transform:uppercase;padding:8px 18px;cursor:pointer;border-radius:2px;text-decoration:none;transition:all 0.2s;}
+.btn-solid:hover{background:var(--sienna);border-color:var(--sienna);}
+
+/* ── PROFILE HERO ── */
+.profile-hero{background:#fff;border-bottom:1px solid var(--border);}
+.profile-cover{height:200px;background:var(--void);position:relative;overflow:hidden;}
+.cover-pattern{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 40% 60%,rgba(139,74,42,0.3) 0%,transparent 70%);}
+.cover-stars{position:absolute;inset:0;}
+.profile-row{max-width:1100px;margin:0 auto;padding:0 40px 28px;display:flex;align-items:flex-end;gap:24px;}
+.profile-avatar{width:88px;height:88px;border-radius:50%;border:4px solid #fff;background:var(--parchment);margin-top:-44px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:30px;color:var(--sienna);overflow:hidden;}
+.profile-avatar img{width:100%;height:100%;object-fit:cover;}
+.profile-text{flex:1;padding-top:16px;}
+.profile-name{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:300;color:var(--ink);margin-bottom:2px;}
+.profile-handle{font-size:13px;color:var(--ink-faint);margin-bottom:6px;}
+.profile-bio{font-family:'EB Garamond',serif;font-size:16px;color:var(--ink-muted);font-style:italic;max-width:480px;}
+.profile-actions{display:flex;gap:10px;margin-top:14px;}
+.role-badge{font-size:9px;letter-spacing:0.12em;text-transform:uppercase;padding:4px 12px;border-radius:2px;}
+.role-badge.librarian{background:rgba(139,74,42,0.1);color:var(--sienna);border:1px solid rgba(139,74,42,0.2);}
+.role-badge.curator{background:rgba(196,154,60,0.1);color:var(--gold);border:1px solid rgba(196,154,60,0.2);}
+.role-badge.fellow{background:rgba(90,107,85,0.1);color:var(--sage);border:1px solid rgba(90,107,85,0.2);}
+.role-badge.reader{background:rgba(28,26,23,0.06);color:var(--ink-muted);border:1px solid var(--border);}
+
+.profile-stats{max-width:1100px;margin:0 auto;padding:14px 40px;border-top:1px solid var(--border);display:flex;gap:40px;}
+.stat-item{text-align:center;}
+.stat-num{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:300;color:var(--ink);display:block;}
+.stat-label{font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-faint);}
+
+/* ── TABS ── */
+.profile-tabs{border-bottom:1px solid var(--border);background:#fff;position:sticky;top:60px;z-index:90;padding:0 40px;display:flex;max-width:100%;}
+.profile-tab{background:none;border:none;border-bottom:2px solid transparent;font-family:'Figtree',sans-serif;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-faint);padding:16px 24px 14px;cursor:pointer;margin-bottom:-1px;transition:all 0.2s;}
+.profile-tab:hover{color:var(--ink-muted);}
+.profile-tab.active{color:var(--ink);border-bottom-color:var(--sienna);}
+
+.tab-pane{display:none;animation:fadeIn 0.3s ease;}
+.tab-pane.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+/* ── SECTION INNER ── */
+.section-inner{max-width:1100px;margin:0 auto;padding:40px 40px;}
+
+/* ── PORTFOLIO ── */
+.portfolio-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:24px;}
+.portfolio-header h2{font-family:'EB Garamond',serif;font-size:22px;font-weight:400;}
+.portfolio-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--border);border:1px solid var(--border);}
+.portfolio-item{aspect-ratio:1;overflow:hidden;position:relative;background:var(--parchment);cursor:pointer;}
+.portfolio-item img{width:100%;height:100%;object-fit:cover;transition:transform 0.4s ease;display:block;}
+.portfolio-item:hover img{transform:scale(1.05);}
+.portfolio-overlay{position:absolute;inset:0;background:rgba(28,26,23,0.75);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.3s;flex-direction:column;gap:6px;}
+.portfolio-item:hover .portfolio-overlay{opacity:1;}
+.portfolio-overlay span{font-family:'Cormorant Garamond',serif;font-size:17px;color:#F7F3EE;text-align:center;padding:0 16px;}
+.portfolio-overlay small{font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:rgba(247,243,238,0.55);}
+.add-work-card{aspect-ratio:1;display:flex;align-items:center;justify-content:center;background:none;border:1px dashed var(--border-strong);cursor:pointer;flex-direction:column;gap:8px;color:var(--ink-faint);transition:all 0.2s;}
+.add-work-card:hover{border-color:var(--sienna-light);color:var(--sienna);}
+
+/* ── MY CONSTELLATION ── */
+.constellation-wrap{height:560px;background:var(--void);border-radius:3px;overflow:hidden;position:relative;}
+.constellation-empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;color:rgba(247,243,238,0.3);}
+.constellation-empty h3{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;color:rgba(247,243,238,0.5);}
+.constellation-empty p{font-family:'EB Garamond',serif;font-size:16px;font-style:italic;}
+#constellation-svg{width:100%;height:100%;}
+.constellation-legend{display:flex;gap:20px;margin-top:16px;padding:0 4px;}
+.c-legend-item{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--ink-faint);}
+.c-legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+
+/* ── SAVED BOARDS ── */
+.boards-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:24px;}
+.boards-header h2{font-family:'EB Garamond',serif;font-size:22px;font-weight:400;}
+.boards-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+.board-card{background:#fff;border:1px solid var(--border);border-radius:3px;overflow:hidden;transition:border-color 0.2s,box-shadow 0.2s;}
+.board-card:hover{border-color:var(--border-strong);box-shadow:0 4px 20px rgba(28,26,23,0.07);}
+.board-cover{height:140px;background:var(--parchment);position:relative;overflow:hidden;}
+.board-cover-img{width:100%;height:100%;object-fit:cover;}
+.board-cover-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(28,26,23,0.5) 0%,transparent 60%);}
+.board-body{padding:18px 20px 20px;}
+.board-title{font-family:'EB Garamond',serif;font-size:18px;color:var(--ink);margin-bottom:4px;}
+.board-count{font-size:12px;color:var(--ink-faint);margin-bottom:16px;}
+.board-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:16px;}
+.board-tag{font-size:9px;letter-spacing:0.08em;text-transform:uppercase;color:var(--sienna);border:1px solid rgba(139,74,42,0.2);padding:2px 8px;border-radius:2px;}
+.board-actions{display:flex;gap:8px;}
+.board-btn{flex:1;background:none;border:1px solid var(--border);color:var(--ink-muted);font-family:'Figtree',sans-serif;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;padding:7px 10px;cursor:pointer;border-radius:2px;transition:all 0.2s;}
+.board-btn:hover{background:var(--ink);color:var(--cream);border-color:var(--ink);}
+.board-btn.convert{background:var(--sienna);color:#fff;border-color:var(--sienna);}
+.board-btn.convert:hover{background:var(--ink);}
+.new-board-card{background:none;border:1px dashed var(--border-strong);border-radius:3px;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:260px;cursor:pointer;gap:10px;color:var(--ink-faint);transition:all 0.2s;}
+.new-board-card:hover{border-color:var(--sienna-light);color:var(--sienna);}
+
+/* ── CURRICULUM MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(28,26,23,0.6);z-index:500;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--cream);border-radius:4px;padding:40px;width:100%;max-width:580px;max-height:80vh;overflow-y:auto;position:relative;}
+.modal-close{position:absolute;top:20px;right:20px;background:none;border:none;font-size:18px;color:var(--ink-faint);cursor:pointer;transition:color 0.2s;}
+.modal-close:hover{color:var(--ink);}
+.modal-title{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;color:var(--ink);margin-bottom:6px;}
+.modal-title em{font-style:italic;color:var(--sienna);}
+.modal-sub{font-family:'EB Garamond',serif;font-size:16px;color:var(--ink-faint);font-style:italic;margin-bottom:28px;}
+.modal-field{margin-bottom:20px;}
+.modal-label{display:block;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-muted);margin-bottom:8px;}
+.modal-input,.modal-textarea{width:100%;border:1px solid var(--border);background:#fff;color:var(--ink);font-family:'EB Garamond',serif;font-size:17px;padding:10px 14px;border-radius:2px;outline:none;transition:border-color 0.2s;}
+.modal-input:focus,.modal-textarea:focus{border-color:var(--sienna-light);}
+.modal-textarea{resize:vertical;min-height:80px;}
+.lesson-order{display:flex;flex-direction:column;gap:8px;margin-top:4px;}
+.lesson-row{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--border);border-radius:2px;padding:10px 14px;}
+.lesson-num{font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-faint);min-width:52px;}
+.lesson-title-text{flex:1;font-family:'EB Garamond',serif;font-size:15px;color:var(--ink);}
+.lesson-week{width:80px;border:1px solid var(--border);border-radius:2px;font-size:13px;padding:4px 8px;outline:none;font-family:'Figtree',sans-serif;}
+.modal-actions{display:flex;gap:10px;margin-top:28px;}
+.modal-btn{flex:1;padding:12px;border-radius:2px;cursor:pointer;font-family:'Figtree',sans-serif;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;transition:all 0.2s;border:none;}
+.modal-btn.primary{background:var(--sienna);color:#fff;}
+.modal-btn.primary:hover{background:var(--ink);}
+.modal-btn.secondary{background:none;border:1px solid var(--border-strong);color:var(--ink);}
+.modal-btn.secondary:hover{background:var(--ink);color:var(--cream);}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--cream);font-size:12px;letter-spacing:0.06em;padding:12px 24px;border-radius:2px;z-index:600;opacity:0;transition:opacity 0.3s;pointer-events:none;}
+.toast.show{opacity:1;}
+
+/* ── EMPTY STATE ── */
+.empty-state{text-align:center;padding:64px 40px;color:var(--ink-faint);}
+.empty-state h3{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;margin-bottom:8px;color:var(--ink-muted);}
+.empty-state p{font-family:'EB Garamond',serif;font-size:16px;font-style:italic;}
+
+@media(max-width:800px){
+  .portfolio-grid{grid-template-columns:repeat(2,1fr);}
+  .boards-grid{grid-template-columns:1fr;}
+  .profile-row{flex-direction:column;align-items:flex-start;}
+}
+</style>
+</head>
+<body>
+
+<div class="grid-banner">
+  <span><span class="grid-dot"></span>Grid: Moderate · Library of Morenita</span>
+</div>
+
+<nav>
+  <a href="index.html" class="nav-logo">Library of <em>Morenita</em></a>
+  <ul class="nav-links">
+    <li><a href="index.html">Archive</a></li>
+    <li><a href="observatory.html">Observatory</a></li>
+    <li><a href="academy.html">Academy</a></li>
+    <li><a href="write.html">Write</a></li>
+    <li><a href="builder.html">Create</a></li>
+  </ul>
+  <div class="nav-actions" id="nav-actions">
+    <a href="auth.html" class="btn-ghost">Sign In</a>
+    <a href="auth.html" class="btn-solid">Join</a>
+  </div>
+</nav>
+
+<!-- ── PROFILE HERO ── -->
+<div class="profile-hero">
+  <div class="profile-cover">
+    <div class="cover-pattern"></div>
+    <svg class="cover-stars" viewBox="0 0 1200 200" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+      <circle cx="100" cy="40" r="1" fill="rgba(255,255,255,0.4)"/>
+      <circle cx="240" cy="80" r="1.5" fill="rgba(255,255,255,0.3)"/>
+      <circle cx="380" cy="30" r="1" fill="rgba(255,255,255,0.5)"/>
+      <circle cx="520" cy="100" r="0.8" fill="rgba(255,255,255,0.4)"/>
+      <circle cx="680" cy="50" r="1.2" fill="rgba(255,255,255,0.3)"/>
+      <circle cx="820" cy="90" r="1" fill="rgba(255,255,255,0.5)"/>
+      <circle cx="960" cy="25" r="0.8" fill="rgba(255,255,255,0.4)"/>
+      <circle cx="1100" cy="70" r="1.5" fill="rgba(255,255,255,0.3)"/>
+      <circle cx="160" cy="150" r="1" fill="rgba(255,255,255,0.3)"/>
+      <circle cx="460" cy="160" r="0.8" fill="rgba(255,255,255,0.4)"/>
+      <circle cx="740" cy="140" r="1.2" fill="rgba(255,255,255,0.3)"/>
+      <circle cx="1020" cy="155" r="1" fill="rgba(255,255,255,0.4)"/>
+    </svg>
+  </div>
+  <div class="profile-row">
+    <div class="profile-avatar" id="profile-avatar">A</div>
+    <div class="profile-text">
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+        <div class="profile-name" id="profile-name">Loading…</div>
+        <span class="role-badge" id="role-badge"></span>
+      </div>
+      <div class="profile-handle" id="profile-handle"></div>
+      <div class="profile-bio" id="profile-bio">Loading your library…</div>
+      <div class="profile-actions">
+        <button class="btn-solid" onclick="editProfile()">Edit Profile</button>
+        <button class="btn-ghost" onclick="shareProfile()">Share</button>
+      </div>
+    </div>
+  </div>
+  <div class="profile-stats">
+    <div class="stat-item"><span class="stat-num" id="stat-works">0</span><span class="stat-label">Works</span></div>
+    <div class="stat-item"><span class="stat-num" id="stat-saves">0</span><span class="stat-label">Saved</span></div>
+    <div class="stat-item"><span class="stat-num" id="stat-boards">0</span><span class="stat-label">Boards</span></div>
+    <div class="stat-item"><span class="stat-num" id="stat-nodes">0</span><span class="stat-label">Constellation Nodes</span></div>
+  </div>
+</div>
+
+<!-- ── TABS ── -->
+<div class="profile-tabs">
+  <button class="profile-tab active" onclick="switchTab('portfolio',this)">Portfolio</button>
+  <button class="profile-tab" onclick="switchTab('constellation',this)">My Constellation</button>
+  <button class="profile-tab" onclick="switchTab('boards',this)">Saved Boards</button>
+</div>
+
+<!-- ════════════════ PORTFOLIO ════════════════ -->
+<div id="tab-portfolio" class="tab-pane active">
+  <div class="section-inner">
+    <div class="portfolio-header">
+      <h2>Portfolio</h2>
+      <button class="btn-ghost" style="font-size:11px;" onclick="showToast('Article upload coming soon')">＋ Add Work</button>
+    </div>
+    <div class="portfolio-grid" id="portfolio-grid">
+      <!-- Populated by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════ MY CONSTELLATION ════════════════ -->
+<div id="tab-constellation" class="tab-pane">
+  <div class="section-inner">
+    <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:20px;">
+      <div>
+        <h2 style="font-family:'EB Garamond',serif;font-size:22px;font-weight:400;margin-bottom:4px;">My Constellation</h2>
+        <p style="font-family:'EB Garamond',serif;font-size:15px;color:var(--ink-faint);font-style:italic;">Your saved articles and written works, mapped by connection.</p>
+      </div>
+      <a href="observatory.html" style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-faint);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='var(--sienna)'" onmouseout="this.style.color='var(--ink-faint)'">View Observatory →</a>
+    </div>
+
+    <div class="constellation-wrap">
+      <div class="constellation-empty" id="constellation-empty" style="display:none;">
+        <h3>Your constellation is empty</h3>
+        <p>Save articles in the Observatory to start building your personal map.</p>
+      </div>
+      <svg id="constellation-svg"></svg>
+    </div>
+
+    <div class="constellation-legend">
+      <div class="c-legend-item"><div class="c-legend-dot" style="background:#C47A55;"></div>Your articles</div>
+      <div class="c-legend-item"><div class="c-legend-dot" style="background:#DDB96A;"></div>Saved quotes</div>
+      <div class="c-legend-item"><div class="c-legend-dot" style="background:#8BA683;"></div>Saved articles</div>
+      <div class="c-legend-item"><div class="c-legend-dot" style="background:rgba(28,26,23,0.15);border:1px solid rgba(28,26,23,0.2);"></div>Tags</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════ SAVED BOARDS ════════════════ -->
+<div id="tab-boards" class="tab-pane">
+  <div class="section-inner">
+    <div class="boards-header">
+      <h2>Saved Boards</h2>
+      <button class="btn-ghost" style="font-size:11px;" onclick="openNewBoard()">＋ New Board</button>
+    </div>
+    <div class="boards-grid" id="boards-grid">
+      <!-- Populated by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════ CURRICULUM MODAL ════════════════ -->
+<div class="modal-overlay" id="curriculum-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-title">Propose a <em>Track</em></div>
+    <div class="modal-sub">Turn this board into a curriculum — ordered by week, submitted for Librarian approval.</div>
+
+    <div class="modal-field">
+      <label class="modal-label">Track Title</label>
+      <input class="modal-input" id="track-title" type="text" placeholder="e.g. The Botanical Body">
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">Description</label>
+      <textarea class="modal-textarea" id="track-desc" placeholder="What will students learn? Who is this for?"></textarea>
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">Lesson Order <span style="color:var(--ink-faint);font-size:9px;">(assign each article a week)</span></label>
+      <div class="lesson-order" id="lesson-order"></div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="modal-btn secondary" onclick="closeModal()">Cancel</button>
+      <button class="modal-btn primary" onclick="submitTrack()" id="submit-track-btn">Submit for Approval</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { supabase, getCurrentUser } from './supabase.js'
+
+let currentUser = null
+let currentProfile = null
+let myArticles = []
+let mySaves = []
+let myBoards = []
+let activeBoard = null
+
+// ── INIT ──
+async function init() {
+  currentUser = await getCurrentUser()
+  if (!currentUser) { window.location.href = 'auth.html'; return }
+  currentProfile = currentUser.profile
+  renderProfileHero()
+  initNavUI()
+  await Promise.all([loadMyArticles(), loadMySaves(), loadMyBoards()])
+  renderPortfolio()
+  renderConstellation()
+  renderBoards()
+  loadStats()
+}
+
+// ── PROFILE HERO ──
+function renderProfileHero() {
+  const p = currentProfile
+  if (!p) return
+  document.getElementById('profile-name').textContent = p.display_name || p.email
+  document.getElementById('profile-handle').textContent = (p.handle ? '@'+p.handle : p.email) + (p.location ? ' · '+p.location : '')
+  document.getElementById('profile-bio').textContent = p.bio || 'Welcome to your Library of Morenita.'
+  document.getElementById('profile-avatar').textContent = (p.display_name||'A')[0].toUpperCase()
+  const badge = document.getElementById('role-badge')
+  const labels = { librarian:'⬡ Librarian', curator:'◈ Curator', fellow:'✦ Fellow', reader:'◻ Reader' }
+  badge.textContent = labels[p.role] || '◻ Reader'
+  badge.className = 'role-badge ' + (p.role || 'reader')
+}
+
+// ── LOAD DATA ──
+async function loadMyArticles() {
+  if (!currentUser) return
+  const { data } = await supabase.from('articles').select('*').eq('author_id', currentUser.id)
+  myArticles = data || []
+}
+
+async function loadMySaves() {
+  if (!currentUser) return
+  const { data } = await supabase.from('saves').select('*, articles(*)').eq('user_id', currentUser.id)
+  mySaves = (data || []).map(s => s.articles).filter(Boolean)
+}
+
+async function loadMyBoards() {
+  if (!currentUser) return
+  const { data } = await supabase.from('collections').select('*, collection_items(*, articles(*))').eq('user_id', currentUser.id)
+  myBoards = data || []
+}
+
+function loadStats() {
+  document.getElementById('stat-works').textContent = myArticles.length
+  document.getElementById('stat-saves').textContent = mySaves.length
+  document.getElementById('stat-boards').textContent = myBoards.length
+  document.getElementById('stat-nodes').textContent = [...new Set([...myArticles,...mySaves].flatMap(a=>a.tags||[]))].length
+}
+
+// ── PORTFOLIO ──
+function renderPortfolio() {
+  const grid = document.getElementById('portfolio-grid')
+  const allWorks = [...myArticles, ...mySaves].slice(0, 11)
+
+  if (allWorks.length === 0) {
+    grid.innerHTML = `<div style="grid-column:1/-1;" class="empty-state"><h3>Your portfolio is empty</h3><p>Write your first article or save pieces from the archive.</p></div>`
+    return
+  }
+
+  grid.innerHTML = allWorks.map(a => `
+    <div class="portfolio-item" onclick="location.href='article.html?id=${a.id}'">
+      ${a.cover_image ? `<img src="${a.cover_image}" alt="${a.title}">` : `<div style="width:100%;height:100%;background:var(--parchment);display:flex;align-items:center;justify-content:center;padding:20px;"><div style="font-family:'EB Garamond',serif;font-size:16px;color:var(--ink-muted);text-align:center;line-height:1.4;">${a.title}</div></div>`}
+      <div class="portfolio-overlay">
+        <span>${a.title}</span>
+        <small>${(a.tags||[])[0]||'Archive'} · ${a.type||'article'}</small>
+      </div>
+    </div>
+  `).join('') + `
+    <div class="add-work-card" onclick="showToast('Upload coming soon')">
+      <div style="font-size:28px;font-weight:300;">＋</div>
+      <div style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase;">Add work</div>
+    </div>`
+}
+
+// ── MY CONSTELLATION ──
+function renderConstellation() {
+  const allItems = [...myArticles, ...mySaves]
+  if (allItems.length === 0) {
+    document.getElementById('constellation-empty').style.display = 'flex'
+    return
+  }
+
+  const TYPE_COLORS_DARK = {
+    article: '#C47A55',
+    quote: '#DDB96A',
+    image: '#8BA683',
+    tag: 'rgba(28,26,23,0.15)'
+  }
+  const saved_ids = new Set(mySaves.map(s=>s.id))
+
+  // Color: own articles sienna, saves sage
+  const coloredItems = allItems.map(a => ({
+    ...a,
+    _color: myArticles.find(m=>m.id===a.id) ? '#C47A55' : '#8BA683'
+  }))
+
+  const usedTags = [...new Set(coloredItems.flatMap(d=>d.tags||[]))]
+  const tagNodes = usedTags.map(t=>({
+    id:'tag-'+t, type:'tag', label:t, title:t, tags:[t]
+  }))
+  const allNodes = [...coloredItems, ...tagNodes]
+  const links = []
+  coloredItems.forEach(item=>{
+    (item.tags||[]).forEach(tag=>{
+      if(usedTags.includes(tag)) links.push({ source:item.id, target:'tag-'+tag })
+    })
+  })
+
+  const container = document.getElementById('constellation-svg').parentElement
+  const W = container.clientWidth
+  const H = 560
+
+  const svg = d3.select('#constellation-svg').attr('width',W).attr('height',H)
+
+  const defs = svg.append('defs')
+  const glow = defs.append('filter').attr('id','c-glow').attr('x','-50%').attr('y','-50%').attr('width','200%').attr('height','200%')
+  glow.append('feGaussianBlur').attr('stdDeviation','3').attr('result','coloredBlur')
+  const fm = glow.append('feMerge'); fm.append('feMergeNode').attr('in','coloredBlur'); fm.append('feMergeNode').attr('in','SourceGraphic')
+
+  const bg = defs.append('radialGradient').attr('id','c-bg').attr('cx','50%').attr('cy','50%').attr('r','70%')
+  bg.append('stop').attr('offset','0%').attr('stop-color','#1A1815')
+  bg.append('stop').attr('offset','100%').attr('stop-color','#0C0B09')
+  svg.append('rect').attr('width','100%').attr('height','100%').attr('fill','url(#c-bg)')
+
+  // Stars
+  d3.range(60).forEach(()=>{
+    svg.append('circle').attr('cx',Math.random()*W).attr('cy',Math.random()*H)
+      .attr('r',Math.random()*0.8).attr('fill','rgba(247,243,238,'+(Math.random()*0.15+0.02)+')')
+  })
+
+  const g = svg.append('g')
+  const lG = g.append('g'), nG = g.append('g'), labG = g.append('g')
+
+  const linkEls = lG.selectAll('line').data(links).join('line')
+    .attr('stroke','rgba(247,243,238,0.07)').attr('stroke-width',1)
+
+  const nodeEls = nG.selectAll('circle').data(allNodes).join('circle')
+    .attr('r', d => d.type==='tag' ? 18 : 7)
+    .attr('fill', d => d.type==='tag' ? 'rgba(247,243,238,0.06)' : d._color || '#C47A55')
+    .attr('stroke', d => d.type==='tag' ? 'rgba(247,243,238,0.15)' : 'rgba(247,243,238,0.3)')
+    .attr('stroke-width', d => d.type==='tag' ? 1 : 1.5)
+    .style('filter', d => d.type!=='tag' ? 'url(#c-glow)' : 'none')
+    .style('cursor', 'pointer')
+    .on('click', (event,d) => {
+      if(d.type!=='tag') window.location.href='article.html?id='+d.id
+    })
+    .call(d3.drag()
+      .on('start',(event,d)=>{ if(!event.active) sim.alphaTarget(0.3).restart(); d.fx=d.x;d.fy=d.y })
+      .on('drag',(event,d)=>{ d.fx=event.x;d.fy=event.y })
+      .on('end',(event,d)=>{ if(!event.active) sim.alphaTarget(0); d.fx=null;d.fy=null })
+    )
+
+  const tagLabels = labG.selectAll('text').data(allNodes.filter(d=>d.type==='tag')).join('text')
+    .text(d=>d.label).attr('font-family','Figtree,sans-serif').attr('font-size','8px')
+    .attr('fill','rgba(247,243,238,0.35)').attr('text-anchor','middle').attr('dy','0.35em')
+    .style('pointer-events','none').style('user-select','none')
+
+  const sim = d3.forceSimulation(allNodes)
+    .force('link',d3.forceLink(links).id(d=>d.id).distance(80).strength(0.4))
+    .force('charge',d3.forceManyBody().strength(d=>d.type==='tag'?-300:-150))
+    .force('center',d3.forceCenter(W/2,H/2))
+    .force('collision',d3.forceCollide().radius(d=>d.type==='tag'?30:14))
+    .alphaDecay(0.02)
+
+  sim.on('tick',()=>{
+    linkEls.attr('x1',d=>d.source.x).attr('y1',d=>d.source.y).attr('x2',d=>d.target.x).attr('y2',d=>d.target.y)
+    nodeEls.attr('cx',d=>d.x).attr('cy',d=>d.y)
+    tagLabels.attr('x',d=>d.x).attr('y',d=>d.y)
+  })
+
+  const zoom = d3.zoom().scaleExtent([0.4,3]).on('zoom',e=>g.attr('transform',e.transform))
+  svg.call(zoom)
+
+  document.getElementById('stat-nodes').textContent = allNodes.length
+}
+
+// ── BOARDS ──
+function renderBoards() {
+  const grid = document.getElementById('boards-grid')
+
+  const boardsHtml = myBoards.map(board => {
+    const items = (board.collection_items||[]).map(ci=>ci.articles).filter(Boolean)
+    const tags = [...new Set(items.flatMap(a=>a?.tags||[]))].slice(0,4)
+    return `
+      <div class="board-card">
+        <div class="board-cover">
+          ${items[0]?.cover_image ? `<img class="board-cover-img" src="${items[0].cover_image}">` : `<div style="width:100%;height:100%;background:linear-gradient(135deg,var(--parchment),var(--cream));"></div>`}
+          <div class="board-cover-overlay"></div>
+        </div>
+        <div class="board-body">
+          <div class="board-title">${board.title}</div>
+          <div class="board-count">${items.length} article${items.length!==1?'s':''}</div>
+          <div class="board-tags">${tags.map(t=>`<span class="board-tag">${t}</span>`).join('')}</div>
+          <div class="board-actions">
+            <button class="board-btn" onclick="viewBoard('${board.id}')">View</button>
+            <button class="board-btn convert" onclick="openCurriculum('${board.id}')">→ Propose Track</button>
+          </div>
+        </div>
+      </div>`
+  }).join('')
+
+  grid.innerHTML = boardsHtml + `
+    <div class="new-board-card" onclick="openNewBoard()">
+      <div style="font-size:28px;font-weight:300;">＋</div>
+      <div style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase;">New Board</div>
+    </div>`
+}
+
+// ── CURRICULUM MODAL ──
+window.openCurriculum = function(boardId) {
+  activeBoard = myBoards.find(b=>b.id===boardId)
+  if(!activeBoard) return
+
+  document.getElementById('track-title').value = activeBoard.title
+  document.getElementById('track-desc').value = ''
+
+  const items = (activeBoard.collection_items||[]).map(ci=>ci.articles).filter(Boolean)
+  const orderEl = document.getElementById('lesson-order')
+  orderEl.innerHTML = items.map((a,i)=>`
+    <div class="lesson-row" data-id="${a.id}">
+      <span class="lesson-num">Lesson ${i+1}</span>
+      <span class="lesson-title-text">${a.title}</span>
+      <input class="lesson-week" type="number" min="1" max="12" value="${Math.ceil((i+1)/2)}" placeholder="Week">
+    </div>
+  `).join('')
+
+  document.getElementById('curriculum-modal').classList.add('open')
+}
+
+window.closeModal = function(){
+  document.getElementById('curriculum-modal').classList.remove('open')
+}
+
+window.submitTrack = async function() {
+  const title = document.getElementById('track-title').value.trim()
+  const desc = document.getElementById('track-desc').value.trim()
+  if(!title){ showToast('Add a track title first'); return }
+
+  const btn = document.getElementById('submit-track-btn')
+  btn.disabled = true; btn.textContent = 'Submitting…'
+
+  // Create the track
+  const { data: track, error } = await supabase.from('curriculum_tracks').insert({
+    title, description: desc,
+    proposed_by: currentUser.id,
+    status: currentProfile?.role==='librarian'?'approved':'proposed',
+    tags: activeBoard ? [...new Set((activeBoard.collection_items||[]).flatMap(ci=>(ci.articles?.tags||[])))] : []
+  }).select().single()
+
+  if(error){ showToast('Error: '+error.message); btn.disabled=false; btn.textContent='Submit for Approval'; return }
+
+  // Create lessons
+  const rows = document.querySelectorAll('.lesson-row')
+  const lessons = Array.from(rows).map((row,i)=>({
+    track_id: track.id,
+    article_id: row.dataset.id,
+    week_number: parseInt(row.querySelector('.lesson-week').value)||1,
+    lesson_order: i+1
+  }))
+
+  await supabase.from('track_lessons').insert(lessons)
+
+  closeModal()
+  const msg = currentProfile?.role==='librarian' ? 'Track approved and added to Academy ✓' : 'Track proposed — pending Librarian approval ✓'
+  showToast(msg)
+  btn.disabled=false; btn.textContent='Submit for Approval'
+}
+
+window.openNewBoard = async function() {
+  const title = prompt('Board name:')
+  if(!title) return
+  const { data, error } = await supabase.from('collections').insert({
+    user_id: currentUser.id, title, is_public: false
+  }).select().single()
+  if(error){ showToast('Error: '+error.message); return }
+  myBoards.push(data)
+  renderBoards()
+  loadStats()
+  showToast('Board "'+title+'" created')
+}
+
+window.viewBoard = function(id) {
+  showToast('Board detail view coming soon')
+}
+
+// ── TAB SWITCHING ──
+window.switchTab = function(tab, btn) {
+  document.querySelectorAll('.profile-tab').forEach(t=>t.classList.remove('active'))
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'))
+  btn.classList.add('active')
+  document.getElementById('tab-'+tab).classList.add('active')
+}
+
+// ── AUTH NAV ──
+function initNavUI() {
+  const navActions = document.getElementById('nav-actions')
+  const p = currentProfile
+  if(p){
+    const ROLE_LABELS={librarian:'⬡ Librarian',curator:'◈ Curator',fellow:'✦ Fellow',reader:'◻ Reader'}
+    navActions.innerHTML=`
+      <span style="font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-faint);">${ROLE_LABELS[p.role]||'◻ Reader'}</span>
+      <span style="font-size:13px;color:var(--ink-muted);font-family:'EB Garamond',serif;">${p.display_name||p.email}</span>
+      <button class="btn-solid" id="so-btn">Sign Out</button>
+    `
+    document.getElementById('so-btn').onclick=async()=>{ await supabase.auth.signOut(); location.href='index.html' }
+    if(p.role==='librarian'||p.role==='curator'){
+      const bar=document.createElement('div')
+      bar.style.cssText='background:rgba(139,74,42,0.06);border-bottom:1px solid rgba(139,74,42,0.12);padding:7px 40px;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--sienna);display:flex;align-items:center;gap:24px;'
+      bar.innerHTML='<span>⬡ Librarian View</span>'
+      document.querySelector('nav').after(bar)
+    }
+  }
+}
+
+// ── UTILS ──
+window.editProfile = function(){ showToast('Profile editing coming soon') }
+window.shareProfile = function(){
+  navigator.clipboard?.writeText(window.location.href)
+  showToast('Profile link copied')
+}
+
+window.showToast = function(msg){
+  const t=document.getElementById('toast')
+  t.textContent=msg; t.classList.add('show')
+  setTimeout(()=>t.classList.remove('show'),2500)
+}
+function showToast(msg){ window.showToast(msg) }
+
+init()
+</script>
+</body>
+</html>
