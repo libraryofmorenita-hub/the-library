@@ -1,0 +1,2049 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Magazine Builder · Library of Morenita</title>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Figtree:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream: #F7F3EE;
+  --parchment: #EDE8E0;
+  --ink: #1C1A17;
+  --ink-muted: #5C5750;
+  --ink-faint: #9B968D;
+  --sienna: #8B4A2A;
+  --sienna-light: #C47A55;
+  --sage: #5A6B55;
+  --gold: #C49A3C;
+  --gold-light: #DDB96A;
+  --border: rgba(28,26,23,0.1);
+  --border-strong: rgba(28,26,23,0.22);
+  --surface: #FAFAF8;
+  --sidebar-w: 240px;
+  --props-w: 256px;
+  --topbar-h: 52px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html,body { width:100%; height:100%; overflow:hidden; }
+
+body {
+  font-family:'Figtree',sans-serif;
+  background:var(--parchment);
+  color:var(--ink);
+  font-size:13px;
+  user-select:none;
+}
+
+/* ── TOPBAR ── */
+.topbar {
+  position:fixed;
+  top:0; left:0; right:0;
+  height:var(--topbar-h);
+  background:var(--ink);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 16px;
+  z-index:200;
+  border-bottom:1px solid rgba(247,243,238,0.08);
+}
+.topbar-left {
+  display:flex;
+  align-items:center;
+  gap:16px;
+}
+.topbar-logo {
+  font-family:'EB Garamond',serif;
+  font-size:15px;
+  color:rgba(247,243,238,0.85);
+  text-decoration:none;
+  letter-spacing:0.03em;
+  white-space:nowrap;
+}
+.topbar-logo em { font-style:italic; color:var(--sienna-light); }
+.topbar-divider {
+  width:1px; height:20px;
+  background:rgba(247,243,238,0.12);
+}
+.issue-name-input {
+  background:none;
+  border:none;
+  outline:none;
+  font-family:'EB Garamond',serif;
+  font-size:16px;
+  font-style:italic;
+  color:rgba(247,243,238,0.7);
+  width:200px;
+}
+.issue-name-input::placeholder { color:rgba(247,243,238,0.25); }
+.topbar-center {
+  display:flex;
+  align-items:center;
+  gap:4px;
+}
+.view-btn {
+  background:none;
+  border:1px solid rgba(247,243,238,0.12);
+  color:rgba(247,243,238,0.45);
+  font-family:'Figtree',sans-serif;
+  font-size:10px;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  padding:5px 12px;
+  cursor:pointer;
+  border-radius:2px;
+  transition:all 0.2s;
+}
+.view-btn:hover { color:rgba(247,243,238,0.8); border-color:rgba(247,243,238,0.25); }
+.view-btn.active {
+  background:rgba(247,243,238,0.1);
+  color:rgba(247,243,238,0.9);
+  border-color:rgba(247,243,238,0.3);
+}
+.topbar-right {
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.tb-btn {
+  background:none;
+  border:1px solid rgba(247,243,238,0.2);
+  color:rgba(247,243,238,0.6);
+  font-family:'Figtree',sans-serif;
+  font-size:10px;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  padding:6px 14px;
+  cursor:pointer;
+  border-radius:2px;
+  transition:all 0.2s;
+}
+.tb-btn:hover { color:rgba(247,243,238,0.9); border-color:rgba(247,243,238,0.4); }
+.tb-btn.primary {
+  background:var(--sienna);
+  border-color:var(--sienna);
+  color:#fff;
+}
+.tb-btn.primary:hover { background:var(--sienna-light); border-color:var(--sienna-light); }
+
+/* ── LAYOUT ── */
+.builder-layout {
+  position:fixed;
+  top:var(--topbar-h);
+  left:0; right:0; bottom:0;
+  display:grid;
+  grid-template-columns:var(--sidebar-w) 1fr var(--props-w);
+}
+
+/* ── LEFT SIDEBAR ── */
+.sidebar {
+  background:var(--surface);
+  border-right:1px solid var(--border);
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+.sidebar-tabs {
+  display:flex;
+  border-bottom:1px solid var(--border);
+  flex-shrink:0;
+}
+.stab {
+  flex:1;
+  background:none;
+  border:none;
+  border-bottom:2px solid transparent;
+  font-family:'Figtree',sans-serif;
+  font-size:10px;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  color:var(--ink-faint);
+  padding:11px 8px 9px;
+  cursor:pointer;
+  transition:all 0.2s;
+}
+.stab:hover { color:var(--ink-muted); }
+.stab.active { color:var(--ink); border-bottom-color:var(--sienna); }
+
+.sidebar-content {
+  flex:1;
+  overflow-y:auto;
+  padding:12px;
+}
+.sidebar-pane { display:none; }
+.sidebar-pane.active { display:block; }
+
+.el-section { margin-bottom:16px; }
+.el-section-label {
+  font-size:9px;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:var(--ink-faint);
+  margin-bottom:8px;
+  padding:0 2px;
+}
+.el-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:6px;
+}
+.el-item {
+  background:var(--cream);
+  border:1px solid var(--border);
+  border-radius:3px;
+  padding:10px 8px 8px;
+  cursor:grab;
+  text-align:center;
+  transition:all 0.2s;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:5px;
+}
+.el-item:hover {
+  border-color:var(--sienna-light);
+  background:#fff;
+  transform:translateY(-1px);
+  box-shadow:0 3px 10px rgba(28,26,23,0.08);
+}
+.el-item:active { cursor:grabbing; transform:scale(0.97); }
+.el-icon {
+  font-size:18px;
+  line-height:1;
+  display:block;
+}
+.el-label {
+  font-size:10px;
+  letter-spacing:0.05em;
+  color:var(--ink-muted);
+}
+
+/* Archive items */
+.archive-item {
+  display:flex;
+  align-items:center;
+  gap:9px;
+  padding:8px;
+  border:1px solid var(--border);
+  border-radius:3px;
+  cursor:grab;
+  background:var(--cream);
+  margin-bottom:7px;
+  transition:all 0.2s;
+}
+.archive-item:hover {
+  border-color:var(--sienna-light);
+  background:#fff;
+}
+.archive-item:active { cursor:grabbing; }
+.archive-thumb {
+  width:36px; height:36px;
+  border-radius:2px;
+  object-fit:cover;
+  flex-shrink:0;
+  background:var(--parchment);
+}
+.archive-info { flex:1; min-width:0; }
+.archive-name {
+  font-size:11px;
+  color:var(--ink);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  line-height:1.3;
+}
+.archive-meta {
+  font-size:10px;
+  color:var(--ink-faint);
+  margin-top:2px;
+}
+
+/* Pages list */
+.page-thumb {
+  background:var(--cream);
+  border:1.5px solid var(--border);
+  border-radius:3px;
+  padding:8px;
+  margin-bottom:8px;
+  cursor:pointer;
+  transition:all 0.2s;
+  display:flex;
+  gap:10px;
+  align-items:center;
+}
+.page-thumb:hover { border-color:var(--sienna-light); }
+.page-thumb.active { border-color:var(--sienna); background:#fff; }
+.page-mini {
+  width:36px; height:50px;
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:1px;
+  flex-shrink:0;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+  padding:3px;
+}
+.page-mini-bar {
+  height:3px;
+  border-radius:1px;
+  background:var(--parchment);
+}
+.page-mini-bar.dark { background:var(--ink-faint); }
+.page-thumb-info { flex:1; }
+.page-thumb-name { font-size:11px; color:var(--ink); }
+.page-thumb-count { font-size:10px; color:var(--ink-faint); margin-top:2px; }
+
+.add-page-btn {
+  width:100%;
+  background:none;
+  border:1px dashed var(--border-strong);
+  border-radius:3px;
+  padding:10px;
+  cursor:pointer;
+  color:var(--ink-faint);
+  font-size:10px;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  font-family:'Figtree',sans-serif;
+  transition:all 0.2s;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+}
+.add-page-btn:hover { border-color:var(--sienna-light); color:var(--sienna); }
+
+/* ── CANVAS ── */
+.canvas-wrap {
+  background:#D8D2CA;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  overflow-y:auto;
+  padding:32px 24px;
+  position:relative;
+}
+
+/* Canvas toolbar */
+.canvas-toolbar {
+  position:sticky;
+  top:0;
+  z-index:50;
+  background:rgba(216,210,202,0.92);
+  backdrop-filter:blur(8px);
+  padding:8px 0 12px;
+  display:flex;
+  gap:6px;
+  width:100%;
+  max-width:560px;
+  justify-content:center;
+  margin-bottom:8px;
+}
+.ct-btn {
+  background:rgba(250,250,248,0.9);
+  border:1px solid var(--border-strong);
+  color:var(--ink-muted);
+  font-size:10px;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  padding:5px 12px;
+  cursor:pointer;
+  border-radius:2px;
+  font-family:'Figtree',sans-serif;
+  transition:all 0.2s;
+  display:flex;
+  align-items:center;
+  gap:5px;
+}
+.ct-btn:hover { background:#fff; color:var(--ink); border-color:var(--border-strong); }
+.ct-btn.danger:hover { color:var(--sienna); border-color:var(--sienna-light); }
+
+/* Magazine page */
+.magazine-page {
+  background:var(--surface);
+  width:100%;
+  max-width:520px;
+  min-height:740px;
+  box-shadow:0 8px 40px rgba(28,26,23,0.18), 0 2px 8px rgba(28,26,23,0.1);
+  border-radius:2px;
+  position:relative;
+  margin-bottom:24px;
+  overflow:visible;
+}
+
+/* Drop zone (between blocks) */
+.drop-zone {
+  height:4px;
+  width:100%;
+  position:relative;
+  z-index:10;
+  transition:height 0.15s, background 0.15s;
+  border-radius:2px;
+}
+.drop-zone.drag-over {
+  height:40px;
+  background:rgba(196,122,85,0.15);
+  border:2px dashed var(--sienna-light);
+}
+
+/* ── BLOCKS ── */
+.block {
+  position:relative;
+  cursor:pointer;
+  transition:outline 0.1s;
+  outline:2px solid transparent;
+  outline-offset:0;
+}
+.block:hover { outline-color:rgba(196,122,85,0.3); }
+.block.selected { outline-color:var(--sienna-light); }
+
+.block-controls {
+  position:absolute;
+  top:-1px;
+  right:-1px;
+  display:none;
+  gap:2px;
+  background:var(--sienna);
+  border-radius:0 0 0 3px;
+  padding:3px 4px;
+  z-index:20;
+}
+.block.selected .block-controls { display:flex; }
+.bc-btn {
+  background:none;
+  border:none;
+  color:rgba(247,243,238,0.8);
+  font-size:11px;
+  cursor:pointer;
+  padding:2px 4px;
+  border-radius:2px;
+  line-height:1;
+  transition:color 0.15s, background 0.15s;
+}
+.bc-btn:hover { color:#fff; background:rgba(247,243,238,0.15); }
+
+/* Drag handle */
+.drag-handle {
+  position:absolute;
+  left:-28px;
+  top:50%;
+  transform:translateY(-50%);
+  width:20px;
+  height:32px;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  cursor:grab;
+  color:var(--ink-faint);
+  font-size:14px;
+  opacity:0;
+  transition:opacity 0.2s;
+}
+.block:hover .drag-handle,
+.block.selected .drag-handle {
+  display:flex;
+  opacity:1;
+}
+.drag-handle:active { cursor:grabbing; }
+
+/* ── BLOCK TYPES ── */
+
+/* Cover / Header */
+.block-cover {
+  background:var(--ink);
+  color:var(--cream);
+  padding:40px 32px 36px;
+  position:relative;
+  overflow:hidden;
+  min-height:220px;
+}
+.block-cover::after {
+  content:'';
+  position:absolute;
+  inset:0;
+  background:radial-gradient(ellipse 70% 60% at 80% 50%, rgba(139,74,42,0.22), transparent);
+  pointer-events:none;
+}
+.cover-eyebrow {
+  font-size:9px;
+  letter-spacing:0.16em;
+  text-transform:uppercase;
+  color:rgba(247,243,238,0.4);
+  margin-bottom:16px;
+  position:relative;
+  z-index:1;
+}
+.cover-headline {
+  font-family:'Cormorant Garamond',serif;
+  font-size:42px;
+  font-weight:300;
+  line-height:1.03;
+  color:var(--cream);
+  position:relative;
+  z-index:1;
+  outline:none;
+}
+.cover-headline em { font-style:italic; color:var(--sienna-light); }
+.cover-sub {
+  font-family:'EB Garamond',serif;
+  font-size:15px;
+  color:rgba(247,243,238,0.6);
+  margin-top:12px;
+  line-height:1.6;
+  font-style:italic;
+  position:relative;
+  z-index:1;
+  outline:none;
+}
+
+/* Hero Image */
+.block-hero-img {
+  width:100%;
+  aspect-ratio:16/9;
+  background:var(--parchment);
+  overflow:hidden;
+  position:relative;
+  cursor:pointer;
+}
+.block-hero-img img {
+  width:100%; height:100%;
+  object-fit:cover;
+  display:block;
+  transition:transform 0.4s ease;
+}
+.block-hero-img:hover img { transform:scale(1.01); }
+.img-placeholder {
+  width:100%; height:100%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  color:var(--ink-faint);
+  cursor:pointer;
+}
+.img-placeholder span { font-size:28px; }
+.img-placeholder p { font-size:10px; letter-spacing:0.08em; text-transform:uppercase; }
+
+/* Text body */
+.block-text {
+  padding:24px 32px;
+}
+.block-text .drop-cap {
+  font-family:'Cormorant Garamond',serif;
+  font-size:60px;
+  font-weight:300;
+  float:left;
+  line-height:0.82;
+  margin:4px 8px 0 0;
+  color:var(--sienna);
+}
+.block-text p, .block-text .editable {
+  font-family:'EB Garamond',serif;
+  font-size:16.5px;
+  line-height:1.75;
+  color:#2A2826;
+  outline:none;
+}
+.editable:focus { background:rgba(196,122,85,0.04); }
+
+/* Pull quote */
+.block-quote {
+  padding:24px 32px;
+  margin:4px 0;
+  border-left:3px solid var(--sienna);
+  background:rgba(139,74,42,0.04);
+}
+.block-quote blockquote {
+  font-family:'Cormorant Garamond',serif;
+  font-size:24px;
+  font-style:italic;
+  font-weight:300;
+  color:var(--ink);
+  line-height:1.35;
+  margin-bottom:10px;
+  outline:none;
+}
+.block-quote cite {
+  font-size:11px;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  color:var(--ink-faint);
+  outline:none;
+}
+
+/* Divider */
+.block-divider {
+  padding:16px 32px;
+  display:flex;
+  align-items:center;
+  gap:16px;
+}
+.divider-line {
+  flex:1; height:1px; background:var(--border-strong);
+}
+.divider-ornament {
+  font-family:'Cormorant Garamond',serif;
+  font-size:18px;
+  color:var(--sienna-light);
+  opacity:0.5;
+}
+
+/* Callout / highlight box */
+.block-callout {
+  margin:4px 28px;
+  background:var(--parchment);
+  border:1px solid var(--border-strong);
+  border-radius:3px;
+  padding:20px 24px;
+}
+.callout-label {
+  font-size:9px;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:var(--sienna);
+  margin-bottom:8px;
+}
+.callout-text {
+  font-family:'EB Garamond',serif;
+  font-size:15px;
+  color:var(--ink-muted);
+  line-height:1.6;
+  font-style:italic;
+  outline:none;
+}
+
+/* Two column */
+.block-twocol {
+  padding:20px 28px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:20px;
+}
+.col-text {
+  font-family:'EB Garamond',serif;
+  font-size:15px;
+  line-height:1.7;
+  color:#2A2826;
+  outline:none;
+}
+
+/* Caption */
+.block-caption {
+  padding:8px 32px 16px;
+  font-size:11px;
+  letter-spacing:0.05em;
+  color:var(--ink-faint);
+  font-style:italic;
+  font-family:'EB Garamond',serif;
+  outline:none;
+  border-top:1px solid var(--border);
+  margin:0 0 4px;
+}
+
+/* Tag line */
+.block-tagline {
+  padding:20px 32px;
+  text-align:center;
+}
+.tagline-text {
+  font-family:'Cormorant Garamond',serif;
+  font-size:13px;
+  letter-spacing:0.16em;
+  text-transform:uppercase;
+  color:var(--sienna);
+  outline:none;
+}
+
+/* Spacer */
+.block-spacer {
+  height:40px;
+  position:relative;
+}
+.spacer-line {
+  position:absolute;
+  top:50%; left:32px; right:32px;
+  height:1px;
+  background:var(--border);
+  display:none;
+}
+.block.selected .spacer-line { display:block; }
+
+/* Full bleed image */
+.block-fullbleed {
+  width:100%;
+  aspect-ratio:3/2;
+  background:var(--parchment);
+  overflow:hidden;
+  position:relative;
+}
+.block-fullbleed img {
+  width:100%; height:100%;
+  object-fit:cover;
+  display:block;
+}
+
+/* ── RIGHT PROPS PANEL ── */
+.props-panel {
+  background:var(--surface);
+  border-left:1px solid var(--border);
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+.props-header {
+  padding:14px 16px 12px;
+  border-bottom:1px solid var(--border);
+  flex-shrink:0;
+}
+.props-title {
+  font-size:10px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--ink-faint);
+}
+.props-subtitle {
+  font-size:11px;
+  color:var(--ink-muted);
+  margin-top:2px;
+}
+.props-scroll {
+  flex:1;
+  overflow-y:auto;
+}
+.prop-section {
+  border-bottom:1px solid var(--border);
+  padding:14px 16px;
+}
+.prop-section-label {
+  font-size:9px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--ink-faint);
+  margin-bottom:10px;
+}
+.prop-row {
+  margin-bottom:10px;
+}
+.prop-label {
+  font-size:10px;
+  color:var(--ink-muted);
+  margin-bottom:5px;
+  display:block;
+}
+.prop-input, .prop-select {
+  width:100%;
+  border:1px solid var(--border);
+  background:var(--cream);
+  color:var(--ink);
+  font-family:'Figtree',sans-serif;
+  font-size:12px;
+  padding:7px 9px;
+  border-radius:2px;
+  outline:none;
+  transition:border-color 0.2s;
+}
+.prop-input:focus, .prop-select:focus { border-color:var(--sienna-light); }
+.prop-textarea {
+  width:100%;
+  border:1px solid var(--border);
+  background:var(--cream);
+  color:var(--ink);
+  font-family:'EB Garamond',serif;
+  font-size:14px;
+  font-style:italic;
+  padding:7px 9px;
+  border-radius:2px;
+  outline:none;
+  resize:vertical;
+  min-height:72px;
+  transition:border-color 0.2s;
+}
+.prop-textarea:focus { border-color:var(--sienna-light); }
+
+.color-row {
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+}
+.color-swatch {
+  width:22px; height:22px;
+  border-radius:50%;
+  cursor:pointer;
+  border:2px solid transparent;
+  transition:border-color 0.15s, transform 0.15s;
+  flex-shrink:0;
+}
+.color-swatch:hover { transform:scale(1.15); }
+.color-swatch.active { border-color:var(--ink); }
+
+.font-row {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:6px;
+}
+.font-btn {
+  background:var(--cream);
+  border:1px solid var(--border);
+  padding:7px 6px;
+  border-radius:2px;
+  cursor:pointer;
+  text-align:center;
+  transition:all 0.2s;
+  font-size:11px;
+  color:var(--ink-muted);
+}
+.font-btn:hover { border-color:var(--sienna-light); color:var(--sienna); }
+.font-btn.active { border-color:var(--sienna); background:#fff; color:var(--sienna); }
+
+/* Align buttons */
+.align-row { display:flex; gap:4px; }
+.align-btn {
+  flex:1;
+  background:var(--cream);
+  border:1px solid var(--border);
+  border-radius:2px;
+  padding:6px;
+  cursor:pointer;
+  font-size:12px;
+  transition:all 0.2s;
+  color:var(--ink-muted);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.align-btn:hover, .align-btn.active { background:var(--ink); color:var(--cream); border-color:var(--ink); }
+
+/* Sustainability */
+.sustain-card {
+  padding:14px 16px;
+  background:rgba(90,107,85,0.06);
+  border-top:1px solid var(--border);
+}
+.sustain-row {
+  display:flex;
+  justify-content:space-between;
+  font-size:11px;
+  color:var(--ink-faint);
+  padding:3px 0;
+}
+.sustain-val { color:var(--sage); font-weight:500; }
+
+/* Export area */
+.export-area {
+  padding:14px 16px;
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+  border-top:1px solid var(--border);
+}
+.export-btn {
+  width:100%;
+  background:var(--sienna);
+  color:#fff;
+  border:none;
+  font-family:'Figtree',sans-serif;
+  font-size:10px;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  padding:10px;
+  cursor:pointer;
+  border-radius:2px;
+  transition:background 0.2s;
+}
+.export-btn:hover { background:var(--ink); }
+.export-btn.ghost {
+  background:none;
+  border:1px solid var(--border-strong);
+  color:var(--ink);
+}
+.export-btn.ghost:hover { background:var(--ink); color:var(--cream); }
+
+/* ── DRAG GHOST ── */
+.drag-ghost {
+  position:fixed;
+  pointer-events:none;
+  z-index:9999;
+  opacity:0.85;
+  transform:rotate(2deg) scale(0.92);
+  background:var(--surface);
+  border:2px solid var(--sienna-light);
+  border-radius:3px;
+  padding:10px 14px;
+  font-size:12px;
+  color:var(--ink);
+  box-shadow:0 8px 24px rgba(28,26,23,0.2);
+  display:none;
+  max-width:180px;
+}
+
+/* ── SELECTION OVERLAY ── */
+.no-select * { user-select:none !important; }
+
+/* ── TOAST ── */
+.toast {
+  position:fixed;
+  bottom:24px;
+  left:50%;
+  transform:translateX(-50%) translateY(20px);
+  background:var(--ink);
+  color:rgba(247,243,238,0.9);
+  font-size:12px;
+  letter-spacing:0.05em;
+  padding:10px 20px;
+  border-radius:3px;
+  z-index:9999;
+  opacity:0;
+  transition:opacity 0.3s, transform 0.3s;
+  pointer-events:none;
+}
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width:4px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:rgba(28,26,23,0.15); border-radius:2px; }
+
+/* ── IMAGE PICKER MODAL ── */
+.modal-overlay {
+  position:fixed;
+  inset:0;
+  background:rgba(28,26,23,0.6);
+  backdrop-filter:blur(4px);
+  z-index:500;
+  display:none;
+  align-items:center;
+  justify-content:center;
+}
+.modal-overlay.open { display:flex; }
+.modal-box {
+  background:var(--surface);
+  border-radius:4px;
+  padding:24px;
+  width:480px;
+  max-height:80vh;
+  overflow-y:auto;
+  box-shadow:0 24px 80px rgba(28,26,23,0.25);
+}
+.modal-title {
+  font-family:'EB Garamond',serif;
+  font-size:22px;
+  margin-bottom:16px;
+  color:var(--ink);
+}
+.modal-input {
+  width:100%;
+  border:1px solid var(--border-strong);
+  background:var(--cream);
+  font-family:'Figtree',sans-serif;
+  font-size:13px;
+  padding:9px 12px;
+  border-radius:2px;
+  outline:none;
+  margin-bottom:12px;
+}
+.modal-input:focus { border-color:var(--sienna-light); }
+.modal-gallery {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+  margin-bottom:16px;
+}
+.modal-img {
+  aspect-ratio:1;
+  object-fit:cover;
+  border-radius:2px;
+  cursor:pointer;
+  border:2px solid transparent;
+  transition:all 0.2s;
+}
+.modal-img:hover { border-color:var(--sienna-light); transform:scale(1.02); }
+.modal-img.selected { border-color:var(--sienna); }
+.modal-actions {
+  display:flex;
+  gap:8px;
+  justify-content:flex-end;
+}
+.modal-btn {
+  background:none;
+  border:1px solid var(--border-strong);
+  color:var(--ink);
+  font-family:'Figtree',sans-serif;
+  font-size:11px;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  padding:8px 16px;
+  cursor:pointer;
+  border-radius:2px;
+  transition:all 0.2s;
+}
+.modal-btn:hover { background:var(--ink); color:var(--cream); }
+.modal-btn.primary { background:var(--sienna); color:#fff; border-color:var(--sienna); }
+.modal-btn.primary:hover { background:var(--ink); border-color:var(--ink); }
+</style>
+</head>
+<body>
+
+<!-- Topbar -->
+<div class="topbar">
+  <div class="topbar-left">
+    <a href="index.html" class="topbar-logo">Library of <em>Morenita</em></a>
+    <div class="topbar-divider"></div>
+    <input class="issue-name-input" type="text" value="Roots & Ritual" placeholder="Issue title…" id="issue-title">
+  </div>
+  <div class="topbar-center">
+    <button class="view-btn active" onclick="setView('edit',this)">Edit</button>
+    <button class="view-btn" onclick="setView('preview',this)">Preview</button>
+  </div>
+  <div class="topbar-right">
+    <button class="tb-btn" onclick="undo()">↩ Undo</button>
+    <button class="tb-btn" onclick="showExportModal()">Export PDF</button>
+    <button class="tb-btn primary" onclick="showToast('Issue saved ✓')">Save Issue</button>
+  </div>
+</div>
+
+<div class="builder-layout" id="builder-layout">
+
+  <!-- ═══ LEFT SIDEBAR ═══ -->
+  <div class="sidebar">
+    <div class="sidebar-tabs">
+      <button class="stab active" onclick="switchSTab('blocks',this)">Blocks</button>
+      <button class="stab" onclick="switchSTab('archive',this)">Archive</button>
+      <button class="stab" onclick="switchSTab('pages',this)">Pages</button>
+    </div>
+    <div class="sidebar-content">
+
+      <!-- BLOCKS TAB -->
+      <div class="sidebar-pane active" id="stab-blocks">
+        <div class="el-section">
+          <div class="el-section-label">Layout</div>
+          <div class="el-grid">
+            <div class="el-item" draggable="true" data-type="cover" ondragstart="startElementDrag(event,'cover')">
+              <span class="el-icon">◼</span>
+              <span class="el-label">Cover</span>
+            </div>
+            <div class="el-item" draggable="true" data-type="twocol" ondragstart="startElementDrag(event,'twocol')">
+              <span class="el-icon" style="display:grid;grid-template-columns:1fr 1fr;gap:2px;width:18px;height:14px;margin:2px auto;"><span style="background:currentColor;opacity:0.4;border-radius:1px;"></span><span style="background:currentColor;opacity:0.4;border-radius:1px;"></span></span>
+              <span class="el-label">2 Column</span>
+            </div>
+            <div class="el-item" draggable="true" data-type="divider" ondragstart="startElementDrag(event,'divider')">
+              <span class="el-icon">━</span>
+              <span class="el-label">Divider</span>
+            </div>
+            <div class="el-item" draggable="true" data-type="spacer" ondragstart="startElementDrag(event,'spacer')">
+              <span class="el-icon">↕</span>
+              <span class="el-label">Spacer</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="el-section">
+          <div class="el-section-label">Text</div>
+          <div class="el-grid">
+            <div class="el-item" draggable="true" data-type="text" ondragstart="startElementDrag(event,'text')">
+              <span class="el-icon" style="font-family:'EB Garamond',serif;font-size:22px;">¶</span>
+              <span class="el-label">Body Text</span>
+            </div>
+            <div class="el-item" draggable="true" data-type="quote" ondragstart="startElementDrag(event,'quote')">
+              <span class="el-icon" style="font-family:'Cormorant Garamond',serif;font-size:22px;font-style:italic;">"</span>
+              <span class="el-label">Pull Quote</span>
+            </div>
+            <div class="el-item" draggable="true" data-type="callout" ondragstart="startElementDrag(event,'callout')">
+              <span class="el-icon">◧</span>
+              <span class="el-label">Callout</span>
+            </div>
+            <div class="el-item" draggable="true" data-type="tagline" ondragstart="startElementDrag(event,'tagline')">
+              <span class="el-icon" style="font-size:13px;letter-spacing:0.1em;">ABC</span>
+              <span class="el-label">Tagline</span>
+            </div>
+            <div class="el-item" draggable="true" data-type="caption" ondragstart="startElementDrag(event,'caption')">
+              <span class="el-icon" style="font-size:11px;opacity:0.6;">Aa</span>
+              <span class="el-label">Caption</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="el-section">
+          <div class="el-section-label">Media</div>
+          <div class="el-grid">
+            <div class="el-item" draggable="true" data-type="hero-img" ondragstart="startElementDrag(event,'hero-img')">
+              <span class="el-icon">🖼</span>
+              <span class="el-label">Image (16:9)</span>
+            </div>
+            <div class="el-item" draggable="true" data-type="fullbleed" ondragstart="startElementDrag(event,'fullbleed')">
+              <span class="el-icon">⬛</span>
+              <span class="el-label">Full Bleed</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ARCHIVE TAB -->
+      <div class="sidebar-pane" id="stab-archive">
+        <div class="el-section-label" style="padding:2px;">Drag saved content onto page</div>
+        <div style="margin-top:10px;">
+          <div class="archive-item" draggable="true" ondragstart="startArchiveDrag(event,'ubuntu')">
+            <img class="archive-thumb" src="https://i.pinimg.com/736x/88/13/8e/88138ec559996abd49cf6eddd940a14d.jpg">
+            <div class="archive-info">
+              <div class="archive-name">Ubuntu — I am because we are</div>
+              <div class="archive-meta">Article · Philosophy</div>
+            </div>
+          </div>
+          <div class="archive-item" draggable="true" ondragstart="startArchiveDrag(event,'rosehip')">
+            <img class="archive-thumb" src="https://i.pinimg.com/1200x/a8/45/22/a84522cc1f06f171ca6e9c6fa6be6a6f.jpg">
+            <div class="archive-info">
+              <div class="archive-name">Rose hip & hibiscus pharmacopeia</div>
+              <div class="archive-meta">Article · Herbalism</div>
+            </div>
+          </div>
+          <div class="archive-item" draggable="true" ondragstart="startArchiveDrag(event,'harlem')">
+            <img class="archive-thumb" src="https://i.pinimg.com/736x/0d/91/d5/0d91d5db1188df9147f6c4f3d32771f4.jpg">
+            <div class="archive-info">
+              <div class="archive-name">Harlem Renaissance & self-determination</div>
+              <div class="archive-meta">Article · Art History</div>
+            </div>
+          </div>
+          <div class="archive-item" draggable="true" ondragstart="startArchiveDrag(event,'garment')">
+            <img class="archive-thumb" src="https://i.pinimg.com/1200x/8f/ef/59/8fef5951d62ade9664de8d332c62137f.jpg">
+            <div class="archive-info">
+              <div class="archive-name">The garment as living archive</div>
+              <div class="archive-meta">Article · Fashion History</div>
+            </div>
+          </div>
+          <div class="archive-item" draggable="true" ondragstart="startArchiveDrag(event,'bellhooks')">
+            <div class="archive-thumb" style="background:var(--parchment);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--sienna);font-style:italic;">"</div>
+            <div class="archive-info">
+              <div class="archive-name">bell hooks on art & liberation</div>
+              <div class="archive-meta">Quote · Resistance</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGES TAB -->
+      <div class="sidebar-pane" id="stab-pages">
+        <div id="pages-list">
+          <div class="page-thumb active" onclick="selectPage(0)">
+            <div class="page-mini">
+              <div class="page-mini-bar dark" style="width:70%;height:5px;margin-bottom:2px;"></div>
+              <div class="page-mini-bar" style="width:100%;"></div>
+              <div class="page-mini-bar" style="width:100%;"></div>
+              <div class="page-mini-bar" style="width:80%;"></div>
+              <div class="page-mini-bar dark" style="width:100%;height:8px;margin-top:3px;"></div>
+            </div>
+            <div class="page-thumb-info">
+              <div class="page-thumb-name">Cover Page</div>
+              <div class="page-thumb-count">5 blocks</div>
+            </div>
+          </div>
+        </div>
+        <button class="add-page-btn" onclick="addPage()">＋ Add Page</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══ CANVAS ═══ -->
+  <div class="canvas-wrap" id="canvas-wrap">
+    <div class="canvas-toolbar">
+      <button class="ct-btn" onclick="duplicateSelected()">⧉ Duplicate</button>
+      <button class="ct-btn" onclick="moveBlockUp()">↑ Up</button>
+      <button class="ct-btn" onclick="moveBlockDown()">↓ Down</button>
+      <button class="ct-btn danger" onclick="deleteSelected()">✕ Delete</button>
+    </div>
+
+    <div class="magazine-page" id="magazine-page" 
+         ondragover="canvasDragOver(event)" 
+         ondrop="canvasDrop(event)"
+         ondragleave="canvasDragLeave(event)">
+      <!-- blocks injected here -->
+    </div>
+  </div>
+
+  <!-- ═══ PROPS PANEL ═══ -->
+  <div class="props-panel">
+    <div class="props-header">
+      <div class="props-title" id="props-title">Page Settings</div>
+      <div class="props-subtitle" id="props-subtitle">Click a block to inspect</div>
+    </div>
+    <div class="props-scroll">
+
+      <!-- Page-level props -->
+      <div class="prop-section" id="page-props">
+        <div class="prop-section-label">Issue</div>
+        <div class="prop-row">
+          <label class="prop-label">Title</label>
+          <input class="prop-input" type="text" id="prop-issue-title" value="Roots & Ritual"
+            oninput="document.getElementById('issue-title').value=this.value">
+        </div>
+        <div class="prop-row">
+          <label class="prop-label">Subtitle / Volume</label>
+          <input class="prop-input" type="text" value="Issue IV · Spring 2026">
+        </div>
+        <div class="prop-row">
+          <label class="prop-label">Cover Style</label>
+          <select class="prop-select" onchange="setCoverStyle(this.value)">
+            <option value="dark">Dark Ink</option>
+            <option value="sienna">Sienna Warm</option>
+            <option value="sage">Sage Green</option>
+            <option value="ivory">Ivory Light</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="prop-section">
+        <div class="prop-section-label">Typography</div>
+        <div class="prop-row">
+          <label class="prop-label">Display Font</label>
+          <div class="font-row">
+            <div class="font-btn active" style="font-family:'Cormorant Garamond',serif;" onclick="setFont('display','cormorant',this)">Cormorant</div>
+            <div class="font-btn" style="font-family:'EB Garamond',serif;" onclick="setFont('display','garamond',this)">Garamond</div>
+            <div class="font-btn" style="font-family:'Playfair Display',serif;" onclick="setFont('display','playfair',this)">Playfair</div>
+            <div class="font-btn" style="font-family:'Figtree',sans-serif;font-size:10px;" onclick="setFont('display','figtree',this)">Figtree</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="prop-section">
+        <div class="prop-section-label">Accent Color</div>
+        <div class="color-row">
+          <div class="color-swatch active" style="background:#8B4A2A;" title="Sienna" onclick="setAccent('#8B4A2A','#C47A55',this)"></div>
+          <div class="color-swatch" style="background:#5A6B55;" title="Sage" onclick="setAccent('#5A6B55','#8BA683',this)"></div>
+          <div class="color-swatch" style="background:#C49A3C;" title="Gold" onclick="setAccent('#C49A3C','#DDB96A',this)"></div>
+          <div class="color-swatch" style="background:#4A6B8A;" title="Slate" onclick="setAccent('#4A6B8A','#7AACCC',this)"></div>
+          <div class="color-swatch" style="background:#7A4A8B;" title="Plum" onclick="setAccent('#7A4A8B','#A87AC4',this)"></div>
+          <div class="color-swatch" style="background:#1C1A17;" title="Ink" onclick="setAccent('#1C1A17','#5C5750',this)"></div>
+        </div>
+      </div>
+
+      <!-- Block-level props (shown when block selected) -->
+      <div class="prop-section" id="block-props" style="display:none;">
+        <div class="prop-section-label" id="block-props-label">Block</div>
+        <div id="block-props-inner"></div>
+      </div>
+
+      <!-- Sustainability -->
+      <div class="sustain-card">
+        <div class="prop-section-label" style="margin-bottom:8px;">Sustainability</div>
+        <div class="sustain-row"><span>Page weight</span><span class="sustain-val" id="s-weight">—</span></div>
+        <div class="sustain-row"><span>CO₂ per view</span><span class="sustain-val" id="s-co2">—</span></div>
+        <div class="sustain-row"><span>Images</span><span class="sustain-val" id="s-imgs">—</span></div>
+      </div>
+
+      <!-- Export -->
+      <div class="export-area">
+        <button class="export-btn" onclick="showToast('Print request sent ✓')">Request Print Copy</button>
+        <button class="export-btn ghost" onclick="exportHTML()">Export as HTML</button>
+        <button class="export-btn ghost" onclick="showToast('Share link copied ✓')">Share Issue Link</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Image picker modal -->
+<div class="modal-overlay" id="img-modal">
+  <div class="modal-box">
+    <div class="modal-title">Choose an image</div>
+    <input class="modal-input" type="text" id="modal-url-input" placeholder="Paste image URL…">
+    <div class="modal-gallery" id="modal-gallery">
+      <img class="modal-img" src="https://i.pinimg.com/1200x/8f/ef/59/8fef5951d62ade9664de8d332c62137f.jpg" onclick="selectModalImg(this)">
+      <img class="modal-img" src="https://i.pinimg.com/1200x/a8/45/22/a84522cc1f06f171ca6e9c6fa6be6a6f.jpg" onclick="selectModalImg(this)">
+      <img class="modal-img" src="https://i.pinimg.com/736x/0d/91/d5/0d91d5db1188df9147f6c4f3d32771f4.jpg" onclick="selectModalImg(this)">
+      <img class="modal-img" src="https://i.pinimg.com/736x/88/13/8e/88138ec559996abd49cf6eddd940a14d.jpg" onclick="selectModalImg(this)">
+      <img class="modal-img" src="https://i.pinimg.com/1200x/8f/ef/59/8fef5951d62ade9664de8d332c62137f.jpg" onclick="selectModalImg(this)" style="filter:hue-rotate(20deg);">
+      <img class="modal-img" src="https://i.pinimg.com/1200x/a8/45/22/a84522cc1f06f171ca6e9c6fa6be6a6f.jpg" onclick="selectModalImg(this)" style="filter:saturate(0.7);">
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn" onclick="closeImgModal()">Cancel</button>
+      <button class="modal-btn primary" onclick="applyModalImg()">Use Image</button>
+    </div>
+  </div>
+</div>
+
+<!-- Drag ghost -->
+<div class="drag-ghost" id="drag-ghost">Block</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════
+// STATE
+// ══════════════════════════════════════
+let blocks = [];
+let selectedId = null;
+let dragType = null;
+let dragArchive = null;
+let dragBlockId = null;
+let dropTargetIndex = null;
+let history = [];
+let accentColor = '#8B4A2A';
+let accentLight = '#C47A55';
+let pendingImgBlockId = null;
+let selectedModalImg = null;
+
+// ── BLOCK TEMPLATES ──
+function makeBlock(type, overrides) {
+  const id = 'b' + Date.now() + Math.random().toString(36).slice(2,6);
+  const base = { id, type, ...defaults(type), ...overrides };
+  return base;
+}
+
+function defaults(type) {
+  switch(type) {
+    case 'cover': return {
+      eyebrow: 'Library of Morenita · Issue IV · Spring 2026',
+      headline: 'Roots &\nRitual',
+      sub: 'A journey through ancestral practices of healing, beauty, and spiritual maintenance.',
+      style: 'dark'
+    };
+    case 'text': return {
+      dropCap: true,
+      content: 'Before the apothecary, before the dispensary, there was the kitchen — the windowsill crowded with small jars, the grandmother who knew what the body needed before the body knew itself. This is where medicine lived: unwritten, embodied, passed hand to hand across generations of healers.',
+    };
+    case 'quote': return {
+      quote: 'The function of art is to do more than tell it like it is — it\'s to imagine what is possible.',
+      cite: '— bell hooks'
+    };
+    case 'hero-img': return { src: '', alt: 'Image' };
+    case 'fullbleed': return { src: '', alt: 'Image' };
+    case 'divider': return { ornament: '✦' };
+    case 'callout': return { label: 'Note', content: 'A reflection worth holding.' };
+    case 'twocol': return {
+      col1: 'The left column text begins here — a meditation on craft and memory, on the hands that shaped a tradition.',
+      col2: 'The right column continues — speaking to what carries forward, what transforms, and what remains.'
+    };
+    case 'caption': return { content: 'Image caption — describe what is shown and why it matters.' };
+    case 'tagline': return { content: 'Cloth · Memory · Resistance · Inheritance' };
+    case 'spacer': return { height: 40 };
+    default: return {};
+  }
+}
+
+// Archive content map
+const ARCHIVE_CONTENT = {
+  ubuntu: {
+    headline: 'Ubuntu\nI am because\nwe are',
+    sub: 'The Nguni Bantu philosophy that places communal being at the center of personhood.',
+    src: 'https://i.pinimg.com/736x/88/13/8e/88138ec559996abd49cf6eddd940a14d.jpg',
+    quote: 'I am because we are, and since we are, therefore I am.',
+    cite: '— Ubuntu philosophy'
+  },
+  rosehip: {
+    headline: 'The Pharmacopeia\nof Grandmothers',
+    sub: 'Rose hip, hibiscus, and the ancestral medicine cabinet.',
+    src: 'https://i.pinimg.com/1200x/a8/45/22/a84522cc1f06f171ca6e9c6fa6be6a6f.jpg',
+    quote: 'Caring for myself is not self-indulgence. It is self-preservation.',
+    cite: '— Audre Lorde'
+  },
+  harlem: {
+    headline: 'The Aesthetics\nof Self-Determination',
+    sub: 'How Black artists in 1920s New York built a visual language of liberation.',
+    src: 'https://i.pinimg.com/736x/0d/91/d5/0d91d5db1188df9147f6c4f3d32771f4.jpg',
+    quote: 'Not everything that is faced can be changed, but nothing can be changed until it is faced.',
+    cite: '— James Baldwin'
+  },
+  garment: {
+    headline: 'The Garment\nas Living Archive',
+    sub: 'West African textile traditions — weaving cosmology into cloth.',
+    src: 'https://i.pinimg.com/1200x/8f/ef/59/8fef5951d62ade9664de8d332c62137f.jpg',
+    quote: 'Before paper held memory, cloth did.',
+    cite: '— Library of Morenita'
+  },
+  bellhooks: {
+    quote: 'The function of art is to do more than tell it like it is — it\'s to imagine what is possible.',
+    cite: '— bell hooks'
+  }
+};
+
+// ══════════════════════════════════════
+// INITIAL PAGE
+// ══════════════════════════════════════
+function init() {
+  blocks = [
+    makeBlock('cover'),
+    makeBlock('hero-img', { src: 'https://i.pinimg.com/1200x/a8/45/22/a84522cc1f06f171ca6e9c6fa6be6a6f.jpg' }),
+    makeBlock('text'),
+    makeBlock('quote'),
+    makeBlock('divider'),
+  ];
+  render();
+  updateSustainability();
+}
+
+// ══════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════
+function render() {
+  const page = document.getElementById('magazine-page');
+  page.innerHTML = '';
+
+  blocks.forEach((block, i) => {
+    // Drop zone before each block
+    const dz = makeDropZone(i);
+    page.appendChild(dz);
+    // Block
+    const el = renderBlock(block, i);
+    page.appendChild(el);
+  });
+
+  // Final drop zone
+  const dzLast = makeDropZone(blocks.length);
+  page.appendChild(dzLast);
+
+  updateSustainability();
+  updatePageCount();
+}
+
+function makeDropZone(index) {
+  const dz = document.createElement('div');
+  dz.className = 'drop-zone';
+  dz.dataset.index = index;
+  dz.addEventListener('dragover', e => {
+    e.preventDefault();
+    dz.classList.add('drag-over');
+    dropTargetIndex = index;
+  });
+  dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+  dz.addEventListener('drop', e => {
+    e.preventDefault();
+    dz.classList.remove('drag-over');
+    handleDrop(index);
+  });
+  return dz;
+}
+
+function renderBlock(block, i) {
+  const wrap = document.createElement('div');
+  wrap.className = 'block' + (selectedId === block.id ? ' selected' : '');
+  wrap.dataset.id = block.id;
+  wrap.dataset.index = i;
+  wrap.draggable = true;
+
+  // Drag handle
+  const handle = document.createElement('div');
+  handle.className = 'drag-handle';
+  handle.innerHTML = '⠿';
+  handle.addEventListener('mousedown', () => {
+    wrap.draggable = true;
+  });
+  wrap.appendChild(handle);
+
+  // Block controls
+  const controls = document.createElement('div');
+  controls.className = 'block-controls';
+  controls.innerHTML = `
+    <button class="bc-btn" onclick="moveBlockUp()" title="Move up">↑</button>
+    <button class="bc-btn" onclick="moveBlockDown()" title="Move down">↓</button>
+    <button class="bc-btn" onclick="duplicateSelected()" title="Duplicate">⧉</button>
+    <button class="bc-btn" onclick="deleteSelected()" title="Delete">✕</button>
+  `;
+  wrap.appendChild(controls);
+
+  // Inner content
+  const inner = buildBlockHTML(block);
+  wrap.appendChild(inner);
+
+  // Select on click
+  wrap.addEventListener('click', e => {
+    e.stopPropagation();
+    selectBlock(block.id);
+  });
+
+  // Drag events for reordering
+  wrap.addEventListener('dragstart', e => {
+    dragBlockId = block.id;
+    dragType = null;
+    dragArchive = null;
+    e.dataTransfer.effectAllowed = 'move';
+    setTimeout(() => wrap.style.opacity = '0.4', 0);
+  });
+  wrap.addEventListener('dragend', () => {
+    wrap.style.opacity = '';
+    dragBlockId = null;
+    document.querySelectorAll('.drop-zone').forEach(d => d.classList.remove('drag-over'));
+  });
+
+  return wrap;
+}
+
+function buildBlockHTML(block) {
+  const d = document.createElement('div');
+  switch(block.type) {
+    case 'cover': {
+      d.className = 'block-cover';
+      d.style.background = getCoverBg(block.style || 'dark');
+      d.innerHTML = `
+        <div class="cover-eyebrow" contenteditable="true" onblur="updateField('${block.id}','eyebrow',this.innerText)">${esc(block.eyebrow)}</div>
+        <div class="cover-headline" contenteditable="true" onblur="updateField('${block.id}','headline',this.innerText)">${esc(block.headline).replace(/\n/g,'<br>')}</div>
+        <div class="cover-sub" contenteditable="true" onblur="updateField('${block.id}','sub',this.innerText)">${esc(block.sub)}</div>
+      `;
+      break;
+    }
+    case 'text': {
+      d.className = 'block-text';
+      const dc = block.dropCap ? `<span class="drop-cap">${block.content.charAt(0)}</span>` : '';
+      const rest = block.dropCap ? block.content.slice(1) : block.content;
+      d.innerHTML = `<p class="editable" contenteditable="true" onblur="updateField('${block.id}','content',this.innerText)">${dc}${esc(rest)}</p>`;
+      break;
+    }
+    case 'quote': {
+      d.className = 'block-quote';
+      d.innerHTML = `
+        <blockquote contenteditable="true" onblur="updateField('${block.id}','quote',this.innerText)">${esc(block.quote)}</blockquote>
+        <cite contenteditable="true" onblur="updateField('${block.id}','cite',this.innerText)">${esc(block.cite)}</cite>
+      `;
+      break;
+    }
+    case 'hero-img': {
+      d.className = 'block-hero-img';
+      if (block.src) {
+        d.innerHTML = `<img src="${block.src}" alt="${block.alt || ''}">`;
+      } else {
+        d.innerHTML = `<div class="img-placeholder" onclick="openImgModal('${block.id}')">
+          <span>🖼</span><p>Click to add image</p>
+        </div>`;
+      }
+      d.addEventListener('click', () => openImgModal(block.id));
+      break;
+    }
+    case 'fullbleed': {
+      d.className = 'block-fullbleed';
+      if (block.src) {
+        d.innerHTML = `<img src="${block.src}" alt="${block.alt || ''}">`;
+      } else {
+        d.innerHTML = `<div class="img-placeholder" style="height:100%;" onclick="openImgModal('${block.id}')">
+          <span>⬛</span><p>Click to add full-bleed image</p>
+        </div>`;
+      }
+      d.addEventListener('click', () => openImgModal(block.id));
+      break;
+    }
+    case 'divider': {
+      d.className = 'block-divider';
+      d.innerHTML = `<div class="divider-line"></div>
+        <div class="divider-ornament">${block.ornament || '✦'}</div>
+        <div class="divider-line"></div>`;
+      break;
+    }
+    case 'callout': {
+      d.className = 'block-callout';
+      d.innerHTML = `<div class="callout-label">${esc(block.label)}</div>
+        <div class="callout-text" contenteditable="true" onblur="updateField('${block.id}','content',this.innerText)">${esc(block.content)}</div>`;
+      break;
+    }
+    case 'twocol': {
+      d.className = 'block-twocol';
+      d.innerHTML = `
+        <div class="col-text" contenteditable="true" onblur="updateField('${block.id}','col1',this.innerText)">${esc(block.col1)}</div>
+        <div class="col-text" contenteditable="true" onblur="updateField('${block.id}','col2',this.innerText)">${esc(block.col2)}</div>
+      `;
+      break;
+    }
+    case 'caption': {
+      d.className = 'block-caption';
+      d.contentEditable = 'true';
+      d.innerText = block.content;
+      d.addEventListener('blur', () => updateField(block.id, 'content', d.innerText));
+      break;
+    }
+    case 'tagline': {
+      d.className = 'block-tagline';
+      d.innerHTML = `<div class="tagline-text" contenteditable="true" style="color:${accentColor}" onblur="updateField('${block.id}','content',this.innerText)">${esc(block.content)}</div>`;
+      break;
+    }
+    case 'spacer': {
+      d.className = 'block-spacer';
+      d.style.height = (block.height || 40) + 'px';
+      d.innerHTML = '<div class="spacer-line"></div>';
+      break;
+    }
+  }
+  return d;
+}
+
+function getCoverBg(style) {
+  const styles = {
+    dark: '#1C1A17',
+    sienna: '#5A2A14',
+    sage: '#2A3A28',
+    ivory: '#F7F3EE',
+  };
+  return styles[style] || '#1C1A17';
+}
+
+function esc(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
+}
+
+// ══════════════════════════════════════
+// SELECTION
+// ══════════════════════════════════════
+function selectBlock(id) {
+  selectedId = id;
+  render();
+  const block = blocks.find(b => b.id === id);
+  if (block) showBlockProps(block);
+}
+
+document.getElementById('magazine-page').addEventListener('click', e => {
+  if (e.target === e.currentTarget) {
+    selectedId = null;
+    render();
+    showPageProps();
+  }
+});
+
+function showPageProps() {
+  document.getElementById('props-title').textContent = 'Page Settings';
+  document.getElementById('props-subtitle').textContent = 'Global issue properties';
+  document.getElementById('block-props').style.display = 'none';
+}
+
+function showBlockProps(block) {
+  document.getElementById('props-title').textContent = capitalize(block.type) + ' Block';
+  document.getElementById('props-subtitle').textContent = 'Block properties';
+  const bp = document.getElementById('block-props');
+  bp.style.display = 'block';
+  document.getElementById('block-props-label').textContent = 'Block Options';
+
+  const inner = document.getElementById('block-props-inner');
+  inner.innerHTML = '';
+
+  if (block.type === 'cover') {
+    inner.innerHTML = `
+      <div class="prop-row">
+        <label class="prop-label">Style</label>
+        <select class="prop-select" onchange="updateFieldRender('${block.id}','style',this.value)">
+          <option value="dark" ${block.style==='dark'?'selected':''}>Dark Ink</option>
+          <option value="sienna" ${block.style==='sienna'?'selected':''}>Sienna Warm</option>
+          <option value="sage" ${block.style==='sage'?'selected':''}>Sage Green</option>
+          <option value="ivory" ${block.style==='ivory'?'selected':''}>Ivory Light</option>
+        </select>
+      </div>
+    `;
+  }
+  if (block.type === 'spacer') {
+    inner.innerHTML = `
+      <div class="prop-row">
+        <label class="prop-label">Height (px)</label>
+        <input class="prop-input" type="number" value="${block.height||40}" min="8" max="200"
+          oninput="updateFieldRender('${block.id}','height',parseInt(this.value))">
+      </div>
+    `;
+  }
+  if (block.type === 'hero-img' || block.type === 'fullbleed') {
+    inner.innerHTML = `
+      <div class="prop-row">
+        <label class="prop-label">Image</label>
+        <button class="prop-input" style="cursor:pointer;text-align:left;font-family:'Figtree',sans-serif;" onclick="openImgModal('${block.id}')">Change image →</button>
+      </div>
+    `;
+  }
+  if (block.type === 'text') {
+    inner.innerHTML = `
+      <div class="prop-row">
+        <label class="prop-label">Drop Cap</label>
+        <select class="prop-select" onchange="updateFieldRender('${block.id}','dropCap',this.value==='true')">
+          <option value="true" ${block.dropCap?'selected':''}>On</option>
+          <option value="false" ${!block.dropCap?'selected':''}>Off</option>
+        </select>
+      </div>
+    `;
+  }
+  if (block.type === 'divider') {
+    inner.innerHTML = `
+      <div class="prop-row">
+        <label class="prop-label">Ornament</label>
+        <select class="prop-select" onchange="updateFieldRender('${block.id}','ornament',this.value)">
+          <option value="✦">✦ Star</option>
+          <option value="◆">◆ Diamond</option>
+          <option value="❧">❧ Leaf</option>
+          <option value="•">• Dot</option>
+          <option value="—">— Em dash</option>
+        </select>
+      </div>
+    `;
+  }
+}
+
+// ══════════════════════════════════════
+// FIELD UPDATES
+// ══════════════════════════════════════
+function updateField(id, field, val) {
+  saveHistory();
+  const block = blocks.find(b => b.id === id);
+  if (block) block[field] = val;
+  updateSustainability();
+}
+
+function updateFieldRender(id, field, val) {
+  saveHistory();
+  const block = blocks.find(b => b.id === id);
+  if (block) { block[field] = val; render(); selectBlock(id); }
+}
+
+// ══════════════════════════════════════
+// DRAG FROM SIDEBAR
+// ══════════════════════════════════════
+function startElementDrag(e, type) {
+  dragType = type;
+  dragArchive = null;
+  dragBlockId = null;
+  const ghost = document.getElementById('drag-ghost');
+  ghost.textContent = capitalize(type) + ' block';
+  ghost.style.display = 'block';
+  e.dataTransfer.setDragImage(ghost, 60, 20);
+  e.dataTransfer.effectAllowed = 'copy';
+}
+
+function startArchiveDrag(e, key) {
+  dragArchive = key;
+  dragType = null;
+  dragBlockId = null;
+  const ghost = document.getElementById('drag-ghost');
+  ghost.textContent = 'Archive item';
+  ghost.style.display = 'block';
+  e.dataTransfer.setDragImage(ghost, 60, 20);
+  e.dataTransfer.effectAllowed = 'copy';
+}
+
+function canvasDragOver(e) { e.preventDefault(); }
+function canvasDragLeave(e) {}
+
+function canvasDrop(e) {
+  e.preventDefault();
+  if (dropTargetIndex === null) dropTargetIndex = blocks.length;
+  handleDrop(dropTargetIndex);
+}
+
+function handleDrop(index) {
+  saveHistory();
+  if (dragType) {
+    const nb = makeBlock(dragType);
+    blocks.splice(index, 0, nb);
+    selectedId = nb.id;
+    dragType = null;
+  } else if (dragArchive) {
+    const arc = ARCHIVE_CONTENT[dragArchive];
+    let newBlocks = [];
+    if (arc.headline) newBlocks.push(makeBlock('cover', { headline: arc.headline, sub: arc.sub || '' }));
+    if (arc.src) newBlocks.push(makeBlock('hero-img', { src: arc.src }));
+    if (arc.quote) newBlocks.push(makeBlock('quote', { quote: arc.quote, cite: arc.cite || '' }));
+    if (newBlocks.length === 0) newBlocks.push(makeBlock('quote', { quote: arc.quote || '', cite: arc.cite || '' }));
+    blocks.splice(index, 0, ...newBlocks);
+    selectedId = newBlocks[0].id;
+    dragArchive = null;
+  } else if (dragBlockId) {
+    const fromIdx = blocks.findIndex(b => b.id === dragBlockId);
+    if (fromIdx !== -1 && fromIdx !== index) {
+      const [moved] = blocks.splice(fromIdx, 1);
+      const toIdx = fromIdx < index ? index - 1 : index;
+      blocks.splice(toIdx, 0, moved);
+    }
+    dragBlockId = null;
+  }
+  dropTargetIndex = null;
+  document.getElementById('drag-ghost').style.display = 'none';
+  render();
+  updatePageCount();
+}
+
+// ══════════════════════════════════════
+// BLOCK OPERATIONS
+// ══════════════════════════════════════
+function deleteSelected() {
+  if (!selectedId) return;
+  saveHistory();
+  blocks = blocks.filter(b => b.id !== selectedId);
+  selectedId = null;
+  render();
+  showPageProps();
+}
+
+function duplicateSelected() {
+  if (!selectedId) return;
+  saveHistory();
+  const idx = blocks.findIndex(b => b.id === selectedId);
+  if (idx === -1) return;
+  const clone = JSON.parse(JSON.stringify(blocks[idx]));
+  clone.id = 'b' + Date.now() + Math.random().toString(36).slice(2,6);
+  blocks.splice(idx + 1, 0, clone);
+  selectedId = clone.id;
+  render();
+  showToast('Block duplicated');
+}
+
+function moveBlockUp() {
+  if (!selectedId) return;
+  saveHistory();
+  const idx = blocks.findIndex(b => b.id === selectedId);
+  if (idx <= 0) return;
+  [blocks[idx-1], blocks[idx]] = [blocks[idx], blocks[idx-1]];
+  render();
+}
+
+function moveBlockDown() {
+  if (!selectedId) return;
+  saveHistory();
+  const idx = blocks.findIndex(b => b.id === selectedId);
+  if (idx >= blocks.length - 1) return;
+  [blocks[idx], blocks[idx+1]] = [blocks[idx+1], blocks[idx]];
+  render();
+}
+
+// ══════════════════════════════════════
+// HISTORY (UNDO)
+// ══════════════════════════════════════
+function saveHistory() {
+  history.push(JSON.stringify(blocks));
+  if (history.length > 40) history.shift();
+}
+
+function undo() {
+  if (!history.length) { showToast('Nothing to undo'); return; }
+  blocks = JSON.parse(history.pop());
+  render();
+  showToast('Undone ↩');
+}
+
+// ══════════════════════════════════════
+// IMAGE MODAL
+// ══════════════════════════════════════
+function openImgModal(blockId) {
+  pendingImgBlockId = blockId;
+  selectedModalImg = null;
+  document.querySelectorAll('.modal-img').forEach(i => i.classList.remove('selected'));
+  document.getElementById('modal-url-input').value = '';
+  document.getElementById('img-modal').classList.add('open');
+}
+
+function closeImgModal() {
+  document.getElementById('img-modal').classList.remove('open');
+  pendingImgBlockId = null;
+}
+
+function selectModalImg(el) {
+  document.querySelectorAll('.modal-img').forEach(i => i.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedModalImg = el.src;
+  document.getElementById('modal-url-input').value = el.src;
+}
+
+function applyModalImg() {
+  const url = document.getElementById('modal-url-input').value.trim() || selectedModalImg;
+  if (!url || !pendingImgBlockId) { closeImgModal(); return; }
+  updateFieldRender(pendingImgBlockId, 'src', url);
+  closeImgModal();
+}
+
+document.getElementById('img-modal').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeImgModal();
+});
+
+// ══════════════════════════════════════
+// STYLE CONTROLS
+// ══════════════════════════════════════
+function setAccent(col, colLight, el) {
+  accentColor = col;
+  accentLight = colLight;
+  document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+  el.classList.add('active');
+  document.documentElement.style.setProperty('--sienna', col);
+  document.documentElement.style.setProperty('--sienna-light', colLight);
+  render();
+}
+
+function setCoverStyle(style) {
+  const cover = blocks.find(b => b.type === 'cover');
+  if (cover) updateFieldRender(cover.id, 'style', style);
+}
+
+const FONT_MAP = {
+  cormorant: "'Cormorant Garamond',serif",
+  garamond: "'EB Garamond',serif",
+  playfair: "'Playfair Display',serif",
+  figtree: "'Figtree',sans-serif",
+};
+function setFont(target, key, el) {
+  document.querySelectorAll('.font-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.cover-headline').forEach(h => h.style.fontFamily = FONT_MAP[key]);
+  document.querySelectorAll('blockquote').forEach(q => q.style.fontFamily = FONT_MAP[key]);
+}
+
+// ══════════════════════════════════════
+// VIEW MODE
+// ══════════════════════════════════════
+function setView(mode, btn) {
+  document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const layout = document.getElementById('builder-layout');
+  if (mode === 'preview') {
+    layout.style.gridTemplateColumns = '0 1fr 0';
+    document.querySelector('.sidebar').style.display = 'none';
+    document.querySelector('.props-panel').style.display = 'none';
+    document.querySelector('.canvas-toolbar').style.display = 'none';
+    document.querySelectorAll('.block-controls, .drag-handle').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('.block').forEach(b => { b.style.outline = 'none'; b.style.cursor = 'default'; });
+  } else {
+    layout.style.gridTemplateColumns = '';
+    document.querySelector('.sidebar').style.display = '';
+    document.querySelector('.props-panel').style.display = '';
+    document.querySelector('.canvas-toolbar').style.display = '';
+    render();
+  }
+}
+
+// ══════════════════════════════════════
+// SIDEBAR TABS
+// ══════════════════════════════════════
+function switchSTab(id, btn) {
+  document.querySelectorAll('.stab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.sidebar-pane').forEach(p => p.classList.remove('active'));
+  document.getElementById('stab-' + id).classList.add('active');
+}
+
+// ══════════════════════════════════════
+// PAGES
+// ══════════════════════════════════════
+let pages = [{ name: 'Cover Page', blockCount: 5 }];
+let currentPage = 0;
+
+function addPage() {
+  pages.push({ name: 'Page ' + (pages.length + 1), blockCount: 0 });
+  updatePageList();
+  showToast('Page added');
+}
+
+function selectPage(i) {
+  currentPage = i;
+  updatePageList();
+}
+
+function updatePageList() {
+  const list = document.getElementById('pages-list');
+  list.innerHTML = '';
+  pages.forEach((p, i) => {
+    const t = document.createElement('div');
+    t.className = 'page-thumb' + (i === currentPage ? ' active' : '');
+    t.onclick = () => selectPage(i);
+    t.innerHTML = `
+      <div class="page-mini">
+        <div class="page-mini-bar dark" style="width:70%;height:5px;margin-bottom:2px;"></div>
+        <div class="page-mini-bar" style="width:100%;"></div>
+        <div class="page-mini-bar" style="width:100%;"></div>
+        <div class="page-mini-bar" style="width:80%;"></div>
+      </div>
+      <div class="page-thumb-info">
+        <div class="page-thumb-name">${p.name}</div>
+        <div class="page-thumb-count">${blocks.length} blocks</div>
+      </div>
+    `;
+    list.appendChild(t);
+  });
+}
+
+function updatePageCount() {
+  if (pages[currentPage]) {
+    pages[currentPage].blockCount = blocks.length;
+    updatePageList();
+  }
+}
+
+// ══════════════════════════════════════
+// SUSTAINABILITY
+// ══════════════════════════════════════
+function updateSustainability() {
+  const imgCount = blocks.filter(b => b.type === 'hero-img' || b.type === 'fullbleed').length;
+  const blockKB = blocks.length * 0.8;
+  const imgKB = imgCount * 18;
+  const total = blockKB + imgKB;
+  document.getElementById('s-weight').textContent = total.toFixed(0) + 'kb';
+  document.getElementById('s-co2').textContent = (total * 0.0008).toFixed(3) + 'g';
+  document.getElementById('s-imgs').textContent = imgCount + ' image' + (imgCount !== 1 ? 's' : '');
+}
+
+// ══════════════════════════════════════
+// EXPORT
+// ══════════════════════════════════════
+function exportHTML() {
+  const page = document.getElementById('magazine-page');
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>${document.getElementById('issue-title').value} · Library of Morenita</title>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;1,400&family=Cormorant+Garamond:ital,wght@0,300;1,300&family=Figtree:wght@400&display=swap" rel="stylesheet">
+<style>
+  body { font-family:'Figtree',sans-serif; background:#EDE8E0; margin:0; padding:32px; }
+  .page { max-width:520px; margin:0 auto; background:#FAFAF8; box-shadow:0 4px 24px rgba(0,0,0,0.12); }
+  ${page.closest('style') ? '' : ''}
+</style>
+</head>
+<body>
+<div class="page">
+${page.innerHTML}
+</div>
+</body>
+</html>`;
+  const blob = new Blob([html], { type: 'text/html' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = (document.getElementById('issue-title').value || 'issue') + '.html';
+  a.click();
+  showToast('HTML exported ✓');
+}
+
+function showExportModal() { showToast('PDF export — coming soon'); }
+
+// ══════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+// ══════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════
+function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+// Keyboard shortcuts
+document.addEventListener('keydown', e => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'z') { e.preventDefault(); undo(); }
+  if (e.key === 'Escape') { selectedId = null; render(); showPageProps(); }
+  if ((e.key === 'Delete' || e.key === 'Backspace') && selectedId) {
+    const active = document.activeElement;
+    if (active && active.isContentEditable) return;
+    deleteSelected();
+  }
+});
+
+// Click outside deselects
+document.getElementById('canvas-wrap').addEventListener('click', e => {
+  if (e.target === e.currentTarget) { selectedId = null; render(); showPageProps(); }
+});
+
+// Init
+init();
+showPageProps();
+</script>
+</body>
+</html>

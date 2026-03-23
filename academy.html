@@ -1,0 +1,2007 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Academy & Study Space · Library of Morenita</title>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Figtree:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream: #F7F3EE;
+  --parchment: #EDE8E0;
+  --ink: #1C1A17;
+  --ink-muted: #5C5750;
+  --ink-faint: #9B968D;
+  --sienna: #8B4A2A;
+  --sienna-light: #C47A55;
+  --sage: #5A6B55;
+  --sage-light: #8BA683;
+  --gold: #C49A3C;
+  --gold-light: #DDB96A;
+  --border: rgba(28,26,23,0.12);
+  --border-strong: rgba(28,26,23,0.25);
+  --void: #0C0B09;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+
+body {
+  font-family: 'Figtree', sans-serif;
+  background: var(--cream);
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1.7;
+  cursor: default;
+}
+
+/* ── GRID BANNER ── */
+.grid-banner {
+  background: var(--ink);
+  color: rgba(247,243,238,0.7);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 7px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.grid-dot { width:6px;height:6px;border-radius:50%;background:#5A9E6A;display:inline-block;margin-right:7px; }
+
+/* ── NAV ── */
+nav {
+  background: var(--cream);
+  border-bottom: 1px solid var(--border);
+  padding: 0 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 60px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.nav-logo {
+  font-family:'EB Garamond',serif;
+  font-size:17px;
+  color:var(--ink);
+  text-decoration:none;
+  letter-spacing:0.03em;
+}
+.nav-logo em { font-style:italic; color:var(--sienna); }
+.nav-links { display:flex; gap:28px; list-style:none; }
+.nav-links a {
+  font-size:11px; letter-spacing:0.08em; text-transform:uppercase;
+  color:var(--ink-muted); text-decoration:none; transition:color 0.2s;
+}
+.nav-links a:hover, .nav-links a.active { color:var(--ink); }
+
+/* ── TAB SYSTEM ── */
+.tab-bar {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  background: var(--cream);
+  position: sticky;
+  top: 60px;
+  z-index: 90;
+  padding: 0 40px;
+}
+.tab-btn {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-family:'Figtree',sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  padding: 16px 24px 14px;
+  cursor: pointer;
+  margin-bottom: -1px;
+  transition: all 0.2s;
+}
+.tab-btn:hover { color: var(--ink-muted); }
+.tab-btn.active {
+  color: var(--ink);
+  border-bottom-color: var(--sienna);
+}
+
+.tab-pane { display:none; }
+.tab-pane.active { display:block; }
+
+/* ════════════════════════════════════
+   ACADEMY TAB
+════════════════════════════════════ */
+
+/* Hero */
+.academy-hero {
+  background: var(--ink);
+  color: var(--cream);
+  padding: 72px 40px 64px;
+  position: relative;
+  overflow: hidden;
+}
+.academy-hero::before {
+  content:'';
+  position:absolute;
+  inset:0;
+  background: radial-gradient(ellipse 80% 60% at 70% 50%, rgba(139,74,42,0.25) 0%, transparent 70%);
+  pointer-events:none;
+}
+.academy-hero-inner {
+  max-width: 760px;
+  position:relative;
+}
+.academy-eyebrow {
+  font-size:10px;
+  letter-spacing:0.16em;
+  text-transform:uppercase;
+  color: var(--sienna-light);
+  margin-bottom: 20px;
+  display:flex;
+  align-items:center;
+  gap:16px;
+}
+.academy-eyebrow::after {
+  content:'';
+  flex:1;
+  max-width:48px;
+  height:1px;
+  background:var(--sienna-light);
+  opacity:0.5;
+  display:block;
+}
+.academy-hero h1 {
+  font-family:'Cormorant Garamond',serif;
+  font-size: clamp(40px,6vw,72px);
+  font-weight:300;
+  line-height:1.03;
+  margin-bottom:20px;
+}
+.academy-hero h1 em { font-style:italic; color:var(--sienna-light); }
+.academy-hero p {
+  font-family:'EB Garamond',serif;
+  font-size:19px;
+  color:rgba(247,243,238,0.65);
+  line-height:1.65;
+  max-width:560px;
+  font-style:italic;
+}
+
+/* Progress bar */
+.progress-strip {
+  background: var(--parchment);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 40px;
+  display:flex;
+  align-items:center;
+  gap:32px;
+}
+.progress-item {
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+.progress-label {
+  font-size:9px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--ink-faint);
+}
+.progress-val {
+  font-family:'Cormorant Garamond',serif;
+  font-size:22px;
+  font-weight:300;
+  color:var(--ink);
+}
+.progress-bar-wrap {
+  flex:1;
+  height:3px;
+  background:rgba(28,26,23,0.1);
+  border-radius:2px;
+  overflow:hidden;
+}
+.progress-bar-fill {
+  height:100%;
+  background: linear-gradient(90deg, var(--sienna), var(--sienna-light));
+  border-radius:2px;
+  width:18%;
+  transition:width 0.8s ease;
+}
+
+/* Tracks grid */
+.tracks-section {
+  max-width:1200px;
+  margin:0 auto;
+  padding:48px 40px;
+}
+.section-head {
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  margin-bottom:28px;
+}
+.section-head h2 {
+  font-family:'EB Garamond',serif;
+  font-size:22px;
+  font-weight:400;
+}
+.section-head a {
+  font-size:11px;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  color:var(--ink-faint);
+  text-decoration:none;
+  transition:color 0.2s;
+}
+.section-head a:hover { color:var(--sienna); }
+
+.tracks-grid {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:20px;
+}
+.track-card {
+  border:1px solid var(--border);
+  background:#fff;
+  border-radius:3px;
+  overflow:hidden;
+  cursor:pointer;
+  transition:border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+}
+.track-card:hover {
+  border-color:var(--border-strong);
+  transform:translateY(-2px);
+  box-shadow:0 8px 32px rgba(28,26,23,0.08);
+}
+.track-cover {
+  height:160px;
+  position:relative;
+  display:flex;
+  align-items:flex-end;
+  padding:20px;
+}
+.track-cover-bg {
+  position:absolute;
+  inset:0;
+  background-size:cover;
+  background-position:center;
+}
+.track-cover-overlay {
+  position:absolute;
+  inset:0;
+  opacity:0.75;
+}
+.track-cover-content { position:relative; z-index:1; }
+.track-num {
+  font-family:'Cormorant Garamond',serif;
+  font-size:48px;
+  font-weight:300;
+  color:rgba(247,243,238,0.2);
+  position:absolute;
+  top:12px; right:20px;
+  line-height:1;
+  z-index:1;
+}
+.track-name {
+  font-family:'Cormorant Garamond',serif;
+  font-size:22px;
+  font-weight:300;
+  color:#F7F3EE;
+  line-height:1.15;
+}
+.track-body { padding:20px 22px 24px; }
+.track-desc {
+  font-family:'EB Garamond',serif;
+  font-size:15px;
+  color:var(--ink-muted);
+  line-height:1.6;
+  font-style:italic;
+  margin-bottom:16px;
+}
+.track-meta {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.track-pills { display:flex; gap:6px; flex-wrap:wrap; }
+.track-pill {
+  font-size:9px;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  color:var(--sienna);
+  border:1px solid rgba(139,74,42,0.25);
+  padding:2px 8px;
+  border-radius:2px;
+}
+.track-progress-circle {
+  width:36px;height:36px;
+  position:relative;
+  flex-shrink:0;
+}
+.track-progress-circle svg {
+  transform:rotate(-90deg);
+}
+.track-progress-circle .pct {
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:9px;
+  font-weight:500;
+  color:var(--ink-faint);
+}
+
+/* Lesson detail */
+.lesson-panel {
+  max-width:1200px;
+  margin:0 auto;
+  padding:0 40px 64px;
+  display:none;
+}
+.lesson-panel.open { display:block; }
+.lesson-back {
+  font-size:11px;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  color:var(--ink-faint);
+  cursor:pointer;
+  margin-bottom:28px;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  border:none;
+  background:none;
+  font-family:'Figtree',sans-serif;
+  transition:color 0.2s;
+}
+.lesson-back:hover { color:var(--sienna); }
+.lesson-title {
+  font-family:'Cormorant Garamond',serif;
+  font-size:42px;
+  font-weight:300;
+  color:var(--ink);
+  margin-bottom:12px;
+  line-height:1.1;
+}
+.lesson-title em { font-style:italic; color:var(--sienna); }
+.lesson-byline {
+  font-family:'EB Garamond',serif;
+  font-size:16px;
+  color:var(--ink-faint);
+  font-style:italic;
+  margin-bottom:36px;
+  padding-bottom:28px;
+  border-bottom:1px solid var(--border);
+}
+
+.syllabus {
+  display:grid;
+  grid-template-columns:1fr 300px;
+  gap:48px;
+}
+.syllabus-weeks { }
+.week-item {
+  display:flex;
+  gap:24px;
+  margin-bottom:32px;
+  padding-bottom:32px;
+  border-bottom:1px solid var(--border);
+  cursor:pointer;
+  transition:all 0.2s;
+}
+.week-item:last-child { border-bottom:none; }
+.week-num {
+  font-family:'Cormorant Garamond',serif;
+  font-size:13px;
+  color:var(--ink-faint);
+  text-transform:uppercase;
+  letter-spacing:0.1em;
+  min-width:56px;
+  padding-top:3px;
+}
+.week-content { flex:1; }
+.week-title {
+  font-family:'EB Garamond',serif;
+  font-size:19px;
+  color:var(--ink);
+  margin-bottom:6px;
+  transition:color 0.2s;
+}
+.week-item:hover .week-title { color:var(--sienna); }
+.week-desc {
+  font-size:13px;
+  color:var(--ink-faint);
+  line-height:1.55;
+  margin-bottom:10px;
+}
+.week-readings {
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+}
+.reading-chip {
+  font-size:10px;
+  letter-spacing:0.06em;
+  background:var(--parchment);
+  color:var(--ink-muted);
+  padding:3px 10px;
+  border-radius:2px;
+  border:1px solid var(--border);
+}
+.week-status {
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-size:10px;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  color:var(--ink-faint);
+  margin-top:10px;
+}
+.status-dot {
+  width:7px;height:7px;border-radius:50%;
+}
+.status-dot.done { background:var(--sage); }
+.status-dot.current { background:var(--gold); }
+.status-dot.locked { background:rgba(28,26,23,0.2); }
+
+.syllabus-aside { }
+.aside-card {
+  background:var(--parchment);
+  border:1px solid var(--border);
+  border-radius:3px;
+  padding:24px;
+  margin-bottom:20px;
+}
+.aside-card h4 {
+  font-family:'EB Garamond',serif;
+  font-size:15px;
+  margin-bottom:12px;
+  color:var(--ink);
+}
+.aside-card ul {
+  list-style:none;
+}
+.aside-card ul li {
+  font-size:13px;
+  color:var(--ink-muted);
+  padding:5px 0;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.aside-card ul li:last-child { border-bottom:none; }
+.aside-card ul li::before {
+  content:'';
+  width:5px; height:5px;
+  border-radius:50%;
+  background:var(--sienna-light);
+  flex-shrink:0;
+}
+
+/* ════════════════════════════════════
+   STUDY SPACE TAB
+════════════════════════════════════ */
+.study-page {
+  background: #0C0B09;
+  min-height: calc(100vh - 93px);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Room scene */
+.room-scene {
+  position:relative;
+  width:100%;
+  height:520px;
+  overflow:hidden;
+  background:#0C0B09;
+}
+
+/* CSS painted room: Library Nook */
+.room-library {
+  position:absolute;
+  inset:0;
+}
+/* floor */
+.room-floor {
+  position:absolute;
+  bottom:0; left:0; right:0;
+  height:160px;
+  background: linear-gradient(180deg, #1A1209 0%, #261A0E 60%, #1E1409 100%);
+}
+/* back wall */
+.room-wall {
+  position:absolute;
+  bottom:160px; left:0; right:0;
+  height:360px;
+  background: linear-gradient(180deg, #0E0C08 0%, #1A1510 70%, #201710 100%);
+}
+/* bookshelf left */
+.bookshelf {
+  position:absolute;
+  bottom:150px;
+  left:5%;
+  width:180px;
+  height:260px;
+  background:#2A1E14;
+  border:1px solid rgba(255,220,160,0.07);
+  border-radius:1px;
+}
+.shelf-row {
+  position:absolute;
+  left:0; right:0;
+  height:6px;
+  background:#3A2A1C;
+}
+.shelf-row:nth-child(1) { bottom:60px; }
+.shelf-row:nth-child(2) { bottom:120px; }
+.shelf-row:nth-child(3) { bottom:180px; }
+/* books */
+.book {
+  position:absolute;
+  bottom:0;
+  width:14px;
+  border-radius:1px 1px 0 0;
+}
+/* window center */
+.room-window {
+  position:absolute;
+  top:30px;
+  left:50%;
+  transform:translateX(-50%);
+  width:220px;
+  height:240px;
+  background: linear-gradient(180deg,
+    rgba(60,90,140,0.7) 0%,
+    rgba(80,60,100,0.5) 40%,
+    rgba(30,20,40,0.8) 100%
+  );
+  border:3px solid #3A2E22;
+  border-radius:2px;
+  overflow:hidden;
+  box-shadow: inset 0 0 60px rgba(80,60,120,0.3), 0 0 40px rgba(60,80,140,0.2);
+}
+.window-cross-h {
+  position:absolute;
+  left:0;right:0;
+  top:50%;
+  height:4px;
+  background:#3A2E22;
+  transform:translateY(-50%);
+}
+.window-cross-v {
+  position:absolute;
+  top:0;bottom:0;
+  left:50%;
+  width:4px;
+  background:#3A2E22;
+  transform:translateX(-50%);
+}
+/* moon */
+.moon {
+  position:absolute;
+  top:30px;
+  right:35px;
+  width:34px;height:34px;
+  border-radius:50%;
+  background: radial-gradient(circle at 40% 40%, #F5E8B0, #DEB96A);
+  box-shadow:0 0 20px rgba(220,185,100,0.4);
+  animation: moonFloat 6s ease-in-out infinite;
+}
+@keyframes moonFloat {
+  0%,100% { transform:translateY(0); }
+  50% { transform:translateY(-6px); }
+}
+.stars-window {
+  position:absolute;
+  inset:0;
+}
+/* desk */
+.desk {
+  position:absolute;
+  bottom:155px;
+  left:50%;
+  transform:translateX(-50%);
+  width:420px;
+  height:18px;
+  background:#3A2619;
+  border-top:3px solid #52341F;
+  border-radius:2px;
+  box-shadow:0 8px 24px rgba(0,0,0,0.5);
+}
+/* desk items */
+.desk-book {
+  position:absolute;
+  bottom:172px;
+  left:calc(50% - 120px);
+  width:80px;
+  height:12px;
+  background:#2C1E0E;
+  border:1px solid rgba(255,200,120,0.15);
+  transform:perspective(200px) rotateX(15deg);
+}
+.desk-paper {
+  position:absolute;
+  bottom:167px;
+  left:calc(50% - 20px);
+  width:90px;
+  height:8px;
+  background:rgba(247,243,238,0.12);
+  border-radius:1px;
+  transform:perspective(200px) rotateX(15deg);
+}
+/* candle */
+.candle-wrap {
+  position:absolute;
+  bottom:173px;
+  left:calc(50% + 100px);
+}
+.candle-body {
+  width:12px;height:28px;
+  background: linear-gradient(180deg,#E8D5A0,#C8B070);
+  border-radius:1px;
+  margin:0 auto;
+}
+.candle-flame {
+  width:8px;height:16px;
+  background: radial-gradient(ellipse 50% 80% at 50% 80%,
+    rgba(255,200,60,1) 0%,
+    rgba(255,140,20,0.8) 50%,
+    rgba(255,80,0,0) 100%
+  );
+  margin:0 auto -4px;
+  border-radius:50% 50% 30% 30%;
+  animation: flicker 1.8s ease-in-out infinite alternate;
+  filter:blur(0.5px);
+}
+.candle-glow {
+  position:absolute;
+  top:-20px;
+  left:50%;
+  transform:translateX(-50%);
+  width:60px;height:60px;
+  border-radius:50%;
+  background:radial-gradient(circle, rgba(255,180,40,0.25) 0%, transparent 70%);
+  animation: glowPulse 1.8s ease-in-out infinite alternate;
+  pointer-events:none;
+}
+@keyframes flicker {
+  0%   { transform: scaleX(1) scaleY(1) translateX(0); opacity:1; }
+  30%  { transform: scaleX(0.9) scaleY(1.05) translateX(-1px); }
+  60%  { transform: scaleX(1.1) scaleY(0.95) translateX(1px); opacity:0.9; }
+  100% { transform: scaleX(0.95) scaleY(1.02) translateX(0.5px); opacity:1; }
+}
+@keyframes glowPulse {
+  0% { opacity:0.8; transform:translateX(-50%) scale(1); }
+  100% { opacity:1; transform:translateX(-50%) scale(1.15); }
+}
+/* lamp */
+.lamp {
+  position:absolute;
+  bottom:190px;
+  right:8%;
+  width:60px;
+}
+.lamp-head {
+  width:60px;height:30px;
+  background: linear-gradient(180deg,#3A2619,#4A3020);
+  border-radius:50% 50% 0 0;
+  position:relative;
+}
+.lamp-glow-inner {
+  position:absolute;
+  bottom:-4px; left:4px; right:4px;
+  height:12px;
+  background:rgba(255,210,120,0.6);
+  border-radius:0 0 30px 30px;
+  filter:blur(4px);
+  animation: glowPulse 2.4s ease-in-out infinite alternate;
+}
+.lamp-stem {
+  width:4px;height:40px;
+  background:#3A2619;
+  margin:0 auto;
+}
+.lamp-base {
+  width:28px;height:8px;
+  background:#3A2619;
+  border-radius:2px;
+  margin:0 auto;
+}
+.lamp-cast {
+  position:absolute;
+  bottom:155px;
+  right:5%;
+  width:180px;height:80px;
+  background:radial-gradient(ellipse at 30% 0%, rgba(255,200,100,0.12) 0%, transparent 70%);
+  pointer-events:none;
+}
+/* rug */
+.rug {
+  position:absolute;
+  bottom:155px;
+  left:50%;
+  transform:translateX(-50%);
+  width:380px;height:8px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(139,74,42,0.3) 20%,
+    rgba(196,122,85,0.4) 50%,
+    rgba(139,74,42,0.3) 80%,
+    transparent 100%
+  );
+  border-radius:4px;
+}
+/* floating particles */
+.particle {
+  position:absolute;
+  width:2px;height:2px;
+  border-radius:50%;
+  background:rgba(255,220,160,0.6);
+  animation: floatUp linear infinite;
+  pointer-events:none;
+}
+@keyframes floatUp {
+  0% { transform:translateY(0) translateX(0); opacity:0; }
+  10% { opacity:0.6; }
+  90% { opacity:0.2; }
+  100% { transform:translateY(-120px) translateX(var(--drift,10px)); opacity:0; }
+}
+
+/* ── ROOM SWITCHER ── */
+.room-switcher {
+  display:flex;
+  justify-content:center;
+  gap:12px;
+  padding:20px;
+  background:#0C0B09;
+  border-bottom:1px solid rgba(247,243,238,0.05);
+}
+.room-btn {
+  background:rgba(247,243,238,0.05);
+  border:1px solid rgba(247,243,238,0.1);
+  color:rgba(247,243,238,0.45);
+  font-family:'Figtree',sans-serif;
+  font-size:10px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  padding:8px 20px;
+  border-radius:2px;
+  cursor:pointer;
+  transition:all 0.25s;
+}
+.room-btn:hover {
+  background:rgba(247,243,238,0.1);
+  color:rgba(247,243,238,0.8);
+}
+.room-btn.active {
+  background:rgba(139,74,42,0.25);
+  border-color:rgba(196,122,85,0.4);
+  color:rgba(247,243,238,0.9);
+}
+
+/* ── SOUND CONTROLS ── */
+.study-controls {
+  max-width:860px;
+  margin:0 auto;
+  padding:40px 40px 24px;
+  color:rgba(247,243,238,0.9);
+}
+.controls-title {
+  font-family:'Cormorant Garamond',serif;
+  font-size:28px;
+  font-weight:300;
+  color:rgba(247,243,238,0.9);
+  margin-bottom:4px;
+}
+.controls-sub {
+  font-family:'EB Garamond',serif;
+  font-size:15px;
+  color:rgba(247,243,238,0.35);
+  font-style:italic;
+  margin-bottom:32px;
+}
+.sound-layers {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+  margin-bottom:32px;
+}
+.sound-layer {
+  background:rgba(247,243,238,0.04);
+  border:1px solid rgba(247,243,238,0.08);
+  border-radius:3px;
+  padding:18px 18px 16px;
+  cursor:pointer;
+  transition:all 0.2s;
+  position:relative;
+  overflow:hidden;
+}
+.sound-layer::before {
+  content:'';
+  position:absolute;
+  inset:0;
+  background:rgba(139,74,42,0.15);
+  opacity:0;
+  transition:opacity 0.2s;
+}
+.sound-layer.active::before { opacity:1; }
+.sound-layer.active {
+  border-color:rgba(196,122,85,0.3);
+}
+.sound-layer:hover { border-color:rgba(247,243,238,0.15); }
+.sound-icon {
+  font-size:24px;
+  margin-bottom:10px;
+  display:block;
+}
+.sound-name {
+  font-size:12px;
+  letter-spacing:0.06em;
+  color:rgba(247,243,238,0.75);
+  margin-bottom:10px;
+  display:block;
+}
+.sound-vol {
+  position:relative;
+  z-index:1;
+}
+.vol-slider {
+  width:100%;
+  -webkit-appearance:none;
+  appearance:none;
+  height:3px;
+  background:rgba(247,243,238,0.15);
+  border-radius:2px;
+  outline:none;
+  cursor:pointer;
+}
+.vol-slider::-webkit-slider-thumb {
+  -webkit-appearance:none;
+  width:12px;height:12px;
+  border-radius:50%;
+  background:var(--sienna-light);
+  cursor:pointer;
+  box-shadow:0 0 6px rgba(196,122,85,0.5);
+}
+.vol-slider::-moz-range-thumb {
+  width:12px;height:12px;
+  border-radius:50%;
+  background:var(--sienna-light);
+  cursor:pointer;
+  border:none;
+}
+.sound-on-indicator {
+  position:absolute;
+  top:12px;right:12px;
+  width:6px;height:6px;
+  border-radius:50%;
+  background:rgba(247,243,238,0.2);
+  transition:all 0.2s;
+}
+.sound-layer.active .sound-on-indicator {
+  background:var(--sage-light);
+  box-shadow:0 0 6px rgba(138,166,131,0.6);
+}
+
+/* Visualizer bar */
+.visualizer {
+  display:flex;
+  align-items:flex-end;
+  gap:3px;
+  height:32px;
+  justify-content:center;
+  margin-bottom:28px;
+  opacity:0.4;
+  transition:opacity 0.3s;
+}
+.visualizer.playing { opacity:1; }
+.viz-bar {
+  width:4px;
+  background:var(--sienna-light);
+  border-radius:2px;
+  animation:vizAnim 0.8s ease-in-out infinite alternate;
+  height:4px;
+  transition:height 0.15s;
+}
+@keyframes vizAnim {
+  0% { transform:scaleY(0.3); }
+  100% { transform:scaleY(1); }
+}
+
+/* Focus timer */
+.focus-timer {
+  background:rgba(247,243,238,0.03);
+  border:1px solid rgba(247,243,238,0.07);
+  border-radius:3px;
+  padding:28px 32px;
+  display:grid;
+  grid-template-columns:1fr auto;
+  align-items:center;
+  gap:32px;
+  margin-bottom:28px;
+}
+.timer-display {
+  font-family:'Cormorant Garamond',serif;
+  font-size:56px;
+  font-weight:300;
+  color:rgba(247,243,238,0.9);
+  letter-spacing:-0.02em;
+  line-height:1;
+}
+.timer-mode {
+  font-size:10px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:rgba(247,243,238,0.3);
+  margin-top:6px;
+}
+.timer-controls {
+  display:flex;
+  gap:10px;
+  align-items:center;
+}
+.timer-btn {
+  background:none;
+  border:1px solid rgba(247,243,238,0.15);
+  color:rgba(247,243,238,0.6);
+  font-family:'Figtree',sans-serif;
+  font-size:10px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  padding:9px 20px;
+  cursor:pointer;
+  border-radius:2px;
+  transition:all 0.2s;
+}
+.timer-btn:hover {
+  background:rgba(247,243,238,0.08);
+  color:rgba(247,243,238,0.9);
+}
+.timer-btn.primary {
+  background:var(--sienna);
+  border-color:var(--sienna);
+  color:#fff;
+}
+.timer-btn.primary:hover { background:var(--sienna-light); border-color:var(--sienna-light); }
+.timer-presets {
+  display:flex;
+  gap:8px;
+  margin-top:12px;
+}
+.preset-btn {
+  background:none;
+  border:1px solid rgba(247,243,238,0.1);
+  color:rgba(247,243,238,0.35);
+  font-size:10px;
+  letter-spacing:0.06em;
+  padding:5px 12px;
+  border-radius:2px;
+  cursor:pointer;
+  font-family:'Figtree',sans-serif;
+  transition:all 0.2s;
+}
+.preset-btn:hover, .preset-btn.active {
+  border-color:rgba(196,122,85,0.4);
+  color:rgba(247,243,238,0.7);
+}
+
+/* Intention setter */
+.intention-box {
+  background:rgba(247,243,238,0.03);
+  border:1px solid rgba(247,243,238,0.07);
+  border-radius:3px;
+  padding:20px 24px;
+}
+.intention-label {
+  font-size:10px;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:rgba(247,243,238,0.25);
+  margin-bottom:10px;
+  display:block;
+}
+.intention-input {
+  width:100%;
+  background:none;
+  border:none;
+  outline:none;
+  font-family:'EB Garamond',serif;
+  font-size:18px;
+  font-style:italic;
+  color:rgba(247,243,238,0.7);
+  line-height:1.5;
+  resize:none;
+  min-height:40px;
+}
+.intention-input::placeholder { color:rgba(247,243,238,0.2); }
+
+/* Currently studying */
+.currently-strip {
+  max-width:860px;
+  margin:0 auto;
+  padding:0 40px 48px;
+}
+.currently-title {
+  font-size:10px;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:rgba(247,243,238,0.2);
+  margin-bottom:16px;
+}
+.current-items {
+  display:flex;
+  gap:14px;
+}
+.current-item {
+  flex:1;
+  background:rgba(247,243,238,0.04);
+  border:1px solid rgba(247,243,238,0.08);
+  border-radius:3px;
+  padding:14px 16px;
+  cursor:pointer;
+  transition:border-color 0.2s;
+}
+.current-item:hover { border-color:rgba(247,243,238,0.15); }
+.current-tag {
+  font-size:9px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--sienna-light);
+  margin-bottom:6px;
+  display:block;
+}
+.current-name {
+  font-family:'EB Garamond',serif;
+  font-size:15px;
+  color:rgba(247,243,238,0.7);
+  line-height:1.3;
+}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px) {
+  .tracks-grid { grid-template-columns:1fr; }
+  .sound-layers { grid-template-columns:1fr 1fr; }
+  .syllabus { grid-template-columns:1fr; }
+  .current-items { flex-wrap:wrap; }
+}
+</style>
+</head>
+<body>
+
+<div class="grid-banner">
+  <span><span class="grid-dot"></span>Grid: Moderate · Library of Morenita</span>
+  <span style="color:rgba(247,243,238,0.35);">Academy & Study Space</span>
+</div>
+
+<nav>
+  <a href="index.html" class="nav-logo">Library of <em>Morenita</em></a>
+  <ul class="nav-links">
+    <li><a href="index.html">Archive</a></li>
+    <li><a href="idea-web.html">Idea Web</a></li>
+    <li><a href="academy.html" class="active">Academy</a></li>
+    <li><a href="builder.html">Create</a></li>
+  </ul>
+</nav>
+
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('academy', this)">Academy</button>
+  <button class="tab-btn" onclick="switchTab('study', this)">Study Space</button>
+</div>
+
+<!-- ════════════════════════════════════ -->
+<!-- ACADEMY TAB                         -->
+<!-- ════════════════════════════════════ -->
+<div id="tab-academy" class="tab-pane active">
+
+  <div class="academy-hero">
+    <div class="academy-hero-inner">
+      <div class="academy-eyebrow">Curriculum Curator · Learning Paths</div>
+      <h1>The <em>pursuit of knowledge</em><br>is the pursuit of self</h1>
+      <p>Each track is a living syllabus — a sequence of issues, articles, and essays that deepen understanding together. Learn by issue, not by lecture.</p>
+    </div>
+  </div>
+
+  <div class="progress-strip">
+    <div class="progress-item">
+      <span class="progress-label">Tracks Enrolled</span>
+      <span class="progress-val">2</span>
+    </div>
+    <div class="progress-item">
+      <span class="progress-label">Lessons Complete</span>
+      <span class="progress-val">3 / 16</span>
+    </div>
+    <div class="progress-item">
+      <span class="progress-label">Reading Streak</span>
+      <span class="progress-val">7 days</span>
+    </div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="main-progress"></div>
+    </div>
+    <div class="progress-item" style="min-width:48px;">
+      <span class="progress-label">Overall</span>
+      <span class="progress-val" style="font-size:16px; color:var(--sienna)">18%</span>
+    </div>
+  </div>
+
+  <!-- Track grid -->
+  <div class="tracks-section" id="tracks-section">
+    <div class="section-head">
+      <h2>Learning Tracks</h2>
+      <a href="#">View all →</a>
+    </div>
+    <div class="tracks-grid">
+
+      <div class="track-card" onclick="openTrack('fashion')">
+        <div class="track-cover" style="">
+          <div class="track-cover-bg" style="background-image:url('https://i.pinimg.com/1200x/8f/ef/59/8fef5951d62ade9664de8d332c62137f.jpg');"></div>
+          <div class="track-cover-overlay" style="background:linear-gradient(135deg,rgba(139,74,42,0.7),rgba(28,26,23,0.8));"></div>
+          <div class="track-num">I</div>
+          <div class="track-cover-content">
+            <div class="track-name">Cloth as<br>Memory</div>
+          </div>
+        </div>
+        <div class="track-body">
+          <div class="track-desc">The cultural history of textiles — from West African weaving traditions to the underground railroad quilts of the American South.</div>
+          <div class="track-meta">
+            <div class="track-pills">
+              <span class="track-pill">Textiles</span>
+              <span class="track-pill">Fashion History</span>
+              <span class="track-pill">Resistance</span>
+            </div>
+            <div class="track-progress-circle">
+              <svg width="36" height="36" viewBox="0 0 36 36">
+                <circle cx="18" cy="18" r="15" fill="none" stroke="rgba(28,26,23,0.1)" stroke-width="2.5"/>
+                <circle cx="18" cy="18" r="15" fill="none" stroke="#8B4A2A" stroke-width="2.5"
+                  stroke-dasharray="94.2"
+                  stroke-dashoffset="75.4"
+                  stroke-linecap="round"/>
+              </svg>
+              <div class="pct">20%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="track-card" onclick="openTrack('herbalism')">
+        <div class="track-cover">
+          <div class="track-cover-bg" style="background-image:url('https://i.pinimg.com/1200x/a8/45/22/a84522cc1f06f171ca6e9c6fa6be6a6f.jpg');"></div>
+          <div class="track-cover-overlay" style="background:linear-gradient(135deg,rgba(90,107,85,0.75),rgba(28,26,23,0.8));"></div>
+          <div class="track-num">II</div>
+          <div class="track-cover-content">
+            <div class="track-name">The Botanical<br>Body</div>
+          </div>
+        </div>
+        <div class="track-body">
+          <div class="track-desc">Plant medicine, herbalism, and the stolen knowledge of Black and Brown healers across Africa, the Americas, and Asia.</div>
+          <div class="track-meta">
+            <div class="track-pills">
+              <span class="track-pill">Herbalism</span>
+              <span class="track-pill">Science</span>
+              <span class="track-pill">Feminism</span>
+            </div>
+            <div class="track-progress-circle">
+              <svg width="36" height="36" viewBox="0 0 36 36">
+                <circle cx="18" cy="18" r="15" fill="none" stroke="rgba(28,26,23,0.1)" stroke-width="2.5"/>
+                <circle cx="18" cy="18" r="15" fill="none" stroke="#5A6B55" stroke-width="2.5"
+                  stroke-dasharray="94.2"
+                  stroke-dashoffset="56.5"
+                  stroke-linecap="round"/>
+              </svg>
+              <div class="pct">40%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="track-card" onclick="openTrack('philosophy')">
+        <div class="track-cover">
+          <div class="track-cover-bg" style="background-image:url('https://i.pinimg.com/736x/88/13/8e/88138ec559996abd49cf6eddd940a14d.jpg');"></div>
+          <div class="track-cover-overlay" style="background:linear-gradient(135deg,rgba(28,26,23,0.6),rgba(28,26,23,0.85));"></div>
+          <div class="track-num">III</div>
+          <div class="track-cover-content">
+            <div class="track-name">African<br>Philosophy</div>
+          </div>
+        </div>
+        <div class="track-body">
+          <div class="track-desc">Ubuntu, Maat, Sankofa — the living philosophical traditions of the African continent and their diasporic inheritance.</div>
+          <div class="track-meta">
+            <div class="track-pills">
+              <span class="track-pill">Philosophy</span>
+              <span class="track-pill">Africa</span>
+              <span class="track-pill">Diaspora</span>
+            </div>
+            <div class="track-progress-circle">
+              <svg width="36" height="36" viewBox="0 0 36 36">
+                <circle cx="18" cy="18" r="15" fill="none" stroke="rgba(28,26,23,0.1)" stroke-width="2.5"/>
+                <circle cx="18" cy="18" r="15" fill="none" stroke="#C49A3C" stroke-width="2.5"
+                  stroke-dasharray="94.2"
+                  stroke-dashoffset="94.2"
+                  stroke-linecap="round"/>
+              </svg>
+              <div class="pct">0%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="track-card" onclick="openTrack('art')">
+        <div class="track-cover">
+          <div class="track-cover-bg" style="background-image:url('https://i.pinimg.com/736x/0d/91/d5/0d91d5db1188df9147f6c4f3d32771f4.jpg');"></div>
+          <div class="track-cover-overlay" style="background:linear-gradient(135deg,rgba(74,107,138,0.7),rgba(28,26,23,0.8));"></div>
+          <div class="track-num">IV</div>
+          <div class="track-cover-content">
+            <div class="track-name">Art as<br>Liberation</div>
+          </div>
+        </div>
+        <div class="track-body">
+          <div class="track-desc">From the Harlem Renaissance to Afrofuturism — how Black and Brown artists built visual languages of resistance and imagination.</div>
+          <div class="track-meta">
+            <div class="track-pills">
+              <span class="track-pill">Art History</span>
+              <span class="track-pill">Resistance</span>
+              <span class="track-pill">Diaspora</span>
+            </div>
+            <div class="track-progress-circle">
+              <svg width="36" height="36" viewBox="0 0 36 36">
+                <circle cx="18" cy="18" r="15" fill="none" stroke="rgba(28,26,23,0.1)" stroke-width="2.5"/>
+                <circle cx="18" cy="18" r="15" fill="none" stroke="#4A6B8A" stroke-width="2.5"
+                  stroke-dasharray="94.2"
+                  stroke-dashoffset="94.2"
+                  stroke-linecap="round"/>
+              </svg>
+              <div class="pct">0%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="track-card" onclick="openTrack('music')">
+        <div class="track-cover" style="background:#1C1A17;">
+          <div class="track-cover-overlay" style="background:linear-gradient(135deg,rgba(122,74,139,0.6),rgba(28,26,23,0.85));"></div>
+          <div class="track-num">V</div>
+          <div class="track-cover-content">
+            <div class="track-name">The Cello &<br>Synchronicity</div>
+          </div>
+        </div>
+        <div class="track-body">
+          <div class="track-desc">Music as infrastructure, the cello as emotional architecture. How rhythm and resonance hold space for collective creation.</div>
+          <div class="track-meta">
+            <div class="track-pills">
+              <span class="track-pill">Music</span>
+              <span class="track-pill">Philosophy</span>
+              <span class="track-pill">Feminism</span>
+            </div>
+            <div class="track-progress-circle">
+              <svg width="36" height="36" viewBox="0 0 36 36">
+                <circle cx="18" cy="18" r="15" fill="none" stroke="rgba(28,26,23,0.1)" stroke-width="2.5"/>
+                <circle cx="18" cy="18" r="15" fill="none" stroke="#7A4A8B" stroke-width="2.5"
+                  stroke-dasharray="94.2"
+                  stroke-dashoffset="94.2"
+                  stroke-linecap="round"/>
+              </svg>
+              <div class="pct">0%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Add track card -->
+      <div class="track-card" style="border:1px dashed var(--border-strong); display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:280px; cursor:pointer; color:var(--ink-faint); gap:10px; background:transparent;" onmouseenter="this.style.borderColor='var(--sienna-light)'; this.style.color='var(--sienna)'" onmouseleave="this.style.borderColor='var(--border-strong)'; this.style.color='var(--ink-faint)'">
+        <div style="font-size:28px; font-weight:300;">＋</div>
+        <div style="font-size:11px; letter-spacing:0.1em; text-transform:uppercase;">Propose a Track</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Lesson detail panel (hidden by default) -->
+  <div class="lesson-panel" id="lesson-panel">
+    <div class="tracks-section" style="padding-top:24px;">
+      <button class="lesson-back" onclick="closeTrack()">← Back to Tracks</button>
+
+      <div class="lesson-title" id="lesson-panel-title">Cloth as <em>Memory</em></div>
+      <div class="lesson-byline" id="lesson-panel-byline">A 5-week syllabus on the textile as archive — from Yoruba adire to the quilts of Gee's Bend</div>
+
+      <div class="syllabus">
+        <div class="syllabus-weeks">
+
+          <div class="week-item">
+            <div class="week-num">Week 01</div>
+            <div class="week-content">
+              <div class="week-title">The loom as language — introduction to textile semiotics</div>
+              <div class="week-desc">What does a weave communicate? An introduction to reading cloth as text — pattern, color, and structure as grammar.</div>
+              <div class="week-readings">
+                <span class="reading-chip">The garment as living archive</span>
+                <span class="reading-chip">Indigo — the color that crossed oceans</span>
+              </div>
+              <div class="week-status">
+                <span class="status-dot done"></span>
+                <span style="color:var(--sage);">Complete</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="week-item">
+            <div class="week-num">Week 02</div>
+            <div class="week-content">
+              <div class="week-title">Kente, Aso-oke, Bogolanfini — three traditions in depth</div>
+              <div class="week-desc">A close reading of three West African textile traditions and the cosmologies encoded in their patterns.</div>
+              <div class="week-readings">
+                <span class="reading-chip">Aso-oke Study</span>
+                <span class="reading-chip">Indigo & Resistance</span>
+              </div>
+              <div class="week-status">
+                <span class="status-dot current"></span>
+                <span style="color:var(--gold);">In progress</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="week-item">
+            <div class="week-num">Week 03</div>
+            <div class="week-content">
+              <div class="week-title">The underground railroad quilt code</div>
+              <div class="week-desc">Contested and compelling — the theory that enslaved people used quilt patterns as navigation maps to freedom.</div>
+              <div class="week-readings">
+                <span class="reading-chip">The feminist history of quilting circles</span>
+              </div>
+              <div class="week-status">
+                <span class="status-dot locked"></span>
+                <span style="color:var(--ink-faint);">Locked</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="week-item">
+            <div class="week-num">Week 04</div>
+            <div class="week-content">
+              <div class="week-title">Fashion as resistance — from Zoot suits to Dashikis</div>
+              <div class="week-desc">How clothing became political armor across the 20th century African American experience.</div>
+              <div class="week-readings">
+                <span class="reading-chip">Coming soon — write this article</span>
+              </div>
+              <div class="week-status">
+                <span class="status-dot locked"></span>
+                <span style="color:var(--ink-faint);">Locked</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="week-item" style="border-bottom:none;">
+            <div class="week-num">Week 05</div>
+            <div class="week-content">
+              <div class="week-title">Your textile archive — final reflection</div>
+              <div class="week-desc">What cloth lives in your memory? A guided written reflection connecting personal history to the thread of this course.</div>
+              <div class="week-readings">
+                <span class="reading-chip">Personal essay prompt</span>
+              </div>
+              <div class="week-status">
+                <span class="status-dot locked"></span>
+                <span style="color:var(--ink-faint);">Locked</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="syllabus-aside">
+          <div class="aside-card">
+            <h4>Track Materials</h4>
+            <ul>
+              <li>The garment as living archive</li>
+              <li>Indigo — the color that crossed oceans</li>
+              <li>Aso-oke Study (portfolio)</li>
+              <li>Indigo & Resistance (work)</li>
+              <li>The feminist history of quilting</li>
+            </ul>
+          </div>
+          <div class="aside-card">
+            <h4>Related Tracks</h4>
+            <ul>
+              <li>Art as Liberation</li>
+              <li>African Philosophy</li>
+              <li>The Botanical Body</li>
+            </ul>
+          </div>
+          <div class="aside-card" style="background:var(--ink); border-color:transparent;">
+            <h4 style="color:rgba(247,243,238,0.9);">Write for this track</h4>
+            <p style="font-size:13px; color:rgba(247,243,238,0.45); margin-top:4px; line-height:1.55;">Weeks 4 & 5 need articles from you. When you write them, tag them <code style="background:rgba(247,243,238,0.1); padding:1px 6px; border-radius:2px; font-size:11px;">textiles · resistance</code> and they'll unlock automatically.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div><!-- end academy tab -->
+
+<!-- ════════════════════════════════════ -->
+<!-- STUDY SPACE TAB                     -->
+<!-- ════════════════════════════════════ -->
+<div id="tab-study" class="tab-pane">
+
+  <!-- Room scene -->
+  <div class="room-scene" id="room-scene">
+    <div class="room-library" id="room-library">
+
+      <!-- Scene layers -->
+      <div class="room-wall"></div>
+      <div class="room-floor"></div>
+
+      <!-- Bookshelf -->
+      <div class="bookshelf">
+        <div class="shelf-row"></div>
+        <div class="shelf-row"></div>
+        <div class="shelf-row"></div>
+        <!-- books as colored divs -->
+        <div class="book" style="left:8px;height:52px;bottom:6px;background:#5A3020;"></div>
+        <div class="book" style="left:24px;height:44px;bottom:6px;background:#3A5A40;"></div>
+        <div class="book" style="left:40px;height:56px;bottom:6px;background:#8B6A30;"></div>
+        <div class="book" style="left:56px;height:40px;bottom:6px;background:#4A3A5A;"></div>
+        <div class="book" style="left:70px;height:48px;bottom:6px;background:#5A2020;"></div>
+        <div class="book" style="left:86px;height:52px;bottom:6px;background:#3A4A30;"></div>
+        <div class="book" style="left:102px;height:44px;bottom:6px;background:#6A5020;"></div>
+        <div class="book" style="left:116px;height:60px;bottom:6px;background:#2A4A5A;"></div>
+        <div class="book" style="left:132px;height:46px;bottom:6px;background:#5A3A20;"></div>
+        <div class="book" style="left:148px;height:50px;bottom:6px;background:#4A4A30;"></div>
+        <!-- second shelf -->
+        <div class="book" style="left:8px;height:44px;bottom:66px;background:#3A5A4A;"></div>
+        <div class="book" style="left:24px;height:52px;bottom:66px;background:#5A2A30;"></div>
+        <div class="book" style="left:40px;height:38px;bottom:66px;background:#6A5A30;"></div>
+        <div class="book" style="left:56px;height:46px;bottom:66px;background:#3A3A5A;"></div>
+        <div class="book" style="left:72px;height:50px;bottom:66px;background:#4A5A2A;"></div>
+        <div class="book" style="left:88px;height:42px;bottom:66px;background:#5A4A20;"></div>
+        <div class="book" style="left:104px;height:48px;bottom:66px;background:#2A5A3A;"></div>
+        <div class="book" style="left:120px;height:54px;bottom:66px;background:#5A2A4A;"></div>
+        <div class="book" style="left:136px;height:40px;bottom:66px;background:#4A3A2A;"></div>
+        <!-- third shelf -->
+        <div class="book" style="left:8px;height:46px;bottom:126px;background:#3A2A5A;"></div>
+        <div class="book" style="left:24px;height:40px;bottom:126px;background:#5A4A2A;"></div>
+        <div class="book" style="left:40px;height:50px;bottom:126px;background:#2A5A4A;"></div>
+        <div class="book" style="left:56px;height:44px;bottom:126px;background:#4A2A3A;"></div>
+        <div class="book" style="left:72px;height:52px;bottom:126px;background:#3A4A5A;"></div>
+        <div class="book" style="left:88px;height:38px;bottom:126px;background:#5A3A30;"></div>
+        <div class="book" style="left:104px;height:46px;bottom:126px;background:#2A3A4A;"></div>
+      </div>
+
+      <!-- Window -->
+      <div class="room-window">
+        <div class="window-cross-h"></div>
+        <div class="window-cross-v"></div>
+        <div class="moon"></div>
+        <!-- tiny stars in window -->
+        <svg class="stars-window" viewBox="0 0 220 240" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="20" cy="20" r="1" fill="rgba(255,255,255,0.7)"/>
+          <circle cx="160" cy="15" r="1.2" fill="rgba(255,255,255,0.5)"/>
+          <circle cx="80" cy="50" r="0.8" fill="rgba(255,255,255,0.6)"/>
+          <circle cx="40" cy="80" r="1" fill="rgba(255,255,255,0.4)"/>
+          <circle cx="190" cy="60" r="0.8" fill="rgba(255,255,255,0.5)"/>
+          <circle cx="120" cy="30" r="1.5" fill="rgba(255,255,255,0.3)"/>
+          <circle cx="60" cy="110" r="0.8" fill="rgba(255,255,255,0.4)"/>
+          <circle cx="170" cy="100" r="1" fill="rgba(255,255,255,0.5)"/>
+        </svg>
+      </div>
+
+      <!-- Desk -->
+      <div class="desk"></div>
+      <div class="rug"></div>
+      <div class="desk-book"></div>
+      <div class="desk-paper"></div>
+
+      <!-- Candle -->
+      <div class="candle-wrap">
+        <div class="candle-glow"></div>
+        <div class="candle-flame"></div>
+        <div class="candle-body"></div>
+      </div>
+
+      <!-- Lamp -->
+      <div class="lamp">
+        <div class="lamp-head"><div class="lamp-glow-inner"></div></div>
+        <div class="lamp-stem"></div>
+        <div class="lamp-base"></div>
+      </div>
+      <div class="lamp-cast"></div>
+
+      <!-- Floating particles (dust/smoke) -->
+      <div class="particle" style="left:52%;top:60%;animation-duration:4s;animation-delay:0s;--drift:8px;"></div>
+      <div class="particle" style="left:53%;top:62%;animation-duration:5.5s;animation-delay:1.2s;--drift:-5px;"></div>
+      <div class="particle" style="left:51%;top:58%;animation-duration:4.8s;animation-delay:2.5s;--drift:12px;"></div>
+      <div class="particle" style="left:54%;top:63%;animation-duration:6s;animation-delay:0.8s;--drift:-9px;"></div>
+    </div>
+  </div>
+
+  <!-- Room switcher -->
+  <div class="room-switcher">
+    <button class="room-btn active" onclick="setRoom('library', this)">🕯 Library Nook</button>
+    <button class="room-btn" onclick="setRoom('forest', this)">🌿 Forest Desk</button>
+    <button class="room-btn" onclick="setRoom('rain', this)">🌧 Rainy Window</button>
+    <button class="room-btn" onclick="setRoom('ocean', this)">🌊 Ocean Study</button>
+  </div>
+
+  <!-- Controls -->
+  <div class="study-controls">
+    <div class="controls-title">Sound Environment</div>
+    <div class="controls-sub">Layer ambient sounds to build your ideal focus space — all tones generated here, no file downloads.</div>
+
+    <!-- Visualizer -->
+    <div class="visualizer" id="visualizer">
+      <div class="viz-bar" style="animation-delay:0s; animation-duration:0.6s;"></div>
+      <div class="viz-bar" style="animation-delay:0.08s; animation-duration:0.8s;"></div>
+      <div class="viz-bar" style="animation-delay:0.14s; animation-duration:0.55s;"></div>
+      <div class="viz-bar" style="animation-delay:0.05s; animation-duration:0.9s;"></div>
+      <div class="viz-bar" style="animation-delay:0.2s; animation-duration:0.65s;"></div>
+      <div class="viz-bar" style="animation-delay:0.03s; animation-duration:0.75s;"></div>
+      <div class="viz-bar" style="animation-delay:0.16s; animation-duration:0.85s;"></div>
+      <div class="viz-bar" style="animation-delay:0.1s; animation-duration:0.6s;"></div>
+      <div class="viz-bar" style="animation-delay:0.07s; animation-duration:0.7s;"></div>
+      <div class="viz-bar" style="animation-delay:0.22s; animation-duration:0.5s;"></div>
+      <div class="viz-bar" style="animation-delay:0.04s; animation-duration:0.88s;"></div>
+      <div class="viz-bar" style="animation-delay:0.18s; animation-duration:0.62s;"></div>
+    </div>
+
+    <div class="sound-layers">
+      <div class="sound-layer" id="layer-rain" onclick="toggleSound('rain', this)">
+        <div class="sound-on-indicator"></div>
+        <span class="sound-icon">🌧</span>
+        <span class="sound-name">Gentle Rain</span>
+        <div class="sound-vol">
+          <input type="range" class="vol-slider" min="0" max="100" value="60"
+            oninput="setVolume('rain', this.value)" onclick="event.stopPropagation()">
+        </div>
+      </div>
+      <div class="sound-layer" id="layer-fire" onclick="toggleSound('fire', this)">
+        <div class="sound-on-indicator"></div>
+        <span class="sound-icon">🔥</span>
+        <span class="sound-name">Fireplace Crackle</span>
+        <div class="sound-vol">
+          <input type="range" class="vol-slider" min="0" max="100" value="50"
+            oninput="setVolume('fire', this.value)" onclick="event.stopPropagation()">
+        </div>
+      </div>
+      <div class="sound-layer" id="layer-wind" onclick="toggleSound('wind', this)">
+        <div class="sound-on-indicator"></div>
+        <span class="sound-icon">🍃</span>
+        <span class="sound-name">Forest Wind</span>
+        <div class="sound-vol">
+          <input type="range" class="vol-slider" min="0" max="100" value="40"
+            oninput="setVolume('wind', this.value)" onclick="event.stopPropagation()">
+        </div>
+      </div>
+      <div class="sound-layer" id="layer-waves" onclick="toggleSound('waves', this)">
+        <div class="sound-on-indicator"></div>
+        <span class="sound-icon">🌊</span>
+        <span class="sound-name">Ocean Waves</span>
+        <div class="sound-vol">
+          <input type="range" class="vol-slider" min="0" max="100" value="50"
+            oninput="setVolume('waves', this.value)" onclick="event.stopPropagation()">
+        </div>
+      </div>
+      <div class="sound-layer" id="layer-birds" onclick="toggleSound('birds', this)">
+        <div class="sound-on-indicator"></div>
+        <span class="sound-icon">🦜</span>
+        <span class="sound-name">Morning Birds</span>
+        <div class="sound-vol">
+          <input type="range" class="vol-slider" min="0" max="100" value="35"
+            oninput="setVolume('birds', this.value)" onclick="event.stopPropagation()">
+        </div>
+      </div>
+      <div class="sound-layer" id="layer-brown" onclick="toggleSound('brown', this)">
+        <div class="sound-on-indicator"></div>
+        <span class="sound-icon">📻</span>
+        <span class="sound-name">Brown Noise</span>
+        <div class="sound-vol">
+          <input type="range" class="vol-slider" min="0" max="100" value="40"
+            oninput="setVolume('brown', this.value)" onclick="event.stopPropagation()">
+        </div>
+      </div>
+    </div>
+
+    <!-- Focus timer -->
+    <div class="focus-timer">
+      <div>
+        <div class="timer-display" id="timer-display">25:00</div>
+        <div class="timer-mode" id="timer-mode">Focus Session</div>
+        <div class="timer-presets">
+          <button class="preset-btn active" onclick="setPreset(25, 'Focus Session', this)">25 min</button>
+          <button class="preset-btn" onclick="setPreset(50, 'Deep Work', this)">50 min</button>
+          <button class="preset-btn" onclick="setPreset(90, 'Flow State', this)">90 min</button>
+          <button class="preset-btn" onclick="setPreset(5, 'Short Break', this)">5 min</button>
+        </div>
+      </div>
+      <div class="timer-controls">
+        <button class="timer-btn primary" id="start-btn" onclick="toggleTimer()">Start</button>
+        <button class="timer-btn" onclick="resetTimer()">Reset</button>
+      </div>
+    </div>
+
+    <!-- Intention -->
+    <div class="intention-box">
+      <span class="intention-label">Set your intention for this session</span>
+      <textarea class="intention-input" rows="2" placeholder="Today I am learning about…"></textarea>
+    </div>
+  </div>
+
+  <!-- Currently studying -->
+  <div class="currently-strip">
+    <div class="currently-title">Pick up where you left off</div>
+    <div class="current-items">
+      <div class="current-item">
+        <span class="current-tag">Cloth as Memory · Week 02</span>
+        <div class="current-name">Kente, Aso-oke, Bogolanfini — three traditions in depth</div>
+      </div>
+      <div class="current-item">
+        <span class="current-tag">Article · Herbalism</span>
+        <div class="current-name">Rose hip, hibiscus, and the pharmacopeia of grandmothers</div>
+      </div>
+      <div class="current-item">
+        <span class="current-tag">Idea Web</span>
+        <div class="current-name">Explore the resistance constellation</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end study tab -->
+
+<script>
+// ── TAB SWITCHING ──
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ── ACADEMY: TRACK OPEN/CLOSE ──
+const TRACK_DATA = {
+  fashion: { title: 'Cloth as <em>Memory</em>', byline: 'A 5-week syllabus on the textile as archive — from Yoruba adire to the quilts of Gee\'s Bend' },
+  herbalism: { title: 'The Botanical <em>Body</em>', byline: 'A 6-week journey through plant medicine, healing knowledge, and the politics of the apothecary' },
+  philosophy: { title: 'African <em>Philosophy</em>', byline: 'Ubuntu, Maat, Sankofa — a 4-week introduction to the living philosophical traditions of the continent' },
+  art: { title: 'Art as <em>Liberation</em>', byline: 'A 5-week survey from the Harlem Renaissance to Afrofuturism' },
+  music: { title: 'The Cello & <em>Synchronicity</em>', byline: 'A 4-week meditation on music as infrastructure and emotional labor' },
+};
+
+function openTrack(id) {
+  const data = TRACK_DATA[id];
+  document.getElementById('lesson-panel-title').innerHTML = data.title;
+  document.getElementById('lesson-panel-byline').textContent = data.byline;
+  document.getElementById('tracks-section').style.display = 'none';
+  document.getElementById('lesson-panel').classList.add('open');
+  window.scrollTo({ top: 200, behavior: 'smooth' });
+}
+function closeTrack() {
+  document.getElementById('tracks-section').style.display = 'block';
+  document.getElementById('lesson-panel').classList.remove('open');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── ROOM SWITCHER ──
+const ROOM_STYLES = {
+  library: {
+    wall: 'linear-gradient(180deg, #0E0C08 0%, #1A1510 70%, #201710 100%)',
+    floor: 'linear-gradient(180deg, #1A1209 0%, #261A0E 60%, #1E1409 100%)',
+    window: 'linear-gradient(180deg, rgba(60,90,140,0.7) 0%, rgba(80,60,100,0.5) 40%, rgba(30,20,40,0.8) 100%)',
+  },
+  forest: {
+    wall: 'linear-gradient(180deg, #060E08 0%, #0D1A0A 70%, #0A1208 100%)',
+    floor: 'linear-gradient(180deg, #0A1208 0%, #1A2A0E 60%, #0E1809 100%)',
+    window: 'linear-gradient(180deg, rgba(30,80,40,0.7) 0%, rgba(20,60,30,0.6) 40%, rgba(10,20,12,0.8) 100%)',
+  },
+  rain: {
+    wall: 'linear-gradient(180deg, #08090E 0%, #10141E 70%, #0C1018 100%)',
+    floor: 'linear-gradient(180deg, #0A0C12 0%, #181C28 60%, #10141E 100%)',
+    window: 'linear-gradient(180deg, rgba(40,60,100,0.8) 0%, rgba(60,80,120,0.5) 40%, rgba(20,30,60,0.9) 100%)',
+  },
+  ocean: {
+    wall: 'linear-gradient(180deg, #060C0E 0%, #0A1820 70%, #081218 100%)',
+    floor: 'linear-gradient(180deg, #08100C 0%, #102018 60%, #0C1814 100%)',
+    window: 'linear-gradient(180deg, rgba(20,70,100,0.7) 0%, rgba(30,90,120,0.5) 40%, rgba(10,40,60,0.85) 100%)',
+  },
+};
+function setRoom(id, btn) {
+  document.querySelectorAll('.room-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const style = ROOM_STYLES[id];
+  document.querySelector('.room-wall').style.background = style.wall;
+  document.querySelector('.room-floor').style.background = style.floor;
+  document.querySelector('.room-window').style.background = style.window;
+}
+
+// ── WEB AUDIO ENGINE ──
+let audioCtx = null;
+const audioNodes = {};
+const soundActive = {};
+
+function getCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+
+// Brown noise buffer
+function makeBrownNoise(ctx, duration) {
+  const sampleRate = ctx.sampleRate;
+  const frameCount = sampleRate * duration;
+  const buffer = ctx.createBuffer(1, frameCount, sampleRate);
+  const data = buffer.getChannelData(0);
+  let lastOut = 0;
+  for (let i = 0; i < frameCount; i++) {
+    const white = Math.random() * 2 - 1;
+    data[i] = (lastOut + 0.02 * white) / 1.02;
+    lastOut = data[i];
+    data[i] *= 3.5;
+  }
+  return buffer;
+}
+
+// Rain: filtered noise
+function createRain(ctx) {
+  const bufSrc = ctx.createBufferSource();
+  bufSrc.buffer = makeBrownNoise(ctx, 4);
+  bufSrc.loop = true;
+
+  const highpass = ctx.createBiquadFilter();
+  highpass.type = 'highpass';
+  highpass.frequency.value = 400;
+
+  const bandpass = ctx.createBiquadFilter();
+  bandpass.type = 'bandpass';
+  bandpass.frequency.value = 2000;
+  bandpass.Q.value = 0.3;
+
+  const gain = ctx.createGain();
+  gain.gain.value = 0;
+
+  bufSrc.connect(highpass);
+  highpass.connect(bandpass);
+  bandpass.connect(gain);
+  gain.connect(ctx.destination);
+  bufSrc.start();
+  return { source: bufSrc, gain };
+}
+
+// Fire: low crackle using filtered noise + LFO modulation
+function createFire(ctx) {
+  const bufSrc = ctx.createBufferSource();
+  bufSrc.buffer = makeBrownNoise(ctx, 4);
+  bufSrc.loop = true;
+
+  const lowpass = ctx.createBiquadFilter();
+  lowpass.type = 'lowpass';
+  lowpass.frequency.value = 500;
+
+  const gain = ctx.createGain();
+  gain.gain.value = 0;
+
+  // LFO to simulate flickering
+  const lfo = ctx.createOscillator();
+  lfo.frequency.value = 1.8;
+  const lfoGain = ctx.createGain();
+  lfoGain.gain.value = 0.15;
+  lfo.connect(lfoGain);
+  lfoGain.connect(gain.gain);
+  lfo.start();
+
+  bufSrc.connect(lowpass);
+  lowpass.connect(gain);
+  gain.connect(ctx.destination);
+  bufSrc.start();
+  return { source: bufSrc, gain, lfo };
+}
+
+// Wind: slow rising/falling noise
+function createWind(ctx) {
+  const bufSrc = ctx.createBufferSource();
+  bufSrc.buffer = makeBrownNoise(ctx, 6);
+  bufSrc.loop = true;
+  bufSrc.playbackRate.value = 0.8;
+
+  const filter = ctx.createBiquadFilter();
+  filter.type = 'bandpass';
+  filter.frequency.value = 300;
+  filter.Q.value = 0.5;
+
+  const gain = ctx.createGain();
+  gain.gain.value = 0;
+
+  bufSrc.connect(filter);
+  filter.connect(gain);
+  gain.connect(ctx.destination);
+  bufSrc.start();
+  return { source: bufSrc, gain };
+}
+
+// Ocean waves: two detuned noise sources + LFO
+function createWaves(ctx) {
+  const bufSrc = ctx.createBufferSource();
+  bufSrc.buffer = makeBrownNoise(ctx, 8);
+  bufSrc.loop = true;
+
+  const filter = ctx.createBiquadFilter();
+  filter.type = 'lowpass';
+  filter.frequency.value = 800;
+
+  const gain = ctx.createGain();
+  gain.gain.value = 0;
+
+  const lfo = ctx.createOscillator();
+  lfo.frequency.value = 0.12;
+  const lfoG = ctx.createGain();
+  lfoG.gain.value = 0.3;
+  lfo.connect(lfoG);
+  lfoG.connect(gain.gain);
+  lfo.start();
+
+  bufSrc.connect(filter);
+  filter.connect(gain);
+  gain.connect(ctx.destination);
+  bufSrc.start();
+  return { source: bufSrc, gain, lfo };
+}
+
+// Birds: sine tones at bird-ish frequencies
+function createBirds(ctx) {
+  const masterGain = ctx.createGain();
+  masterGain.gain.value = 0;
+  masterGain.connect(ctx.destination);
+
+  const birdFreqs = [2200, 2800, 3200, 2600, 3000];
+  const oscs = [];
+
+  birdFreqs.forEach((freq, i) => {
+    const osc = ctx.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.value = freq;
+
+    const env = ctx.createGain();
+    env.gain.value = 0;
+
+    osc.connect(env);
+    env.connect(masterGain);
+    osc.start();
+    oscs.push({ osc, env });
+
+    // chirp pattern
+    function chirp() {
+      const now = ctx.currentTime;
+      const delay = 1.5 + Math.random() * 4 + i * 0.7;
+      setTimeout(() => {
+        if (!soundActive['birds']) return;
+        env.gain.setValueAtTime(0, ctx.currentTime);
+        env.gain.linearRampToValueAtTime(0.12, ctx.currentTime + 0.02);
+        env.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.15);
+        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+        osc.frequency.linearRampToValueAtTime(freq * 1.08, ctx.currentTime + 0.08);
+        chirp();
+      }, delay * 1000);
+    }
+    chirp();
+  });
+
+  return { gain: masterGain, oscs };
+}
+
+// Brown noise
+function createBrownNoise(ctx) {
+  const bufSrc = ctx.createBufferSource();
+  bufSrc.buffer = makeBrownNoise(ctx, 4);
+  bufSrc.loop = true;
+
+  const gain = ctx.createGain();
+  gain.gain.value = 0;
+
+  bufSrc.connect(gain);
+  gain.connect(ctx.destination);
+  bufSrc.start();
+  return { source: bufSrc, gain };
+}
+
+const CREATORS = {
+  rain: createRain,
+  fire: createFire,
+  wind: createWind,
+  waves: createWaves,
+  birds: createBirds,
+  brown: createBrownNoise,
+};
+const VOL_MAP = { rain:0.6, fire:0.5, wind:0.4, waves:0.5, birds:0.35, brown:0.4 };
+
+function toggleSound(id, el) {
+  const ctx = getCtx();
+  if (ctx.state === 'suspended') ctx.resume();
+
+  if (!audioNodes[id]) {
+    audioNodes[id] = CREATORS[id](ctx);
+  }
+
+  soundActive[id] = !soundActive[id];
+  el.classList.toggle('active', soundActive[id]);
+
+  const targetVol = soundActive[id] ? VOL_MAP[id] : 0;
+  audioNodes[id].gain.gain.setTargetAtTime(targetVol, ctx.currentTime, 0.3);
+
+  // Update visualizer
+  const anyActive = Object.values(soundActive).some(Boolean);
+  document.getElementById('visualizer').classList.toggle('playing', anyActive);
+  updateVizBars(anyActive);
+}
+
+function setVolume(id, val) {
+  if (!audioNodes[id] || !soundActive[id]) return;
+  const ctx = getCtx();
+  const v = val / 100 * (VOL_MAP[id] * 1.5);
+  audioNodes[id].gain.gain.setTargetAtTime(v, ctx.currentTime, 0.1);
+}
+
+let vizInterval;
+function updateVizBars(active) {
+  clearInterval(vizInterval);
+  const bars = document.querySelectorAll('.viz-bar');
+  if (active) {
+    vizInterval = setInterval(() => {
+      bars.forEach(bar => {
+        bar.style.height = (Math.random() * 24 + 4) + 'px';
+      });
+    }, 100);
+  } else {
+    bars.forEach(bar => bar.style.height = '4px');
+  }
+}
+
+// ── TIMER ──
+let timerSeconds = 25 * 60;
+let timerTotal = 25 * 60;
+let timerRunning = false;
+let timerInterval;
+
+function setPreset(mins, label, btn) {
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  resetTimer();
+  timerSeconds = mins * 60;
+  timerTotal = mins * 60;
+  document.getElementById('timer-mode').textContent = label;
+  updateTimerDisplay();
+}
+function updateTimerDisplay() {
+  const m = Math.floor(timerSeconds / 60).toString().padStart(2,'0');
+  const s = (timerSeconds % 60).toString().padStart(2,'0');
+  document.getElementById('timer-display').textContent = m + ':' + s;
+}
+function toggleTimer() {
+  const btn = document.getElementById('start-btn');
+  if (timerRunning) {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    btn.textContent = 'Resume';
+  } else {
+    timerRunning = true;
+    btn.textContent = 'Pause';
+    timerInterval = setInterval(() => {
+      if (timerSeconds <= 0) {
+        clearInterval(timerInterval);
+        timerRunning = false;
+        btn.textContent = 'Start';
+        document.getElementById('timer-display').textContent = 'Done ✓';
+        return;
+      }
+      timerSeconds--;
+      updateTimerDisplay();
+    }, 1000);
+  }
+}
+function resetTimer() {
+  clearInterval(timerInterval);
+  timerRunning = false;
+  timerSeconds = timerTotal;
+  document.getElementById('start-btn').textContent = 'Start';
+  updateTimerDisplay();
+}
+</script>
+</body>
+</html>
