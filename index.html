@@ -1,0 +1,1634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Library of Morenita</title>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Figtree:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F7F3EE;
+    --parchment: #EDE8E0;
+    --ink: #1C1A17;
+    --ink-muted: #5C5750;
+    --ink-faint: #9B968D;
+    --sienna: #8B4A2A;
+    --sienna-light: #C47A55;
+    --sage: #5A6B55;
+    --sage-light: #8BA683;
+    --gold: #C49A3C;
+    --gold-light: #DDB96A;
+    --border: rgba(28,26,23,0.12);
+    --border-strong: rgba(28,26,23,0.25);
+
+    /* Grid-aware: low energy mode */
+    --grid-bg: var(--cream);
+    --grid-surface: #FFFFFF;
+    --grid-accent: var(--sienna);
+    --image-filter: none;
+    --anim-duration: 0.4s;
+  }
+
+  [data-grid="low"] {
+    --grid-bg: #F0ECE6;
+    --grid-surface: #F7F4EF;
+    --image-filter: grayscale(20%);
+    --anim-duration: 0.2s;
+  }
+
+  [data-grid="moderate"] {
+    --grid-bg: var(--cream);
+    --grid-surface: #FFFFFF;
+    --image-filter: none;
+    --anim-duration: 0.4s;
+  }
+
+  [data-grid="high"] {
+    --grid-bg: var(--parchment);
+    --grid-surface: var(--cream);
+    --image-filter: grayscale(60%) contrast(0.9);
+    --anim-duration: 0s;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Figtree', sans-serif;
+    background: var(--grid-bg);
+    color: var(--ink);
+    font-size: 15px;
+    line-height: 1.7;
+    transition: background 0.6s ease;
+  }
+
+  /* ── GRID-AWARE BANNER ── */
+  .grid-banner {
+    background: var(--ink);
+    color: rgba(247,243,238,0.85);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 8px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .grid-banner .grid-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .grid-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #5A9E6A;
+    flex-shrink: 0;
+  }
+  [data-grid="moderate"] .grid-dot { background: #C49A3C; }
+  [data-grid="high"] .grid-dot { background: #9B4A3A; }
+
+  .grid-controls {
+    display: flex;
+    gap: 4px;
+  }
+  .grid-btn {
+    background: none;
+    border: 1px solid rgba(247,243,238,0.2);
+    color: rgba(247,243,238,0.7);
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 2px;
+    cursor: pointer;
+    font-family: 'Figtree', sans-serif;
+    transition: all 0.2s;
+  }
+  .grid-btn:hover, .grid-btn.active {
+    background: rgba(247,243,238,0.15);
+    color: rgba(247,243,238,1);
+    border-color: rgba(247,243,238,0.4);
+  }
+  .grid-btn.active { border-color: rgba(247,243,238,0.6); }
+
+  /* ── NAVIGATION ── */
+  nav {
+    background: var(--grid-bg);
+    border-bottom: 1px solid var(--border);
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    transition: background 0.6s ease;
+  }
+
+  .nav-logo {
+    font-family: 'EB Garamond', serif;
+    font-size: 18px;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .nav-logo em {
+    font-style: italic;
+    color: var(--sienna);
+  }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    list-style: none;
+  }
+  .nav-links a {
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover, .nav-links a.active { color: var(--ink); }
+
+  .nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .btn-ghost {
+    background: none;
+    border: 1px solid var(--border-strong);
+    color: var(--ink);
+    font-family: 'Figtree', sans-serif;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 8px 18px;
+    cursor: pointer;
+    border-radius: 2px;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  .btn-ghost:hover { background: var(--ink); color: var(--grid-bg); }
+  .btn-solid {
+    background: var(--ink);
+    border: 1px solid var(--ink);
+    color: var(--grid-bg);
+    font-family: 'Figtree', sans-serif;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 8px 18px;
+    cursor: pointer;
+    border-radius: 2px;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  .btn-solid:hover { background: var(--sienna); border-color: var(--sienna); }
+
+  /* ── PAGE SECTIONS ── */
+  .page-section {
+    display: none;
+    min-height: calc(100vh - 104px);
+    animation: fadeUp var(--anim-duration) ease;
+  }
+  .page-section.active { display: block; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── HOME / ARCHIVE ── */
+  .hero {
+    padding: 80px 40px 60px;
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  .hero-eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--sienna);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+  }
+  .hero-eyebrow::before, .hero-eyebrow::after {
+    content: '';
+    height: 1px;
+    width: 40px;
+    background: var(--sienna-light);
+    display: block;
+  }
+  .hero h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(42px, 7vw, 80px);
+    font-weight: 300;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    margin-bottom: 24px;
+  }
+  .hero h1 em {
+    font-style: italic;
+    color: var(--sienna);
+  }
+  .hero-sub {
+    font-family: 'EB Garamond', serif;
+    font-size: 19px;
+    color: var(--ink-muted);
+    max-width: 560px;
+    margin: 0 auto 40px;
+    line-height: 1.6;
+    font-style: italic;
+  }
+  .hero-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+  }
+
+  /* ── FEATURED STORY ── */
+  .featured-strip {
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    background: var(--grid-surface);
+    padding: 48px 40px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    max-width: 1200px;
+    margin: 0 auto 0;
+    transition: background 0.6s ease;
+  }
+  .featured-image-wrap {
+    overflow: hidden;
+    aspect-ratio: 4/3;
+  }
+  .featured-image-wrap img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    filter: var(--image-filter);
+    transition: filter 0.6s ease, transform 0.5s ease;
+  }
+  .featured-image-wrap img:hover { transform: scale(1.02); }
+  .featured-content {
+    padding: 32px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .tag {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--sienna);
+    border: 1px solid var(--sienna-light);
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 2px;
+    margin-bottom: 16px;
+    width: fit-content;
+  }
+  .featured-content h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 36px;
+    font-weight: 300;
+    line-height: 1.1;
+    margin-bottom: 16px;
+    color: var(--ink);
+  }
+  .featured-content h2 em { font-style: italic; color: var(--sienna); }
+  .featured-content p {
+    font-family: 'EB Garamond', serif;
+    font-size: 17px;
+    color: var(--ink-muted);
+    line-height: 1.65;
+    margin-bottom: 24px;
+  }
+  .read-link {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid var(--ink);
+    padding-bottom: 2px;
+    width: fit-content;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .read-link:hover { color: var(--sienna); border-color: var(--sienna); }
+
+  /* ── ARCHIVE GRID ── */
+  .section-header {
+    padding: 48px 40px 24px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .section-header h3 {
+    font-family: 'EB Garamond', serif;
+    font-size: 22px;
+    font-weight: 400;
+    color: var(--ink);
+  }
+  .section-header a {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    text-decoration: none;
+  }
+  .section-header a:hover { color: var(--sienna); }
+
+  .archive-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--border);
+    max-width: 1200px;
+    margin: 0 auto;
+    border: 1px solid var(--border);
+  }
+
+  .archive-card {
+    background: var(--grid-surface);
+    padding: 0;
+    cursor: pointer;
+    transition: background 0.6s ease;
+    text-decoration: none;
+    display: block;
+    color: inherit;
+  }
+  .archive-card:hover .card-img img { transform: scale(1.04); }
+  .card-img {
+    aspect-ratio: 3/4;
+    overflow: hidden;
+  }
+  .card-img img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    filter: var(--image-filter);
+    transition: filter 0.6s ease, transform 0.5s ease;
+    display: block;
+  }
+  .card-body {
+    padding: 20px 20px 24px;
+    border-top: 1px solid var(--border);
+  }
+  .card-topic {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--sienna);
+    margin-bottom: 8px;
+  }
+  .card-title {
+    font-family: 'EB Garamond', serif;
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 1.25;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+  .card-meta {
+    font-size: 12px;
+    color: var(--ink-faint);
+  }
+  .card-save {
+    margin-top: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .save-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--ink-muted);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    cursor: pointer;
+    border-radius: 2px;
+    font-family: 'Figtree', sans-serif;
+    transition: all 0.2s;
+  }
+  .save-btn:hover, .save-btn.saved {
+    background: var(--ink);
+    color: var(--grid-bg);
+    border-color: var(--ink);
+  }
+
+  /* ── COLLECTIONS PAGE ── */
+  .page-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 48px 40px;
+  }
+  .page-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 48px;
+    font-weight: 300;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+  .page-subtitle {
+    font-family: 'EB Garamond', serif;
+    font-size: 18px;
+    color: var(--ink-muted);
+    font-style: italic;
+    margin-bottom: 40px;
+  }
+
+  .collections-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .collections-toolbar .filter-tabs {
+    display: flex;
+    gap: 0;
+  }
+  .filter-tab {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--ink-muted);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 7px 16px;
+    cursor: pointer;
+    font-family: 'Figtree', sans-serif;
+    border-right: none;
+    transition: all 0.2s;
+  }
+  .filter-tab:first-child { border-radius: 2px 0 0 2px; }
+  .filter-tab:last-child { border-right: 1px solid var(--border); border-radius: 0 2px 2px 0; }
+  .filter-tab.active, .filter-tab:hover {
+    background: var(--ink);
+    color: var(--grid-bg);
+    border-color: var(--ink);
+  }
+
+  .new-issue-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--sienna);
+    color: #fff;
+    border: none;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 9px 20px;
+    cursor: pointer;
+    border-radius: 2px;
+    font-family: 'Figtree', sans-serif;
+    transition: background 0.2s;
+  }
+  .new-issue-btn:hover { background: var(--ink); }
+
+  .issues-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .issue-card {
+    background: var(--grid-surface);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.6s ease;
+  }
+  .issue-card:hover { border-color: var(--border-strong); }
+  .issue-cover {
+    aspect-ratio: 3/4;
+    background: var(--parchment);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 20px;
+  }
+  .issue-cover-bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    filter: var(--image-filter);
+    transition: filter 0.6s ease;
+  }
+  .issue-cover-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(28,26,23,0.7) 0%, transparent 50%);
+  }
+  .issue-cover-content { position: relative; z-index: 1; }
+  .issue-cover-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 300;
+    color: #F7F3EE;
+    line-height: 1.2;
+    margin-bottom: 6px;
+  }
+  .issue-cover-count {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(247,243,238,0.65);
+  }
+  .issue-meta {
+    padding: 16px 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .issue-date {
+    font-size: 12px;
+    color: var(--ink-faint);
+  }
+  .issue-status {
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--sage);
+    border: 1px solid var(--sage-light);
+    padding: 2px 8px;
+    border-radius: 2px;
+  }
+  .issue-status.draft {
+    color: var(--gold);
+    border-color: var(--gold-light);
+  }
+
+  .new-issue-card {
+    background: none;
+    border: 1px dashed var(--border-strong);
+    border-radius: 3px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 320px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    gap: 12px;
+    color: var(--ink-faint);
+  }
+  .new-issue-card:hover {
+    border-color: var(--sienna-light);
+    background: rgba(139,74,42,0.03);
+    color: var(--sienna);
+  }
+  .new-issue-card .plus {
+    font-size: 32px;
+    font-weight: 300;
+    line-height: 1;
+  }
+  .new-issue-card span {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* ── PROFILE PAGE ── */
+  .profile-hero {
+    background: var(--grid-surface);
+    border-bottom: 1px solid var(--border);
+    transition: background 0.6s ease;
+  }
+  .profile-cover {
+    height: 220px;
+    background: var(--parchment);
+    position: relative;
+    overflow: hidden;
+  }
+  .profile-cover-img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    filter: var(--image-filter);
+    transition: filter 0.6s ease;
+  }
+  .profile-cover-pattern {
+    position: absolute;
+    inset: 0;
+    opacity: 0.3;
+    background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%238B4A2A' fill-opacity='0.4'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E");
+  }
+
+  .profile-info {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 40px 32px;
+    display: flex;
+    align-items: flex-end;
+    gap: 24px;
+  }
+  .profile-avatar {
+    width: 96px; height: 96px;
+    border-radius: 50%;
+    border: 4px solid var(--grid-surface);
+    background: var(--parchment);
+    margin-top: -48px;
+    flex-shrink: 0;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 32px;
+    color: var(--sienna);
+  }
+  .profile-text { flex: 1; padding-top: 12px; }
+  .profile-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 32px;
+    font-weight: 300;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+  .profile-handle {
+    font-size: 13px;
+    color: var(--ink-faint);
+    margin-bottom: 8px;
+  }
+  .profile-bio {
+    font-family: 'EB Garamond', serif;
+    font-size: 16px;
+    color: var(--ink-muted);
+    font-style: italic;
+    max-width: 500px;
+  }
+  .profile-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+  }
+  .profile-stats {
+    display: flex;
+    gap: 32px;
+    padding: 16px 0;
+    border-top: 1px solid var(--border);
+    margin-top: 16px;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+  .stat-item { text-align: center; }
+  .stat-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-weight: 300;
+    color: var(--ink);
+    display: block;
+  }
+  .stat-label {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+
+  .portfolio-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    background: var(--border);
+    max-width: 1200px;
+    margin: 32px auto;
+    border: 1px solid var(--border);
+  }
+  .portfolio-item {
+    aspect-ratio: 1;
+    overflow: hidden;
+    position: relative;
+    background: var(--parchment);
+    cursor: pointer;
+  }
+  .portfolio-item img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    filter: var(--image-filter);
+    transition: filter 0.6s ease, transform 0.4s ease;
+    display: block;
+  }
+  .portfolio-item:hover img { transform: scale(1.05); }
+  .portfolio-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(28,26,23,0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .portfolio-item:hover .portfolio-overlay { opacity: 1; }
+  .portfolio-overlay span {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    color: #F7F3EE;
+    text-align: center;
+    padding: 0 16px;
+  }
+  .portfolio-overlay small {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(247,243,238,0.6);
+  }
+
+  /* ── MAGAZINE BUILDER ── */
+  .builder-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr 260px;
+    height: calc(100vh - 120px);
+    border-top: 1px solid var(--border);
+  }
+  .builder-sidebar {
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    background: var(--grid-surface);
+    transition: background 0.6s ease;
+  }
+  .builder-sidebar-title {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    padding: 16px 20px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .element-group { padding: 16px 20px; border-bottom: 1px solid var(--border); }
+  .element-group-label {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 10px;
+  }
+  .elements-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .element-btn {
+    background: var(--grid-bg);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 12px 10px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+    color: var(--ink-muted);
+    font-size: 11px;
+    font-family: 'Figtree', sans-serif;
+    letter-spacing: 0.04em;
+  }
+  .element-btn:hover {
+    background: var(--grid-surface);
+    border-color: var(--sienna-light);
+    color: var(--sienna);
+  }
+  .element-btn .el-icon { font-size: 18px; display: block; margin-bottom: 6px; }
+
+  .builder-canvas {
+    background: #E8E4DE;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 32px;
+    overflow-y: auto;
+  }
+  .magazine-page {
+    background: #FAFAF8;
+    width: 100%;
+    max-width: 480px;
+    min-height: 680px;
+    box-shadow: 0 4px 24px rgba(28,26,23,0.15);
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+  }
+  .page-header-block {
+    background: var(--ink);
+    color: #F7F3EE;
+    padding: 32px 28px;
+  }
+  .page-header-block .issue-label {
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(247,243,238,0.5);
+    margin-bottom: 16px;
+  }
+  .page-header-block h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 38px;
+    font-weight: 300;
+    line-height: 1.05;
+    color: #F7F3EE;
+    margin-bottom: 12px;
+  }
+  .page-header-block h1 em { font-style: italic; color: var(--sienna-light); }
+  .page-header-block p {
+    font-family: 'EB Garamond', serif;
+    font-size: 15px;
+    color: rgba(247,243,238,0.7);
+    line-height: 1.5;
+  }
+  .page-image-block {
+    width: 100%;
+    aspect-ratio: 16/10;
+    background: var(--parchment);
+    overflow: hidden;
+  }
+  .page-image-block img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+    filter: var(--image-filter);
+    transition: filter 0.6s ease;
+  }
+  .page-text-block { padding: 24px 28px; }
+  .page-text-block .drop-cap {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 64px;
+    font-weight: 300;
+    float: left;
+    line-height: 0.8;
+    margin: 4px 8px 0 0;
+    color: var(--sienna);
+  }
+  .page-text-block p {
+    font-family: 'EB Garamond', serif;
+    font-size: 16px;
+    line-height: 1.7;
+    color: #2A2826;
+  }
+  .page-quote-block {
+    padding: 20px 28px;
+    border-left: 3px solid var(--sienna);
+    margin: 0 28px 24px;
+    background: rgba(139,74,42,0.04);
+  }
+  .page-quote-block blockquote {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 21px;
+    font-style: italic;
+    font-weight: 300;
+    color: var(--ink);
+    line-height: 1.4;
+    margin-bottom: 8px;
+  }
+  .page-quote-block cite {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+
+  .add-block-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: calc(100% - 56px);
+    margin: 16px 28px;
+    border: 1px dashed var(--border-strong);
+    background: none;
+    color: var(--ink-faint);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 12px;
+    cursor: pointer;
+    font-family: 'Figtree', sans-serif;
+    border-radius: 2px;
+    transition: all 0.2s;
+  }
+  .add-block-btn:hover {
+    border-color: var(--sienna-light);
+    color: var(--sienna);
+    background: rgba(139,74,42,0.03);
+  }
+
+  .builder-props {
+    border-left: 1px solid var(--border);
+    overflow-y: auto;
+    background: var(--grid-surface);
+    transition: background 0.6s ease;
+  }
+  .props-title {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    padding: 16px 20px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .prop-group { padding: 16px 20px; border-bottom: 1px solid var(--border); }
+  .prop-label {
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    color: var(--ink-muted);
+    margin-bottom: 8px;
+    display: block;
+  }
+  .prop-select, .prop-input {
+    width: 100%;
+    border: 1px solid var(--border);
+    background: var(--grid-bg);
+    color: var(--ink);
+    font-size: 13px;
+    font-family: 'Figtree', sans-serif;
+    padding: 8px 10px;
+    border-radius: 2px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .prop-select:focus, .prop-input:focus { border-color: var(--sienna-light); }
+  .color-swatches {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .swatch {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: border-color 0.15s;
+  }
+  .swatch:hover, .swatch.active { border-color: var(--ink); }
+  .export-area { padding: 20px; }
+  .export-btn {
+    width: 100%;
+    background: var(--sienna);
+    color: #fff;
+    border: none;
+    font-family: 'Figtree', sans-serif;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 12px;
+    cursor: pointer;
+    border-radius: 2px;
+    margin-bottom: 8px;
+    transition: background 0.2s;
+  }
+  .export-btn:hover { background: var(--ink); }
+  .export-btn.secondary {
+    background: none;
+    border: 1px solid var(--border-strong);
+    color: var(--ink);
+  }
+  .export-btn.secondary:hover { background: var(--ink); color: var(--grid-bg); }
+
+  /* ── SEARCH BAR ── */
+  .search-bar {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px 40px 0;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+  .search-input {
+    flex: 1;
+    border: 1px solid var(--border);
+    background: var(--grid-surface);
+    color: var(--ink);
+    font-family: 'EB Garamond', serif;
+    font-size: 17px;
+    padding: 10px 16px;
+    border-radius: 2px;
+    outline: none;
+    transition: border-color 0.2s, background 0.6s ease;
+  }
+  .search-input:focus { border-color: var(--sienna-light); }
+  .search-input::placeholder { color: var(--ink-faint); font-style: italic; }
+
+  /* ── ENERGY INFO ── */
+  .energy-info {
+    max-width: 1200px;
+    margin: 24px auto 0;
+    padding: 0 40px;
+  }
+  .energy-card {
+    background: var(--grid-surface);
+    border: 1px solid var(--border);
+    padding: 16px 20px;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: background 0.6s ease;
+  }
+  .energy-icon {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: rgba(90,107,85,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .energy-text h4 {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 2px;
+  }
+  .energy-text p {
+    font-size: 12px;
+    color: var(--ink-faint);
+    line-height: 1.4;
+  }
+
+  /* ── QUOTE STRIP ── */
+  .quote-strip {
+    text-align: center;
+    padding: 60px 40px;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+  .quote-strip blockquote {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-style: italic;
+    font-weight: 300;
+    color: var(--ink);
+    line-height: 1.4;
+    margin-bottom: 16px;
+  }
+  .quote-strip cite {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--sienna);
+  }
+
+  /* ── UTILITY ── */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 0;
+  }
+
+  @media (max-width: 900px) {
+    .archive-grid { grid-template-columns: repeat(2, 1fr); }
+    .featured-strip { grid-template-columns: 1fr; }
+    .builder-layout { grid-template-columns: 1fr; }
+    .builder-sidebar, .builder-props { display: none; }
+    nav { padding: 0 16px; }
+    .nav-links { display: none; }
+    .page-inner { padding: 32px 20px; }
+  }
+</style>
+</head>
+<body data-grid="moderate">
+
+<!-- Grid-Aware Banner -->
+<div class="grid-banner">
+  <div class="grid-status">
+    <div class="grid-dot"></div>
+    <span id="grid-label">Grid: Moderate — standard experience</span>
+  </div>
+  <div class="grid-controls">
+    <button class="grid-btn" onclick="setGrid('low')">Low</button>
+    <button class="grid-btn active" onclick="setGrid('moderate')">Moderate</button>
+    <button class="grid-btn" onclick="setGrid('high')">High</button>
+  </div>
+</div>
+
+<!-- Navigation -->
+<nav>
+  <a href="#" class="nav-logo" onclick="showSection('home')">Library of <em>Morenita</em></a>
+  <ul class="nav-links">
+    <li><a href="#" class="active" onclick="showSection('home'); setActive(this)">Archive</a></li>
+    <li><a href="#" onclick="showSection('collections'); setActive(this)">My Issues</a></li>
+    <li><a href="#" onclick="showSection('profile'); setActive(this)">Portfolio</a></li>
+    <li><a href="#" onclick="showSection('builder'); setActive(this)">Create</a></li>
+  </ul>
+  <div class="nav-actions">
+    <a href="#" class="btn-ghost">Sign In</a>
+    <a href="#" class="btn-solid">Join</a>
+  </div>
+</nav>
+
+<!-- ═══════════ HOME / ARCHIVE ═══════════ -->
+<section id="home" class="page-section active">
+
+  <div class="hero">
+    <div class="hero-eyebrow">Digital Archive · Curriculum Curator · Study Space</div>
+    <h1>Knowledge is the <em>inheritance</em> of every ancestor</h1>
+    <p class="hero-sub">A living library for artists, thinkers, and makers rooted in culture. Save ideas. Build issues. Know deeply.</p>
+    <div class="hero-actions">
+      <a href="#" class="btn-solid" onclick="showSection('collections')">Start Your Issue</a>
+      <a href="#" class="btn-ghost">Explore the Archive</a>
+    </div>
+  </div>
+
+  <div class="search-bar">
+    <input class="search-input" type="text" placeholder="Search philosophy, fashion history, herbalism, art…">
+  </div>
+
+  <div class="energy-info">
+    <div class="energy-card">
+      <div class="energy-icon">🌿</div>
+      <div class="energy-text">
+        <h4>Grid-aware design</h4>
+        <p>This page adapts its visual weight based on your local energy grid — reducing emissions when fossil fuels are high. You control this above.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Featured Story -->
+  <div class="section-header">
+    <h3>Featured this season</h3>
+  </div>
+  <div class="featured-strip">
+    <div class="featured-image-wrap">
+      <img src="https://i.pinimg.com/1200x/8f/ef/59/8fef5951d62ade9664de8d332c62137f.jpg" alt="Featured story">
+    </div>
+    <div class="featured-content">
+      <span class="tag">Fashion History</span>
+      <h2>The <em>garment</em> as a living archive — West African textile traditions</h2>
+      <p>Before paper held memory, cloth did. The aso-oke, the kente, the bogolanfini — each weave carries cosmology, lineage, and resistance encoded in pattern and pigment.</p>
+      <a href="#" class="read-link">Read the full story →</a>
+    </div>
+  </div>
+
+  <!-- Archive Grid -->
+  <div class="section-header">
+    <h3>The Archive</h3>
+    <a href="#">View all →</a>
+  </div>
+
+  <div class="archive-grid">
+    <a class="archive-card" href="#">
+      <div class="card-img">
+        <img src="https://i.pinimg.com/736x/88/13/8e/88138ec559996abd49cf6eddd940a14d.jpg" alt="Philosophy">
+      </div>
+      <div class="card-body">
+        <div class="card-topic">Philosophy</div>
+        <div class="card-title">Ubuntu — I am because we are</div>
+        <div class="card-meta">8 min read · Collected 247 times</div>
+        <div class="card-save">
+          <button class="save-btn" onclick="toggleSave(this, event)">+ Save</button>
+        </div>
+      </div>
+    </a>
+
+    <a class="archive-card" href="#">
+      <div class="card-img">
+        <img src="https://i.pinimg.com/1200x/a8/45/22/a84522cc1f06f171ca6e9c6fa6be6a6f.jpg" alt="Herbalism">
+      </div>
+      <div class="card-body">
+        <div class="card-topic">Eastern Medicine</div>
+        <div class="card-title">Rose hip, hibiscus, and the pharmacopeia of grandmothers</div>
+        <div class="card-meta">12 min read · Collected 189 times</div>
+        <div class="card-save">
+          <button class="save-btn" onclick="toggleSave(this, event)">+ Save</button>
+        </div>
+      </div>
+    </a>
+
+    <a class="archive-card" href="#">
+      <div class="card-img">
+        <img src="https://i.pinimg.com/736x/0d/91/d5/0d91d5db1188df9147f6c4f3d32771f4.jpg" alt="Art History">
+      </div>
+      <div class="card-body">
+        <div class="card-topic">Art History</div>
+        <div class="card-title">The Harlem Renaissance and the aesthetics of self-determination</div>
+        <div class="card-meta">15 min read · Collected 312 times</div>
+        <div class="card-save">
+          <button class="save-btn" onclick="toggleSave(this, event)">+ Save</button>
+        </div>
+      </div>
+    </a>
+
+    <a class="archive-card" href="#">
+      <div class="card-img" style="background: var(--parchment); aspect-ratio:3/4; display:flex; align-items:center; justify-content:center;">
+        <div style="text-align:center; padding:20px;">
+          <div style="font-family:'Cormorant Garamond',serif; font-size:48px; color:var(--sienna); opacity:0.4; line-height:1;">"</div>
+          <div style="font-family:'EB Garamond',serif; font-size:16px; color:var(--ink-muted); font-style:italic; line-height:1.5;">The function of art is to do more than tell it like it is — it's to imagine what is possible.</div>
+          <div style="font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--sienna); margin-top:16px;">bell hooks</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-topic">Quotes</div>
+        <div class="card-title">bell hooks on art, imagination, and liberation</div>
+        <div class="card-meta">Quote collection · Saved 441 times</div>
+        <div class="card-save">
+          <button class="save-btn" onclick="toggleSave(this, event)">+ Save</button>
+        </div>
+      </div>
+    </a>
+  </div>
+
+  <div class="quote-strip">
+    <blockquote>"An investment in knowledge pays the best interest."</blockquote>
+    <cite>Benjamin Franklin</cite>
+  </div>
+
+</section>
+
+<!-- ═══════════ MY ISSUES / COLLECTIONS ═══════════ -->
+<section id="collections" class="page-section">
+  <div class="page-inner">
+    <div class="page-title">My Issues</div>
+    <p class="page-subtitle">Your personal archive — curated by curiosity, deepened over time.</p>
+
+    <div class="collections-toolbar">
+      <div class="filter-tabs">
+        <button class="filter-tab active">All Issues</button>
+        <button class="filter-tab">Published</button>
+        <button class="filter-tab">Drafts</button>
+        <button class="filter-tab">Print Queue</button>
+      </div>
+      <button class="new-issue-btn" onclick="showSection('builder')">＋ New Issue</button>
+    </div>
+
+    <div class="issues-grid">
+
+      <div class="issue-card">
+        <div class="issue-cover">
+          <div class="issue-cover-bg" style="background-image: url('https://i.pinimg.com/1200x/8f/ef/59/8fef5951d62ade9664de8d332c62137f.jpg');"></div>
+          <div class="issue-cover-overlay"></div>
+          <div class="issue-cover-content">
+            <div class="issue-cover-title">Roots & Ritual</div>
+            <div class="issue-cover-count">14 articles saved</div>
+          </div>
+        </div>
+        <div class="issue-meta">
+          <span class="issue-date">March 2026</span>
+          <span class="issue-status">Published</span>
+        </div>
+      </div>
+
+      <div class="issue-card">
+        <div class="issue-cover">
+          <div class="issue-cover-bg" style="background-image: url('https://i.pinimg.com/1200x/a8/45/22/a84522cc1f06f171ca6e9c6fa6be6a6f.jpg');"></div>
+          <div class="issue-cover-overlay"></div>
+          <div class="issue-cover-content">
+            <div class="issue-cover-title">The Botanical Body</div>
+            <div class="issue-cover-count">9 articles saved</div>
+          </div>
+        </div>
+        <div class="issue-meta">
+          <span class="issue-date">February 2026</span>
+          <span class="issue-status draft">Draft</span>
+        </div>
+      </div>
+
+      <div class="issue-card">
+        <div class="issue-cover">
+          <div class="issue-cover-bg" style="background-image: url('https://i.pinimg.com/736x/0d/91/d5/0d91d5db1188df9147f6c4f3d32771f4.jpg');"></div>
+          <div class="issue-cover-overlay"></div>
+          <div class="issue-cover-content">
+            <div class="issue-cover-title">Cloth as Memory</div>
+            <div class="issue-cover-count">11 articles saved</div>
+          </div>
+        </div>
+        <div class="issue-meta">
+          <span class="issue-date">January 2026</span>
+          <span class="issue-status">Published</span>
+        </div>
+      </div>
+
+      <div class="new-issue-card" onclick="showSection('builder')">
+        <div class="plus">＋</div>
+        <span>Create New Issue</span>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ PROFILE / PORTFOLIO ═══════════ -->
+<section id="profile" class="page-section">
+  <div class="profile-hero">
+    <div class="profile-cover">
+      <div class="profile-cover-pattern"></div>
+    </div>
+    <div class="profile-info">
+      <div class="profile-avatar">A</div>
+      <div class="profile-text">
+        <div class="profile-name">Amara Soleil</div>
+        <div class="profile-handle">@amarasoleil · Murrieta, CA</div>
+        <div class="profile-bio">Textile artist & archivist of forgotten botanicals. Weaving stories from soil to silk.</div>
+        <div class="profile-actions">
+          <button class="btn-solid">Edit Profile</button>
+          <button class="btn-ghost">Share Portfolio</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="profile-stats">
+      <div class="stat-item">
+        <span class="stat-num">34</span>
+        <span class="stat-label">Works</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num">3</span>
+        <span class="stat-label">Issues</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num">212</span>
+        <span class="stat-label">Saved</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num">89</span>
+        <span class="stat-label">Followers</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-inner" style="padding-top: 0;">
+    <div class="section-header" style="padding-left:0; padding-right:0;">
+      <h3>Portfolio</h3>
+      <button class="save-btn">＋ Add Work</button>
+    </div>
+
+    <div class="portfolio-grid">
+      <div class="portfolio-item">
+        <img src="https://i.pinimg.com/736x/88/13/8e/88138ec559996abd49cf6eddd940a14d.jpg" alt="">
+        <div class="portfolio-overlay">
+          <span>Indigo & Resistance</span>
+          <small>Textile · 2025</small>
+        </div>
+      </div>
+      <div class="portfolio-item">
+        <img src="https://i.pinimg.com/1200x/a8/45/22/a84522cc1f06f171ca6e9c6fa6be6a6f.jpg" alt="">
+        <div class="portfolio-overlay">
+          <span>Botanical Grimoire Vol. I</span>
+          <small>Mixed media · 2025</small>
+        </div>
+      </div>
+      <div class="portfolio-item">
+        <img src="https://i.pinimg.com/736x/0d/91/d5/0d91d5db1188df9147f6c4f3d32771f4.jpg" alt="">
+        <div class="portfolio-overlay">
+          <span>Roots & Ritual</span>
+          <small>Photography · 2024</small>
+        </div>
+      </div>
+      <div class="portfolio-item">
+        <img src="https://i.pinimg.com/1200x/8f/ef/59/8fef5951d62ade9664de8d332c62137f.jpg" alt="">
+        <div class="portfolio-overlay">
+          <span>Aso-oke Study</span>
+          <small>Research · 2024</small>
+        </div>
+      </div>
+      <div class="portfolio-item" style="display:flex; align-items:center; justify-content:center; background:var(--parchment); cursor:pointer;">
+        <div style="text-align:center; color:var(--ink-faint);">
+          <div style="font-size:28px; margin-bottom:8px;">＋</div>
+          <div style="font-size:11px; letter-spacing:0.08em; text-transform:uppercase;">Add work</div>
+        </div>
+      </div>
+      <div class="portfolio-item">
+        <img src="https://i.pinimg.com/736x/88/13/8e/88138ec559996abd49cf6eddd940a14d.jpg" alt="">
+        <div class="portfolio-overlay">
+          <span>Sacred Geometry Series</span>
+          <small>Drawing · 2024</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ MAGAZINE BUILDER ═══════════ -->
+<section id="builder" class="page-section">
+  <div class="builder-layout">
+
+    <!-- Left: Elements Sidebar -->
+    <div class="builder-sidebar">
+      <div class="builder-sidebar-title">Elements</div>
+
+      <div class="element-group">
+        <div class="element-group-label">Text</div>
+        <div class="elements-row">
+          <button class="element-btn"><span class="el-icon">T</span>Title</button>
+          <button class="element-btn"><span class="el-icon" style="font-family:'EB Garamond',serif; font-style:italic;">T</span>Quote</button>
+          <button class="element-btn"><span class="el-icon" style="font-size:13px; line-height:1.3;">¶</span>Body</button>
+          <button class="element-btn"><span class="el-icon" style="font-size:11px; letter-spacing:0.1em;">ABC</span>Caption</button>
+        </div>
+      </div>
+
+      <div class="element-group">
+        <div class="element-group-label">Media</div>
+        <div class="elements-row">
+          <button class="element-btn"><span class="el-icon">🖼</span>Image</button>
+          <button class="element-btn"><span class="el-icon">▶</span>Video</button>
+          <button class="element-btn"><span class="el-icon">♪</span>Audio</button>
+          <button class="element-btn"><span class="el-icon">📎</span>Embed</button>
+        </div>
+      </div>
+
+      <div class="element-group">
+        <div class="element-group-label">Layout</div>
+        <div class="elements-row">
+          <button class="element-btn"><span class="el-icon" style="display:grid; grid-template-columns:1fr 1fr; gap:2px; width:20px; height:16px; margin:0 auto 6px;"><span style="background:var(--border-strong); border-radius:1px;"></span><span style="background:var(--border-strong); border-radius:1px;"></span></span>2 Col</button>
+          <button class="element-btn"><span class="el-icon">━</span>Divider</button>
+          <button class="element-btn"><span class="el-icon">◻</span>Spacer</button>
+          <button class="element-btn"><span class="el-icon">▤</span>Grid</button>
+        </div>
+      </div>
+
+      <div class="element-group">
+        <div class="element-group-label">From Your Archive</div>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <div style="display:flex; align-items:center; gap:10px; padding:8px; border:1px solid var(--border); border-radius:2px; cursor:pointer; background:var(--grid-bg); transition:all 0.2s;" onmouseover="this.style.borderColor='var(--sienna-light)'" onmouseout="this.style.borderColor='var(--border)'">
+            <div style="width:32px; height:32px; background:var(--parchment); border-radius:1px; flex-shrink:0; overflow:hidden;"><img src="https://i.pinimg.com/736x/88/13/8e/88138ec559996abd49cf6eddd940a14d.jpg" style="width:100%;height:100%;object-fit:cover;"></div>
+            <div>
+              <div style="font-size:12px; color:var(--ink); line-height:1.3;">Ubuntu philosophy</div>
+              <div style="font-size:10px; color:var(--ink-faint);">Saved · Philosophy</div>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px; padding:8px; border:1px solid var(--border); border-radius:2px; cursor:pointer; background:var(--grid-bg); transition:all 0.2s;" onmouseover="this.style.borderColor='var(--sienna-light)'" onmouseout="this.style.borderColor='var(--border)'">
+            <div style="width:32px; height:32px; background:var(--parchment); border-radius:1px; flex-shrink:0; overflow:hidden;"><img src="https://i.pinimg.com/1200x/a8/45/22/a84522cc1f06f171ca6e9c6fa6be6a6f.jpg" style="width:100%;height:100%;object-fit:cover;"></div>
+            <div>
+              <div style="font-size:12px; color:var(--ink); line-height:1.3;">Rose hip & hibiscus</div>
+              <div style="font-size:10px; color:var(--ink-faint);">Saved · Herbalism</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Center: Canvas -->
+    <div class="builder-canvas">
+      <div class="magazine-page">
+        <div class="page-header-block">
+          <div class="issue-label">Library of Morenita · Issue IV · Spring 2026</div>
+          <h1>Roots &<br><em>Ritual</em></h1>
+          <p>A journey through the ancient practices of healing, beauty, and spiritual maintenance passed down through generations of Black and Brown women.</p>
+        </div>
+
+        <div class="page-image-block">
+          <img src="https://i.pinimg.com/1200x/a8/45/22/a84522cc1f06f171ca6e9c6fa6be6a6f.jpg" alt="Botanicals">
+        </div>
+
+        <div class="page-text-block">
+          <p><span class="drop-cap">B</span>efore the apothecary, before the dispensary, there was the kitchen. The windowsill crowded with small jars. The grandmother who knew what the body needed before the body knew itself. This is where medicine lived — unwritten, embodied, passed hand to hand.</p>
+        </div>
+
+        <div class="page-quote-block">
+          <blockquote>"The creation of something new is not accomplished by the intellect but by the play instinct."</blockquote>
+          <cite>— Carl Jung</cite>
+        </div>
+
+        <button class="add-block-btn">＋ Add a block</button>
+      </div>
+    </div>
+
+    <!-- Right: Properties -->
+    <div class="builder-props">
+      <div class="props-title">Page Properties</div>
+
+      <div class="prop-group">
+        <label class="prop-label">Issue Title</label>
+        <input class="prop-input" type="text" value="Roots & Ritual">
+      </div>
+
+      <div class="prop-group">
+        <label class="prop-label">Cover Style</label>
+        <select class="prop-select">
+          <option>Dark header</option>
+          <option>Full bleed image</option>
+          <option>Minimal white</option>
+          <option>Typographic</option>
+        </select>
+      </div>
+
+      <div class="prop-group">
+        <label class="prop-label">Accent Color</label>
+        <div class="color-swatches">
+          <div class="swatch active" style="background:#8B4A2A;" title="Sienna"></div>
+          <div class="swatch" style="background:#5A6B55;" title="Sage"></div>
+          <div class="swatch" style="background:#C49A3C;" title="Gold"></div>
+          <div class="swatch" style="background:#4A6B8A;" title="Slate"></div>
+          <div class="swatch" style="background:#7A4A8B;" title="Plum"></div>
+          <div class="swatch" style="background:#1C1A17;" title="Ink"></div>
+        </div>
+      </div>
+
+      <div class="prop-group">
+        <label class="prop-label">Typography</label>
+        <select class="prop-select">
+          <option>Cormorant Garamond + Figtree</option>
+          <option>EB Garamond + Figtree</option>
+          <option>Playfair Display + Lato</option>
+        </select>
+      </div>
+
+      <div class="prop-group">
+        <label class="prop-label">Paper Size</label>
+        <select class="prop-select">
+          <option>A4 Magazine (Digital)</option>
+          <option>Letter (Print-ready)</option>
+          <option>Square (Social)</option>
+        </select>
+      </div>
+
+      <div class="export-area">
+        <button class="export-btn">Request Print Copy</button>
+        <button class="export-btn secondary">Export as PDF</button>
+        <button class="export-btn secondary">Share Issue</button>
+      </div>
+
+      <div style="padding:0 20px 16px;">
+        <div style="font-size:10px; letter-spacing:0.06em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:8px;">Sustainability</div>
+        <div style="font-size:12px; color:var(--ink-muted); line-height:1.5;">
+          Estimated page weight: <strong style="color:var(--sage)">42kb</strong><br>
+          CO₂ per view: <strong style="color:var(--sage)">0.04g</strong><br>
+          <span style="color:var(--ink-faint);">94% lighter than avg. magazine page</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  function showSection(id) {
+    document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    window.scrollTo(0, 0);
+  }
+
+  function setActive(el) {
+    document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  function setGrid(level) {
+    document.body.setAttribute('data-grid', level);
+    document.querySelectorAll('.grid-btn').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+
+    const labels = {
+      low: 'Grid: Low — minimal mode, reduced imagery',
+      moderate: 'Grid: Moderate — standard experience',
+      high: 'Grid: High — fossil fuel heavy, reduced visuals'
+    };
+    document.getElementById('grid-label').textContent = labels[level];
+  }
+
+  function toggleSave(btn, e) {
+    e.preventDefault();
+    if (btn.classList.contains('saved')) {
+      btn.classList.remove('saved');
+      btn.textContent = '+ Save';
+    } else {
+      btn.classList.add('saved');
+      btn.textContent = '✓ Saved';
+    }
+  }
+
+  document.querySelectorAll('.filter-tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+      document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+
+  document.querySelectorAll('.swatch').forEach(swatch => {
+    swatch.addEventListener('click', function() {
+      document.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>
