@@ -328,6 +328,7 @@ window.filterMag=function(tag,btn){
   renderGrid(tag?items.filter(i=>(i.tags||[]).includes(tag)):items)
 }
 function renderGrid(it){
+  it = [...it].sort(() => Math.random() - 0.5)
   const grid=document.getElementById('mag-grid')
   const arts=it.filter(i=>i.type==='article'),qs=it.filter(i=>i.type==='quote'),imgs=it.filter(i=>i.type==='image')
   const blocks=[];let ai=0,qi=0,ii=0
