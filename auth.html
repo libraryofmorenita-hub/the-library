@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign In · Library of Morenita</title>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Figtree:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream: #F7F3EE;
+  --parchment: #EDE8E0;
+  --ink: #1C1A17;
+  --ink-muted: #5C5750;
+  --ink-faint: #9B968D;
+  --sienna: #8B4A2A;
+  --sienna-light: #C47A55;
+  --sage: #5A6B55;
+  --gold: #C49A3C;
+  --border: rgba(28,26,23,0.12);
+  --border-strong: rgba(28,26,23,0.25);
+  --void: #0C0B09;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { height:100%; }
+body {
+  font-family:'Figtree',sans-serif;
+  background:var(--void);
+  color:var(--cream);
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  min-height:100vh;
+}
+
+/* ── LEFT PANEL ── */
+.left-panel {
+  position:relative;
+  background:var(--void);
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  padding:48px;
+  overflow:hidden;
+}
+.left-panel::before {
+  content:'';
+  position:absolute;
+  inset:0;
+  background:radial-gradient(ellipse 80% 60% at 30% 60%, rgba(139,74,42,0.2) 0%, transparent 70%);
+  pointer-events:none;
+}
+.left-bg-text {
+  position:absolute;
+  bottom:-40px;
+  left:-20px;
+  font-family:'Cormorant Garamond',serif;
+  font-size:220px;
+  font-weight:300;
+  color:rgba(247,243,238,0.03);
+  line-height:1;
+  pointer-events:none;
+  user-select:none;
+}
+.left-logo {
+  font-family:'EB Garamond',serif;
+  font-size:18px;
+  color:var(--cream);
+  text-decoration:none;
+  letter-spacing:0.03em;
+  position:relative;
+}
+.left-logo em { font-style:italic; color:var(--sienna-light); }
+.left-content { position:relative; }
+.left-content h1 {
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(36px,4vw,56px);
+  font-weight:300;
+  line-height:1.05;
+  margin-bottom:20px;
+  color:var(--cream);
+}
+.left-content h1 em { font-style:italic; color:var(--sienna-light); }
+.left-content p {
+  font-family:'EB Garamond',serif;
+  font-size:18px;
+  color:rgba(247,243,238,0.5);
+  line-height:1.65;
+  font-style:italic;
+  max-width:380px;
+}
+.left-quote {
+  position:relative;
+  border-left:2px solid rgba(196,122,85,0.3);
+  padding-left:20px;
+}
+.left-quote blockquote {
+  font-family:'Cormorant Garamond',serif;
+  font-size:17px;
+  font-style:italic;
+  color:rgba(247,243,238,0.4);
+  line-height:1.5;
+  margin-bottom:8px;
+}
+.left-quote cite {
+  font-size:10px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:rgba(247,243,238,0.2);
+}
+
+/* ── RIGHT PANEL ── */
+.right-panel {
+  background:var(--cream);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:48px;
+}
+.auth-box {
+  width:100%;
+  max-width:400px;
+}
+
+/* Tabs */
+.auth-tabs {
+  display:flex;
+  margin-bottom:40px;
+  border-bottom:1px solid var(--border);
+}
+.auth-tab {
+  background:none;
+  border:none;
+  border-bottom:2px solid transparent;
+  font-family:'Figtree',sans-serif;
+  font-size:12px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--ink-faint);
+  padding:12px 24px 10px;
+  cursor:pointer;
+  margin-bottom:-1px;
+  transition:all 0.2s;
+}
+.auth-tab.active {
+  color:var(--ink);
+  border-bottom-color:var(--sienna);
+}
+
+/* Forms */
+.auth-form { display:none; }
+.auth-form.active { display:block; }
+
+.form-title {
+  font-family:'Cormorant Garamond',serif;
+  font-size:32px;
+  font-weight:300;
+  color:var(--ink);
+  margin-bottom:6px;
+}
+.form-title em { font-style:italic; color:var(--sienna); }
+.form-sub {
+  font-family:'EB Garamond',serif;
+  font-size:15px;
+  color:var(--ink-faint);
+  font-style:italic;
+  margin-bottom:32px;
+}
+
+.field {
+  margin-bottom:20px;
+}
+.field label {
+  display:block;
+  font-size:10px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--ink-muted);
+  margin-bottom:8px;
+}
+.field input, .field select {
+  width:100%;
+  border:1px solid var(--border);
+  background:#fff;
+  color:var(--ink);
+  font-family:'EB Garamond',serif;
+  font-size:17px;
+  padding:11px 14px;
+  border-radius:2px;
+  outline:none;
+  transition:border-color 0.2s;
+}
+.field input:focus, .field select:focus { border-color:var(--sienna-light); }
+.field input::placeholder { color:var(--ink-faint); font-style:italic; }
+.field select { font-style:normal; cursor:pointer; }
+
+.role-cards {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-bottom:4px;
+}
+.role-card {
+  border:1px solid var(--border);
+  border-radius:3px;
+  padding:14px;
+  cursor:pointer;
+  transition:all 0.2s;
+  position:relative;
+}
+.role-card input[type="radio"] {
+  position:absolute;
+  opacity:0;
+  width:0;
+  height:0;
+}
+.role-card.selected {
+  border-color:var(--sienna);
+  background:rgba(139,74,42,0.04);
+}
+.role-icon { font-size:20px; margin-bottom:6px; display:block; }
+.role-name {
+  font-size:12px;
+  font-weight:500;
+  color:var(--ink);
+  margin-bottom:3px;
+}
+.role-desc {
+  font-size:11px;
+  color:var(--ink-faint);
+  line-height:1.4;
+}
+.role-note {
+  font-size:11px;
+  color:var(--ink-faint);
+  font-style:italic;
+  margin-top:8px;
+  line-height:1.5;
+}
+
+.submit-btn {
+  width:100%;
+  background:var(--ink);
+  color:var(--cream);
+  border:none;
+  font-family:'Figtree',sans-serif;
+  font-size:12px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  padding:14px;
+  cursor:pointer;
+  border-radius:2px;
+  margin-top:8px;
+  transition:background 0.2s;
+}
+.submit-btn:hover { background:var(--sienna); }
+.submit-btn:disabled { opacity:0.5; cursor:not-allowed; }
+
+.divider {
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin:20px 0;
+  color:var(--ink-faint);
+  font-size:11px;
+  letter-spacing:0.06em;
+}
+.divider::before, .divider::after {
+  content:'';
+  flex:1;
+  height:1px;
+  background:var(--border);
+}
+
+.google-btn {
+  width:100%;
+  background:#fff;
+  border:1px solid var(--border-strong);
+  color:var(--ink);
+  font-family:'Figtree',sans-serif;
+  font-size:13px;
+  padding:12px;
+  cursor:pointer;
+  border-radius:2px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  transition:border-color 0.2s;
+}
+.google-btn:hover { border-color:var(--ink); }
+.google-icon {
+  width:18px; height:18px;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%234285F4' d='M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z'/%3E%3Cpath fill='%2334A853' d='M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z'/%3E%3Cpath fill='%23FBBC05' d='M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z'/%3E%3Cpath fill='%23EA4335' d='M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z'/%3E%3C/svg%3E") center/contain no-repeat;
+}
+
+/* Messages */
+.msg {
+  padding:12px 16px;
+  border-radius:2px;
+  font-size:13px;
+  margin-bottom:16px;
+  display:none;
+  line-height:1.4;
+}
+.msg.error { background:rgba(155,74,58,0.1); border:1px solid rgba(155,74,58,0.3); color:#7A3020; display:block; }
+.msg.success { background:rgba(90,107,85,0.1); border:1px solid rgba(90,107,85,0.3); color:#3A5030; display:block; }
+
+/* Loading */
+.spinner {
+  display:inline-block;
+  width:14px; height:14px;
+  border:2px solid rgba(247,243,238,0.3);
+  border-top-color:var(--cream);
+  border-radius:50%;
+  animation:spin 0.6s linear infinite;
+  margin-right:8px;
+  vertical-align:middle;
+}
+@keyframes spin { to { transform:rotate(360deg); } }
+
+@media(max-width:768px) {
+  body { grid-template-columns:1fr; }
+  .left-panel { display:none; }
+  .right-panel { padding:32px 24px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Left Panel -->
+<div class="left-panel">
+  <div class="left-bg-text">M</div>
+  <a href="index.html" class="left-logo">Library of <em>Morenita</em></a>
+  <div class="left-content">
+    <h1>A place to<br>know <em>deeply</em></h1>
+    <p>A living archive for artists, thinkers, and makers rooted in culture. Every idea connected. Every reader welcomed.</p>
+  </div>
+  <div class="left-quote">
+    <blockquote>"The pursuit of knowledge partnered with the pursuit of happiness is a recipe for happy & healthy individuals."</blockquote>
+    <cite>Library of Morenita</cite>
+  </div>
+</div>
+
+<!-- Right Panel -->
+<div class="right-panel">
+  <div class="auth-box">
+
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchTab('signin', this)">Sign In</button>
+      <button class="auth-tab" onclick="switchTab('join', this)">Join</button>
+    </div>
+
+    <!-- ── SIGN IN ── -->
+    <div id="form-signin" class="auth-form active">
+      <div class="form-title">Welcome <em>back</em></div>
+      <div class="form-sub">Sign in to your library.</div>
+
+      <div id="signin-msg" class="msg"></div>
+
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="signin-email" placeholder="your@email.com">
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="signin-password" placeholder="••••••••">
+      </div>
+
+      <button class="submit-btn" id="signin-btn" onclick="handleSignIn()">Sign In</button>
+
+      <div class="divider">or</div>
+      <button class="google-btn" onclick="handleGoogle()">
+        <div class="google-icon"></div>
+        Continue with Google
+      </button>
+    </div>
+
+    <!-- ── JOIN ── -->
+    <div id="form-join" class="auth-form">
+      <div class="form-title">Join the <em>library</em></div>
+      <div class="form-sub">Create your reader's account.</div>
+
+      <div id="join-msg" class="msg"></div>
+
+      <div class="field">
+        <label>Your Name</label>
+        <input type="text" id="join-name" placeholder="Full name">
+      </div>
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="join-email" placeholder="your@email.com">
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="join-password" placeholder="8+ characters">
+      </div>
+
+      <div class="field">
+        <label>I am joining as</label>
+        <div class="role-cards">
+          <label class="role-card selected" onclick="selectRole('reader', this)">
+            <input type="radio" name="role" value="reader" checked>
+            <span class="role-icon">📖</span>
+            <div class="role-name">Reader</div>
+            <div class="role-desc">Explore, save, and learn</div>
+          </label>
+          <label class="role-card" onclick="selectRole('fellow', this)">
+            <input type="radio" name="role" value="fellow">
+            <span class="role-icon">✦</span>
+            <div class="role-name">Fellow</div>
+            <div class="role-desc">Write & contribute</div>
+          </label>
+        </div>
+        <div class="role-note" id="role-note">Readers can explore the full archive with a weekly reading allowance.</div>
+      </div>
+
+      <button class="submit-btn" id="join-btn" onclick="handleJoin()">Create Account</button>
+
+      <div class="divider">or</div>
+      <button class="google-btn" onclick="handleGoogle()">
+        <div class="google-icon"></div>
+        Continue with Google
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<script type="module">
+import { supabase, ROLES } from './supabase.js'
+
+// ── TAB SWITCHING ──
+window.switchTab = function(tab, btn) {
+  document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'))
+  document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'))
+  btn.classList.add('active')
+  document.getElementById('form-' + tab).classList.add('active')
+}
+
+// ── ROLE SELECTION ──
+let selectedRole = 'reader'
+const roleNotes = {
+  reader: 'Readers can explore the full archive with a weekly reading allowance.',
+  fellow: 'Fellows can write articles and propose curriculum tracks — published with Librarian approval.'
+}
+window.selectRole = function(role, card) {
+  selectedRole = role
+  document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'))
+  card.classList.add('selected')
+  document.getElementById('role-note').textContent = roleNotes[role]
+}
+
+// ── SIGN IN ──
+window.handleSignIn = async function() {
+  const email = document.getElementById('signin-email').value.trim()
+  const password = document.getElementById('signin-password').value
+  const btn = document.getElementById('signin-btn')
+  const msg = document.getElementById('signin-msg')
+
+  if (!email || !password) { showMsg(msg, 'Please fill in all fields.', 'error'); return }
+
+  btn.disabled = true
+  btn.innerHTML = '<span class="spinner"></span>Signing in…'
+  msg.className = 'msg'
+
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+
+  if (error) {
+    showMsg(msg, error.message, 'error')
+    btn.disabled = false
+    btn.textContent = 'Sign In'
+    return
+  }
+
+  // Route by role
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', data.user.id)
+    .single()
+
+  routeByRole(profile?.role)
+}
+
+// ── JOIN ──
+window.handleJoin = async function() {
+  const name = document.getElementById('join-name').value.trim()
+  const email = document.getElementById('join-email').value.trim()
+  const password = document.getElementById('join-password').value
+  const btn = document.getElementById('join-btn')
+  const msg = document.getElementById('join-msg')
+
+  if (!name || !email || !password) { showMsg(msg, 'Please fill in all fields.', 'error'); return }
+  if (password.length < 8) { showMsg(msg, 'Password must be at least 8 characters.', 'error'); return }
+
+  btn.disabled = true
+  btn.innerHTML = '<span class="spinner"></span>Creating account…'
+  msg.className = 'msg'
+
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: {
+        display_name: name,
+        role: selectedRole
+      }
+    }
+  })
+
+  if (error) {
+    showMsg(msg, error.message, 'error')
+    btn.disabled = false
+    btn.textContent = 'Create Account'
+    return
+  }
+
+  showMsg(msg, 'Account created! Check your email to confirm, then sign in.', 'success')
+  btn.disabled = false
+  btn.textContent = 'Create Account'
+}
+
+// ── GOOGLE ──
+window.handleGoogle = async function() {
+  await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: window.location.origin + '/index.html' }
+  })
+}
+
+// ── ROUTE BY ROLE ──
+function routeByRole(role) {
+  switch(role) {
+    case ROLES.LIBRARIAN:
+    case ROLES.CURATOR:
+      window.location.href = 'index.html'
+      break
+    case ROLES.FELLOW:
+      window.location.href = 'index.html'
+      break
+    default:
+      window.location.href = 'index.html'
+  }
+}
+
+// ── CHECK IF ALREADY LOGGED IN ──
+const { data: { user } } = await supabase.auth.getUser()
+if (user) routeByRole(null)
+
+// ── UTILS ──
+function showMsg(el, text, type) {
+  el.textContent = text
+  el.className = 'msg ' + type
+}
+</script>
+</body>
+</html>
