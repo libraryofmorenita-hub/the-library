@@ -213,11 +213,7 @@ nav{position:fixed;top:31px;left:0;right:0;background:rgba(14,13,11,0.95);backdr
   <svg id="web-canvas"></svg>
   <div id="node-card"><button class="nc-x" onclick="closeCard()">✕</button><div class="nc-type" id="nc-type"></div><div class="nc-title" id="nc-title"></div><div class="nc-excerpt" id="nc-excerpt"></div><div class="nc-tags" id="nc-tags"></div><div class="nc-btns"><button class="nc-btn read" id="nc-read">Open →</button><button class="nc-btn save" id="nc-save" onclick="saveNode()">+ Save</button></div></div>
   <div id="obs-stats"><div id="sn">— nodes</div><div id="sl">— edges</div></div>
-  <div id="obs-legend"><div class="leg-t">Node Types</div><div class="leg-row" onclick="filterType('article')"><div class="leg-dot" style="background:#C47A55;"></div>Articles</div>
-    <div class="leg-row" onclick="filterType('quote')"><div class="leg-dot" style="background:#DDB96A;"></div>Quotes</div>
-    <div class="leg-row" onclick="filterType('image')"><div class="leg-dot" style="background:#8BA683;"></div>Works</div>
-    <div class="leg-row" onclick="filterType('star')" style="margin-top:6px;"><div style="width:10px;height:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;"><svg width="10" height="10" viewBox="-5 -5 10 10"><path d="M0,-4.5 L1.7,-1.7 L4.5,0 L1.7,1.7 L0,4.5 L-1.7,1.7 L-4.5,0 L-1.7,-1.7 Z" fill="rgba(247,243,238,0.4)" stroke="rgba(247,243,238,0.6)" stroke-width="0.4"/></svg></div>Stars</div>
-    <div class="leg-row" onclick="filterType(null)" style="margin-top:5px;"><div class="leg-dot" style="background:transparent;border:1px dashed rgba(247,243,238,0.12);"></div><span style="color:rgba(247,243,238,0.22);">All</span></div></div>
+  <div id="obs-legend"><div class="leg-t">Node Types</div><div class="leg-row" onclick="filterType('article')"><div class="leg-dot" style="background:#C47A55;"></div>Articles</div><div class="leg-row" onclick="filterType('quote')"><div class="leg-dot" style="background:#DDB96A;"></div>Quotes</div><div class="leg-row" onclick="filterType('image')"><div class="leg-dot" style="background:#8BA683;"></div>Works</div><div class="leg-row" onclick="filterType('tag')"><div class="leg-dot" style="background:rgba(247,243,238,0.1);border:1px solid rgba(247,243,238,0.18);"></div>Tags</div><div class="leg-row" onclick="filterType(null)" style="margin-top:5px;"><div class="leg-dot" style="background:transparent;border:1px dashed rgba(247,243,238,0.12);"></div><span style="color:rgba(247,243,238,0.22);">All</span></div></div>
   <div id="zoom-ctrls"><button class="ctrl-btn" onclick="zoomIn()">+</button><button class="ctrl-btn" onclick="zoomOut()">−</button><button class="ctrl-btn" onclick="resetZoom()">⌂</button></div>
   <div class="obs-search"><input type="text" id="search-input" placeholder="Search the constellation…"><button onclick="searchWeb()">Find</button></div>
 </div>
@@ -236,27 +232,24 @@ nav{position:fixed;top:31px;left:0;right:0;background:rgba(14,13,11,0.95);backdr
 
 <script type="module">
 import { supabase, getCurrentUser } from './supabase.js'
-const CONSTELLATIONS = {"Knowing": ["oral-tradition", "indigenous-science", "mysticism", "philosophy", "cosmology"], "Body": ["herbalism", "beauty-ritual", "food-sovereignty", "ancestral-medicine", "ecology"], "Craft": ["textiles", "ceramics", "architecture", "natural-dye", "printmaking"], "Story": ["literature", "photography", "art-history", "film", "oral-poetry"], "Sound": ["music", "dance", "sound-healing", "percussion"], "Power": ["resistance", "diaspora", "decolonization", "land", "memory"], "Place": ["west-africa", "latin-america", "south-asia", "east-asia", "caribbean", "pacific", "middle-east"], "Time": ["ancestral", "contemporary", "speculative"], "Future": ["solarpunk", "open-source", "biomimicry", "appropriate-tech", "community-infrastructure"]}
-const CONSTELLATION_COLORS = {"Knowing": "#DDB96A", "Body": "#8BA683", "Craft": "#C47A55", "Story": "#4A6B8A", "Sound": "#7A4A8B", "Power": "#9B4A3A", "Place": "#5A9E6A", "Time": "#C49A3C", "Future": "#4A8B8A"}
-const ALL_STARS = ["oral-tradition", "indigenous-science", "mysticism", "philosophy", "cosmology", "herbalism", "beauty-ritual", "food-sovereignty", "ancestral-medicine", "ecology", "textiles", "ceramics", "architecture", "natural-dye", "printmaking", "literature", "photography", "art-history", "film", "oral-poetry", "music", "dance", "sound-healing", "percussion", "resistance", "diaspora", "decolonization", "land", "memory", "west-africa", "latin-america", "south-asia", "east-asia", "caribbean", "pacific", "middle-east", "ancestral", "contemporary", "speculative", "solarpunk", "open-source", "biomimicry", "appropriate-tech", "community-infrastructure"]
 const TC={article:'#C47A55',quote:'#DDB96A',image:'#8BA683',tag:'rgba(247,243,238,0.07)'}
 const TR={article:9,quote:7,image:8,tag:22}
 const FB=[
-  {id:'f1',type:'article',title:'Ubuntu — I am because we are',excerpt:'The Nguni Bantu philosophy that places communal being at the center of personhood.',tags:['philosophy','cosmology','diaspora','ancestral'],read_time:'8 min',cover_image:'https://i.pinimg.com/736x/88/13/8e/88138ec559996abd49cf6eddd940a14d.jpg'},
-  {id:'f2',type:'article',title:'The garment as living archive',excerpt:'West African textile traditions — aso-oke, kente, bogolanfini — encoding cosmology in cloth.',tags:['textiles','natural-dye','west-africa','art-history','resistance'],read_time:'11 min',cover_image:'https://i.pinimg.com/1200x/8f/ef/59/8fef5951d62ade9664de8d332c62137f.jpg'},
-  {id:'f3',type:'article',title:'Rose hip, hibiscus & the pharmacopeia of grandmothers',excerpt:'Before the apothecary, there was the kitchen windowsill.',tags:['herbalism','beauty-ritual','ecology','ancestral-medicine','body'],read_time:'12 min',cover_image:'https://i.pinimg.com/1200x/a8/45/22/a84522cc1f06f171ca6e9c6fa6be6a6f.jpg'},
-  {id:'f4',type:'article',title:'The Harlem Renaissance and self-determination',excerpt:'How Black artists in 1920s New York built a visual language of liberation.',tags:['art-history','diaspora','resistance','literature','memory'],read_time:'15 min',cover_image:'https://i.pinimg.com/736x/0d/91/d5/0d91d5db1188df9147f6c4f3d32771f4.jpg'},
-  {id:'f5',type:'article',title:'Indigo — the color that crossed oceans',excerpt:'From Yoruba adire to Japanese shibori, indigo as shared human inheritance.',tags:['textiles','natural-dye','west-africa','ecology','ancestral'],read_time:'9 min'},
-  {id:'f6',type:'article',title:'Sacred geometry in Moroccan architecture',excerpt:'The zellige, the muqarnas — pattern as spiritual practice.',tags:['architecture','west-africa','cosmology','art-history','philosophy'],read_time:'13 min'},
-  {id:'f7',type:'article',title:'Octavia Butler and the speculative Black imagination',excerpt:'Science fiction as a tool of liberation.',tags:['literature','speculative','resistance','diaspora','decolonization'],read_time:'14 min'},
-  {id:'f8',type:'article',title:'Decolonizing the botanical',excerpt:'Who gets credited for knowing? A history of stolen plant science.',tags:['herbalism','indigenous-science','decolonization','ecology','food-sovereignty'],read_time:'16 min'},
-  {id:'q1',type:'quote',title:'The function of art is to imagine what is possible',excerpt:'',tags:['art-history','literature','resistance','decolonization'],author:'bell hooks'},
-  {id:'q2',type:'quote',title:'Not everything that is faced can be changed, but nothing can be changed until it is faced',excerpt:'',tags:['resistance','diaspora','philosophy','memory'],author:'James Baldwin'},
-  {id:'q3',type:'quote',title:'Caring for myself is not self-indulgence, it is self-preservation',excerpt:'',tags:['beauty-ritual','ancestral-medicine','resistance','ecology'],author:'Audre Lorde'},
-  {id:'q4',type:'quote',title:'The earth has music for those who listen',excerpt:'',tags:['ecology','cosmology','sound-healing','philosophy'],author:'George Santayana'},
-  {id:'i1',type:'image',title:'Indigo & Resistance',excerpt:'Textile work exploring the politics of natural dye.',tags:['textiles','resistance','art-history','west-africa'],medium:'Textile · 2025',cover_image:'https://i.pinimg.com/736x/88/13/8e/88138ec559996abd49cf6eddd940a14d.jpg'},
-  {id:'i2',type:'image',title:'Botanical Grimoire Vol. I',excerpt:'Mixed media collage — herbarium meets magical text.',tags:['herbalism','ecology','beauty-ritual','cosmology'],medium:'Mixed media · 2025',cover_image:'https://i.pinimg.com/1200x/a8/45/22/a84522cc1f06f171ca6e9c6fa6be6a6f.jpg'},
-  {id:'i3',type:'image',title:'Roots & Ritual',excerpt:'Photography exploring ancestral beauty practices.',tags:['beauty-ritual','diaspora','decolonization','ecology'],medium:'Photography · 2024',cover_image:'https://i.pinimg.com/736x/0d/91/d5/0d91d5db1188df9147f6c4f3d32771f4.jpg'},
+  {id:'f1',type:'article',title:'Ubuntu — I am because we are',excerpt:'The Nguni Bantu philosophy that places communal being at the center of personhood.',tags:['philosophy','africa','diaspora','spirituality'],read_time:'8 min',cover_image:'https://i.pinimg.com/736x/88/13/8e/88138ec559996abd49cf6eddd940a14d.jpg'},
+  {id:'f2',type:'article',title:'The garment as living archive',excerpt:'West African textile traditions — aso-oke, kente, bogolanfini — encoding cosmology in cloth.',tags:['fashion-history','textiles','africa','art-history','resistance'],read_time:'11 min',cover_image:'https://i.pinimg.com/1200x/8f/ef/59/8fef5951d62ade9664de8d332c62137f.jpg'},
+  {id:'f3',type:'article',title:'Rose hip, hibiscus & the pharmacopeia of grandmothers',excerpt:'Before the apothecary, there was the kitchen windowsill.',tags:['herbalism','beauty-ritual','nature','feminism','science'],read_time:'12 min',cover_image:'https://i.pinimg.com/1200x/a8/45/22/a84522cc1f06f171ca6e9c6fa6be6a6f.jpg'},
+  {id:'f4',type:'article',title:'The Harlem Renaissance and self-determination',excerpt:'How Black artists in 1920s New York built a visual language of liberation.',tags:['art-history','diaspora','resistance','literature','music'],read_time:'15 min',cover_image:'https://i.pinimg.com/736x/0d/91/d5/0d91d5db1188df9147f6c4f3d32771f4.jpg'},
+  {id:'f5',type:'article',title:'Indigo — the color that crossed oceans',excerpt:'From Yoruba adire to Japanese shibori, indigo as shared human inheritance.',tags:['textiles','fashion-history','africa','science','nature'],read_time:'9 min'},
+  {id:'f6',type:'article',title:'Sacred geometry in Moroccan architecture',excerpt:'The zellige, the muqarnas — pattern as spiritual practice.',tags:['architecture','africa','spirituality','art-history','philosophy'],read_time:'13 min'},
+  {id:'f7',type:'article',title:'Octavia Butler and the speculative Black imagination',excerpt:'Science fiction as a tool of liberation.',tags:['literature','science','resistance','diaspora','feminism'],read_time:'14 min'},
+  {id:'f8',type:'article',title:'Decolonizing the botanical',excerpt:'Who gets credited for knowing? A history of stolen plant science.',tags:['herbalism','science','resistance','feminism','nature'],read_time:'16 min'},
+  {id:'q1',type:'quote',title:'The function of art is to imagine what is possible',excerpt:'',tags:['art-history','literature','resistance','feminism'],author:'bell hooks'},
+  {id:'q2',type:'quote',title:'Not everything that is faced can be changed, but nothing can be changed until it is faced',excerpt:'',tags:['resistance','diaspora','philosophy','literature'],author:'James Baldwin'},
+  {id:'q3',type:'quote',title:'Caring for myself is not self-indulgence, it is self-preservation',excerpt:'',tags:['feminism','beauty-ritual','resistance','spirituality'],author:'Audre Lorde'},
+  {id:'q4',type:'quote',title:'The earth has music for those who listen',excerpt:'',tags:['nature','spirituality','music','philosophy'],author:'George Santayana'},
+  {id:'i1',type:'image',title:'Indigo & Resistance',excerpt:'Textile work exploring the politics of natural dye.',tags:['textiles','resistance','art-history','africa'],medium:'Textile · 2025',cover_image:'https://i.pinimg.com/736x/88/13/8e/88138ec559996abd49cf6eddd940a14d.jpg'},
+  {id:'i2',type:'image',title:'Botanical Grimoire Vol. I',excerpt:'Mixed media collage — herbarium meets magical text.',tags:['herbalism','nature','beauty-ritual','spirituality'],medium:'Mixed media · 2025',cover_image:'https://i.pinimg.com/1200x/a8/45/22/a84522cc1f06f171ca6e9c6fa6be6a6f.jpg'},
+  {id:'i3',type:'image',title:'Roots & Ritual',excerpt:'Photography exploring ancestral beauty practices.',tags:['beauty-ritual','diaspora','feminism','nature'],medium:'Photography · 2024',cover_image:'https://i.pinimg.com/736x/0d/91/d5/0d91d5db1188df9147f6c4f3d32771f4.jpg'},
 ]
 let items=[],nodes=[],links=[],sim,svg,g,nEls,lEls,tHalos,tLabs,cu=null,aN=null,refs={}
 
@@ -270,338 +263,55 @@ async function init(){
 }
 
 function buildObs(){
-  const usedStars=[...new Set(items.flatMap(d=>d.tags||[]))]
-  const usedConst=Object.entries(CONSTELLATIONS).filter(([n,s])=>s.some(x=>usedStars.includes(x)))
-
-  // Tier 1: Constellation rings
-  const cNodes=usedConst.map(([n,s])=>({
-    id:'C-'+n, type:'constellation', label:n, title:n,
-    color:CONSTELLATION_COLORS[n]||'#C47A55', stars:s.filter(x=>usedStars.includes(x))
-  }))
-
-  // Tier 2: Star nodes
-  const sNodes=usedStars.map(s=>{
-    const cn=Object.entries(CONSTELLATIONS).find(([n,stars])=>stars.includes(s))?.[0]||''
-    return {id:'S-'+s, type:'star', label:s, title:s, tags:[s], parentConst:'C-'+cn, color:CONSTELLATION_COLORS[cn]||'#C47A55'}
-  })
-
-  // Tier 3: Glowing dots (items unchanged)
-  nodes=[...items,...sNodes,...cNodes]
-  links=[]
-  items.forEach(it=>(it.tags||[]).forEach(t=>{
-    if(usedStars.includes(t)) links.push({source:it.id,target:'S-'+t,strength:0.5})
-  }))
-  sNodes.forEach(s=>links.push({source:s.id,target:s.parentConst,strength:0.15}))
-
+  const tags=[...new Set(items.flatMap(d=>d.tags||[]))]
+  const tN=tags.map(t=>({id:'tag-'+t,type:'tag',label:t,title:t,tags:[t]}))
+  nodes=[...items,...tN];links=[]
+  items.forEach(it=>(it.tags||[]).forEach(t=>{if(tags.includes(t))links.push({source:it.id,target:'tag-'+t})}))
   document.getElementById('loading').style.display='none'
   const cv=document.getElementById('web-canvas');cv.style.display='block'
-  document.getElementById('sn').textContent=items.length+' pieces · '+sNodes.length+' stars · '+cNodes.length+' constellations'
-  document.getElementById('sl').textContent=links.length+' connections'
+  document.getElementById('sn').textContent=nodes.length+' nodes'
+  document.getElementById('sl').textContent=links.length+' edges'
   initD3(cv)
 }
 
 function initD3(cv){
-  const W=cv.clientWidth||window.innerWidth, H=cv.clientHeight||(window.innerHeight-89)
+  const W=cv.clientWidth||window.innerWidth,H=cv.clientHeight||(window.innerHeight-89)
   svg=d3.select('#web-canvas').attr('width',W).attr('height',H)
   const df=svg.append('defs')
-
-  // Glow filters
-  const gf=df.append('filter').attr('id','gw').attr('x','-60%').attr('y','-60%').attr('width','220%').attr('height','220%')
-  gf.append('feGaussianBlur').attr('stdDeviation','4').attr('result','cb')
-  const fm=gf.append('feMerge');fm.append('feMergeNode').attr('in','cb');fm.append('feMergeNode').attr('in','SourceGraphic')
-  const gfs=df.append('filter').attr('id','gws').attr('x','-100%').attr('y','-100%').attr('width','300%').attr('height','300%')
-  gfs.append('feGaussianBlur').attr('stdDeviation','9').attr('result','cb')
-  const fm2=gfs.append('feMerge');fm2.append('feMergeNode').attr('in','cb');fm2.append('feMergeNode').attr('in','SourceGraphic')
-  // Star glow (warm)
-  const gfst=df.append('filter').attr('id','gw-star').attr('x','-80%').attr('y','-80%').attr('width','260%').attr('height','260%')
-  gfst.append('feGaussianBlur').attr('stdDeviation','3').attr('result','cb')
-  const fm3=gfst.append('feMerge');fm3.append('feMergeNode').attr('in','cb');fm3.append('feMergeNode').attr('in','SourceGraphic')
-
-  // Background
+  const gf=df.append('filter').attr('id','gw').attr('x','-50%').attr('y','-50%').attr('width','200%').attr('height','200%')
+  gf.append('feGaussianBlur').attr('stdDeviation','3.5').attr('result','cb');const fm=gf.append('feMerge');fm.append('feMergeNode').attr('in','cb');fm.append('feMergeNode').attr('in','SourceGraphic')
+  const gs=df.append('filter').attr('id','gws').attr('x','-100%').attr('y','-100%').attr('width','300%').attr('height','300%')
+  gs.append('feGaussianBlur').attr('stdDeviation','7').attr('result','cb');const fm2=gs.append('feMerge');fm2.append('feMergeNode').attr('in','cb');fm2.append('feMergeNode').attr('in','SourceGraphic')
   const rg=df.append('radialGradient').attr('id','bg').attr('cx','50%').attr('cy','50%').attr('r','70%')
-  rg.append('stop').attr('offset','0%').attr('stop-color','#1A1815')
-  rg.append('stop').attr('offset','100%').attr('stop-color','#0C0B09')
+  rg.append('stop').attr('offset','0%').attr('stop-color','#1A1815');rg.append('stop').attr('offset','100%').attr('stop-color','#0C0B09')
   svg.append('rect').attr('width','100%').attr('height','100%').attr('fill','url(#bg)')
-  // Ambient stars
-  const sg=svg.append('g')
-  d3.range(200).forEach(()=>sg.append('circle')
-    .attr('cx',Math.random()*W).attr('cy',Math.random()*H)
-    .attr('r',Math.random()*0.9).attr('fill','rgba(247,243,238,'+(Math.random()*0.14+0.02)+')'))
-
-  g=svg.append('g')
-  const lG=g.append('g'), nG=g.append('g'), labG=g.append('g')
-
-  // Links
-  lEls=lG.selectAll('line').data(links).join('line')
-    .attr('stroke',d=>{
-      const src=nodes.find(n=>n.id===(typeof d.source==='object'?d.source.id:d.source))
-      if(src?.type==='star') return (src.color||'#fff').replace(/[^,]+\)$/,'0.08)')
-      return 'rgba(247,243,238,0.05)'
-    })
-    .attr('stroke-width',d=>{
-      const src=nodes.find(n=>n.id===(typeof d.source==='object'?d.source.id:d.source))
-      return src?.type==='star'?0.8:0.6
-    })
-
-  // ── TIER 1: Constellation rings (circles, named) ──
-  const constData=nodes.filter(d=>d.type==='constellation')
-  nG.selectAll('.c-ring').data(constData).join('circle').attr('class','c-ring')
-    .attr('r',48)
-    .attr('fill','rgba(247,243,238,0.015)')
-    .attr('stroke',d=>d.color||'rgba(247,243,238,0.2)')
-    .attr('stroke-width',1)
-    .attr('stroke-dasharray','3,4')
-    .attr('opacity',0.5)
-    .style('cursor','pointer')
-    .on('click',function(e,d){e.stopPropagation();hiConstellation(d)})
-
-  nG.selectAll('.c-ring2').data(constData).join('circle').attr('class','c-ring2')
-    .attr('r',52)
-    .attr('fill','none')
-    .attr('stroke',d=>d.color||'rgba(247,243,238,0.1)')
-    .attr('stroke-width',0.4)
-    .attr('opacity',0.2)
-
-  // Constellation labels
-  labG.selectAll('.c-lab').data(constData).join('text').attr('class','c-lab')
-    .text(d=>d.label)
-    .attr('font-family','Figtree,sans-serif')
-    .attr('font-size','8.5px')
-    .attr('letter-spacing','0.16em')
-    .attr('fill',d=>d.color||'rgba(247,243,238,0.5)')
-    .attr('opacity',0.5)
-    .attr('text-anchor','middle')
-    .attr('dy','0.35em')
-    .style('pointer-events','none')
-    .style('user-select','none')
-    .style('text-transform','uppercase')
-
-  // ── TIER 2: Stars (4-point SVG path) ──
-  const starData=nodes.filter(d=>d.type==='star')
-  // 4-point star path at origin, size s
-  function starPath(s){
-    const o=s, i=s*0.38
-    return `M0,${-o} L${i},${-i} L${o},0 L${i},${i} L0,${o} L${-i},${i} L${-o},0 L${-i},${-i} Z`
-  }
-  nEls=nG.selectAll('.s-node').data(starData).join('path').attr('class','s-node')
-    .attr('d',starPath(8))
-    .attr('fill',d=>d.color||'rgba(247,243,238,0.15)')
-    .attr('fill-opacity',0.22)
-    .attr('stroke',d=>d.color||'rgba(247,243,238,0.5)')
-    .attr('stroke-width',0.8)
-    .style('filter','url(#gw-star)')
-    .style('cursor','pointer')
-    .on('mouseover',function(e,d){
-      const hl=document.getElementById('hl');hl.textContent=d.label;hl.style.opacity='1'
-      d3.select(this).transition().duration(140).attr('d',starPath(13)).attr('fill-opacity',0.5)
-      hiStarLinks(d)
-    })
-    .on('mousemove',e=>{const hl=document.getElementById('hl');hl.style.left=(e.clientX+13)+'px';hl.style.top=(e.clientY-7)+'px'})
-    .on('mouseout',function(e,d){
-      document.getElementById('hl').style.opacity='0'
-      if(!aN||aN.id!==d.id) d3.select(this).transition().duration(200).attr('d',starPath(8)).attr('fill-opacity',0.22)
-      if(!aN) rLinks()
-    })
-    .on('click',function(e,d){
-      e.stopPropagation();aN=d
-      hiStar(d)
-      showNC(d)
-      d3.select(this).transition().duration(150).attr('d',starPath(14)).attr('fill-opacity',0.7)
-    })
-    .call(drg())
-
-  // Star labels
-  tLabs=labG.selectAll('.s-lab').data(starData).join('text').attr('class','s-lab')
-    .text(d=>d.label)
-    .attr('font-family','Figtree,sans-serif').attr('font-size','8px')
-    .attr('fill','rgba(247,243,238,0.25)').attr('text-anchor','middle').attr('dy','20px')
-    .style('pointer-events','none').style('user-select','none')
-
-  // ── TIER 3: Glowing dots (articles, quotes, images) ──
-  const dotData=nodes.filter(d=>d.type==='article'||d.type==='quote'||d.type==='image')
-  const dotEls=nG.selectAll('.d-node').data(dotData).join('circle').attr('class','d-node')
-    .attr('r',d=>TC[d.type]?8:7)
-    .attr('fill',d=>TC[d.type]||'#C47A55')
-    .attr('stroke','rgba(247,243,238,0.25)').attr('stroke-width',1.2)
-    .style('filter','url(#gw)')
-    .style('cursor','pointer')
-    .on('mouseover',function(e,d){
-      const hl=document.getElementById('hl');hl.textContent=d.title;hl.style.opacity='1'
-      d3.select(this).transition().duration(140).attr('r',13).style('filter','url(#gws)')
-      hiDotLinks(d)
-    })
-    .on('mousemove',e=>{const hl=document.getElementById('hl');hl.style.left=(e.clientX+13)+'px';hl.style.top=(e.clientY-7)+'px'})
-    .on('mouseout',function(e,d){
-      document.getElementById('hl').style.opacity='0'
-      if(!aN||aN.id!==d.id) d3.select(this).transition().duration(200).attr('r',8).style('filter','url(#gw)')
-      if(!aN) rLinks()
-    })
-    .on('click',function(e,d){
-      e.stopPropagation();aN=d
-      hiDot(d)
-      showNC(d)
-      d3.select(this).transition().duration(150).attr('r',14).style('filter','url(#gws)')
-    })
-    .call(drg())
-
-  // Combine for rAll resets
-  window.__dotEls=dotEls
-
+  const sg=svg.append('g');d3.range(160).forEach(()=>sg.append('circle').attr('cx',Math.random()*W).attr('cy',Math.random()*H).attr('r',Math.random()*1.1).attr('fill','rgba(247,243,238,'+(Math.random()*0.16+0.02)+')'))
+  g=svg.append('g');const lG=g.append('g'),nG=g.append('g'),labG=g.append('g')
+  lEls=lG.selectAll('line').data(links).join('line').attr('stroke','rgba(247,243,238,0.06)').attr('stroke-width',1)
+  tHalos=nG.selectAll('.th').data(nodes.filter(d=>d.type==='tag')).join('circle').attr('class','th').attr('r',d=>TR[d.type]+12).attr('fill','none').attr('stroke','rgba(247,243,238,0.04)').attr('stroke-width',1)
+  nEls=nG.selectAll('.nd').data(nodes).join('circle').attr('class',d=>'nd nd-'+d.type).attr('r',d=>TR[d.type]).attr('fill',d=>d.type==='tag'?'rgba(247,243,238,0.07)':TC[d.type]).attr('stroke',d=>d.type==='tag'?'rgba(247,243,238,0.16)':'rgba(247,243,238,0.27)').attr('stroke-width',d=>d.type==='tag'?1:1.5).style('filter',d=>d.type!=='tag'?'url(#gw)':'none').style('cursor','pointer').call(drg())
+  tLabs=labG.selectAll('text').data(nodes.filter(d=>d.type==='tag')).join('text').text(d=>d.label).attr('font-family','Figtree,sans-serif').attr('font-size','9px').attr('fill','rgba(247,243,238,0.32)').attr('text-anchor','middle').attr('dy','0.35em').style('pointer-events','none').style('user-select','none')
+  const hl=document.getElementById('hl')
+  nEls.on('mouseover',function(e,d){if(d.type==='tag')return;hl.textContent=d.title;hl.style.opacity='1';d3.select(this).transition().duration(140).attr('r',TR[d.type]*1.5).style('filter','url(#gws)');hiLinks(d)})
+    .on('mousemove',e=>{hl.style.left=(e.clientX+13)+'px';hl.style.top=(e.clientY-7)+'px'})
+    .on('mouseout',function(e,d){if(d.type==='tag')return;hl.style.opacity='0';if(d.id!==(aN&&aN.id)){d3.select(this).transition().duration(200).attr('r',TR[d.type]).style('filter',d.type!=='tag'?'url(#gw)':'none')};if(!aN)rLinks()})
+    .on('click',function(e,d){e.stopPropagation();if(d.type==='tag'){const c=new Set();links.forEach(l=>{const s=li(l.source),t=li(l.target);if(s===d.id||t===d.id){c.add(s);c.add(t)}});dimA(c);return};aN=d;hiConst(d);showNC(d);d3.select(this).transition().duration(200).attr('r',TR[d.type]*1.65).style('filter','url(#gws)')})
   svg.on('click',()=>{aN=null;closeCard();rAll()})
-
-  // Simulation — 3 tier distances
-  sim=d3.forceSimulation(nodes)
-    .force('link',d3.forceLink(links).id(d=>d.id)
-      .distance(d=>{
-        const s=nodes.find(n=>n.id===(typeof d.source==='object'?d.source.id:d.source))
-        if(s?.type==='star') return 130   // star → constellation
-        return 80                          // dot → star
-      })
-      .strength(d=>{
-        const s=nodes.find(n=>n.id===(typeof d.source==='object'?d.source.id:d.source))
-        return s?.type==='star'?0.12:0.45
-      })
-    )
-    .force('charge',d3.forceManyBody().strength(d=>{
-      if(d.type==='constellation') return -800
-      if(d.type==='star') return -200
-      return -80
-    }))
-    .force('center',d3.forceCenter(W/2,H/2))
-    .force('collision',d3.forceCollide().radius(d=>{
-      if(d.type==='constellation') return 60
-      if(d.type==='star') return 22
-      return 14
-    }))
-    .alphaDecay(0.012)
-    .on('tick',()=>{
-      lEls.attr('x1',d=>d.source.x).attr('y1',d=>d.source.y).attr('x2',d=>d.target.x).attr('y2',d=>d.target.y)
-      // Constellation rings + labels
-      nG.selectAll('.c-ring').attr('cx',d=>d.x).attr('cy',d=>d.y)
-      nG.selectAll('.c-ring2').attr('cx',d=>d.x).attr('cy',d=>d.y)
-      labG.selectAll('.c-lab').attr('x',d=>d.x).attr('y',d=>d.y)
-      // Stars (path transform)
-      nEls.attr('transform',d=>`translate(${d.x},${d.y})`)
-      tLabs.attr('x',d=>d.x).attr('y',d=>d.y)
-      // Dots
-      dotEls.attr('cx',d=>d.x).attr('cy',d=>d.y)
-    })
-
-  const z=d3.zoom().scaleExtent([0.2,5]).on('zoom',e=>g.attr('transform',e.transform))
-  svg.call(z);window.__z=z
-  window.zoomIn=()=>svg.transition().call(z.scaleBy,1.4)
-  window.zoomOut=()=>svg.transition().call(z.scaleBy,0.7)
-  window.resetZoom=()=>svg.transition().call(z.transform,d3.zoomIdentity)
+  sim=d3.forceSimulation(nodes).force('link',d3.forceLink(links).id(d=>d.id).distance(110).strength(0.3)).force('charge',d3.forceManyBody().strength(d=>d.type==='tag'?-400:-200)).force('center',d3.forceCenter(W/2,H/2)).force('collision',d3.forceCollide().radius(d=>TR[d.type]+18)).alphaDecay(0.015)
+    .on('tick',()=>{lEls.attr('x1',d=>d.source.x).attr('y1',d=>d.source.y).attr('x2',d=>d.target.x).attr('y2',d=>d.target.y);nEls.attr('cx',d=>d.x).attr('cy',d=>d.y);tHalos.attr('cx',d=>d.x).attr('cy',d=>d.y);tLabs.attr('x',d=>d.x).attr('y',d=>d.y)})
+  const z=d3.zoom().scaleExtent([0.25,4]).on('zoom',e=>g.attr('transform',e.transform));svg.call(z);window.__z=z
+  window.zoomIn=()=>svg.transition().call(z.scaleBy,1.4);window.zoomOut=()=>svg.transition().call(z.scaleBy,0.7);window.resetZoom=()=>svg.transition().call(z.transform,d3.zoomIdentity)
 }
 function li(n){return typeof n==='object'?n.id:n}
-
-function hiDotLinks(d){
-  lEls.attr('stroke',l=>(li(l.source)===d.id||li(l.target)===d.id)?(TC[d.type]||'#fff'):'rgba(247,243,238,0.02)')
-    .attr('stroke-width',l=>(li(l.source)===d.id||li(l.target)===d.id)?1.5:0.4)
-}
-function hiStarLinks(d){
-  lEls.attr('stroke',l=>(li(l.source)===d.id||li(l.target)===d.id)?(d.color||'#fff'):'rgba(247,243,238,0.02)')
-    .attr('stroke-width',l=>(li(l.source)===d.id||li(l.target)===d.id)?1.2:0.3)
-}
-function rLinks(){
-  lEls.attr('stroke',d=>{
-    const src=nodes.find(n=>n.id===(typeof d.source==='object'?d.source.id:d.source))
-    return src?.type==='star'?(src.color||'#fff').replace(/[\d.]+\)$/,'0.08)'):'rgba(247,243,238,0.05)'
-  }).attr('stroke-width',d=>{
-    const src=nodes.find(n=>n.id===(typeof d.source==='object'?d.source.id:d.source))
-    return src?.type==='star'?0.8:0.6
-  })
-}
-
-function dimNodes(keepIds){
-  nG.selectAll('.c-ring').attr('opacity',d=>keepIds.has(d.id)?0.5:0.05)
-  nG.selectAll('.c-ring2').attr('opacity',d=>keepIds.has(d.id)?0.2:0.02)
-  labG.selectAll('.c-lab').attr('opacity',d=>keepIds.has(d.id)?0.5:0.04)
-  nEls.attr('opacity',d=>keepIds.has(d.id)?1:0.06)
-  tLabs.attr('opacity',d=>keepIds.has(d.id)?1:0.04)
-  if(window.__dotEls) window.__dotEls.attr('opacity',d=>keepIds.has(d.id)?1:0.06)
-}
-
-function rAll(){
-  nG.selectAll('.c-ring').attr('opacity',0.5)
-  nG.selectAll('.c-ring2').attr('opacity',0.2)
-  labG.selectAll('.c-lab').attr('opacity',0.5)
-  nEls.attr('opacity',1).transition().duration(200).attr('d',d=>{
-    const o=8,i=8*0.38
-    return `M0,${-o} L${i},${-i} L${o},0 L${i},${i} L0,${o} L${-i},${i} L${-o},0 L${-i},${-i} Z`
-  }).attr('fill-opacity',0.22)
-  tLabs.attr('opacity',1)
-  if(window.__dotEls) window.__dotEls.attr('opacity',1).transition().duration(200).attr('r',8).style('filter','url(#gw)')
-  rLinks()
-}
-
-function hiDot(d){
-  // Light up: the dot, its star connections, those stars, those constellations
-  const myStars=new Set((d.tags||[]).map(t=>'S-'+t))
-  const myConst=new Set([...(d.tags||[])].map(t=>{
-    const cn=Object.entries(CONSTELLATIONS).find(([n,s])=>s.includes(t))?.[0]||''
-    return 'C-'+cn
-  }))
-  // Siblings: other dots sharing a star
-  const siblings=new Set(items.filter(i=>i.id!==d.id&&(i.tags||[]).some(t=>(d.tags||[]).includes(t))).map(i=>i.id))
-  const keep=new Set([d.id,...myStars,...myConst,...siblings])
-  dimNodes(keep)
-  lEls.attr('stroke',l=>{
-    const s=li(l.source),t=li(l.target)
-    return(s===d.id||myStars.has(s)||myStars.has(t))?(TC[d.type]||'#C47A55'):'rgba(247,243,238,0.01)'
-  }).attr('stroke-width',l=>{
-    const s=li(l.source),t=li(l.target)
-    return(s===d.id||t===d.id)?2:0.4
-  })
-}
-
-function hiStar(d){
-  // Light up: the star, its constellation, all dots connected to this star
-  const constId=d.parentConst
-  const connDots=new Set(items.filter(i=>(i.tags||[]).includes(d.label)).map(i=>i.id))
-  const keep=new Set([d.id,constId,...connDots])
-  dimNodes(keep)
-  lEls.attr('stroke',l=>{
-    const s=li(l.source),t=li(l.target)
-    return(s===d.id||t===d.id)?(d.color||'#fff'):'rgba(247,243,238,0.01)'
-  }).attr('stroke-width',l=>(li(l.source)===d.id||li(l.target)===d.id)?1.5:0.3)
-}
-
-function hiConstellation(d){
-  // Light up entire constellation: its stars + all their dots
-  const myStars=new Set((d.stars||[]).map(s=>'S-'+s))
-  const myDots=new Set(items.filter(i=>(i.tags||[]).some(t=>(d.stars||[]).includes(t))).map(i=>i.id))
-  const keep=new Set([d.id,...myStars,...myDots])
-  dimNodes(keep)
-  lEls.attr('stroke',l=>{
-    const s=li(l.source),t=li(l.target)
-    return(myStars.has(s)||myStars.has(t)||myDots.has(s)||myDots.has(t))?(d.color||'#fff'):'rgba(247,243,238,0.01)'
-  }).attr('stroke-width',0.8)
-}
-
+function hiLinks(d){lEls.attr('stroke',l=>(li(l.source)===d.id||li(l.target)===d.id)?TC[d.type]:'rgba(247,243,238,0.02)').attr('stroke-width',l=>(li(l.source)===d.id||li(l.target)===d.id)?1.5:0.5)}
+function rLinks(){lEls.attr('stroke','rgba(247,243,238,0.06)').attr('stroke-width',1)}
+function dimA(k){nEls.attr('opacity',d=>k.has(d.id)?1:0.07);tHalos.attr('opacity',d=>k.has(d.id)?1:0.03);tLabs.attr('opacity',d=>k.has(d.id)?1:0.03)}
+function rAll(){nEls.attr('opacity',1);tHalos.attr('opacity',1);tLabs.attr('opacity',1);rLinks();nEls.transition().duration(200).attr('r',d=>TR[d.type]).style('filter',d=>d.type!=='tag'?'url(#gw)':'none')}
+function hiConst(d){const c=new Set([d.id,...(d.tags||[]).map(t=>'tag-'+t)]);items.forEach(n=>{if(n.id!==d.id&&(n.tags||[]).some(t=>(d.tags||[]).includes(t)))c.add(n.id)});dimA(c);lEls.attr('stroke',l=>(li(l.source)===d.id||li(l.target)===d.id)?TC[d.type]:'rgba(247,243,238,0.02)').attr('stroke-width',l=>(li(l.source)===d.id||li(l.target)===d.id)?2:0.4)}
 function showNC(d){document.getElementById('nc-type').textContent=d.type==='article'?'Article · '+(d.read_time||''):d.type==='quote'?'Quote · '+(d.author||''):'Work · '+(d.medium||'');document.getElementById('nc-title').textContent=d.title;document.getElementById('nc-excerpt').textContent=d.excerpt||'';const tg=document.getElementById('nc-tags');tg.innerHTML='';(d.tags||[]).forEach(t=>{const s=document.createElement('span');s.className='nc-tag';s.textContent=t;tg.appendChild(s)});document.getElementById('nc-read').onclick=()=>openOverlay(d.id);document.getElementById('node-card').classList.add('visible')}
 window.closeCard=function(){document.getElementById('node-card').classList.remove('visible');aN=null;rAll()}
-window.filterType=function(t){
-  if(!t){rAll();return}
-  const keep=new Set()
-  if(t==='article'||t==='quote'||t==='image'){
-    items.filter(i=>i.type===t).forEach(i=>keep.add(i.id))
-  } else if(t==='tag'||t==='star'){
-    nodes.filter(n=>n.type==='star').forEach(n=>keep.add(n.id))
-    nodes.filter(n=>n.type==='constellation').forEach(n=>keep.add(n.id))
-  }
-  dimNodes(keep)
-}
-window.searchWeb=function(){
-  const q=document.getElementById('search-input').value.toLowerCase().trim()
-  if(!q){rAll();return}
-  const m=new Set()
-  nodes.forEach(n=>{
-    if((n.title&&n.title.toLowerCase().includes(q))||(n.label&&n.label.toLowerCase().includes(q))||(n.tags&&n.tags.some(t=>t.includes(q))))
-      m.add(n.id)
-  })
-  dimNodes(m)
-}
+window.filterType=function(t){if(!t){rAll();return};nEls.attr('opacity',d=>d.type===t||d.type==='tag'?1:0.07)}
+window.searchWeb=function(){const q=document.getElementById('search-input').value.toLowerCase().trim();if(!q){rAll();return};const m=new Set();nodes.forEach(n=>{if((n.title&&n.title.toLowerCase().includes(q))||(n.label&&n.label.toLowerCase().includes(q))||(n.tags&&n.tags.some(t=>t.includes(q))))m.add(n.id)});nEls.attr('opacity',d=>m.has(d.id)?1:0.05);tHalos.attr('opacity',d=>m.has(d.id)?1:0.03);tLabs.attr('opacity',d=>m.has(d.id)?1:0.03)}
 document.getElementById('search-input').addEventListener('keydown',e=>{if(e.key==='Enter')searchWeb();if(e.key==='Escape'){document.getElementById('search-input').value='';rAll()}})
 window.saveNode=async function(){if(!cu||!aN){toast('Sign in to save');return};await supabase.from('saves').upsert({user_id:cu.id,article_id:aN.id});document.getElementById('nc-save').textContent='✓ Saved';toast('Saved to your constellation')}
 function drg(){return d3.drag().on('start',(e,d)=>{if(!e.active&&sim)sim.alphaTarget(0.3).restart();d.fx=d.x;d.fy=d.y}).on('drag',(e,d)=>{d.fx=e.x;d.fy=e.y}).on('end',(e,d)=>{if(!e.active&&sim)sim.alphaTarget(0);d.fx=null;d.fy=null})}
@@ -618,6 +328,7 @@ window.filterMag=function(tag,btn){
   renderGrid(tag?items.filter(i=>(i.tags||[]).includes(tag)):items)
 }
 function renderGrid(it){
+  it = [...it].sort(() => Math.random() - 0.5)
   const grid=document.getElementById('mag-grid')
   const arts=it.filter(i=>i.type==='article'),qs=it.filter(i=>i.type==='quote'),imgs=it.filter(i=>i.type==='image')
   const blocks=[];let ai=0,qi=0,ii=0

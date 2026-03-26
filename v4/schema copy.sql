@@ -1,4 +1,4 @@
--- ═══════════════════════════════════════════════════════
+a-- ═══════════════════════════════════════════════════════
 -- Library of Morenita — Full Database Schema
 -- Paste this entire file into Supabase SQL Editor and Run
 -- ═══════════════════════════════════════════════════════
@@ -45,55 +45,24 @@ create table if not exists tags (
   color text default '#8B4A2A'
 );
 
--- Add constellation column if needed
-alter table tags add column if not exists constellation text;
-
-insert into tags (name, color, constellation) values
-  ('oral-tradition', '#DDB96A', 'Knowing')
-  ('indigenous-science', '#DDB96A', 'Knowing')
-  ('mysticism', '#DDB96A', 'Knowing')
-  ('philosophy', '#DDB96A', 'Knowing')
-  ('cosmology', '#DDB96A', 'Knowing')
-  ('herbalism', '#8BA683', 'Body')
-  ('beauty-ritual', '#8BA683', 'Body')
-  ('food-sovereignty', '#8BA683', 'Body')
-  ('ancestral-medicine', '#8BA683', 'Body')
-  ('ecology', '#8BA683', 'Body')
-  ('textiles', '#C47A55', 'Craft')
-  ('ceramics', '#C47A55', 'Craft')
-  ('architecture', '#C47A55', 'Craft')
-  ('natural-dye', '#C47A55', 'Craft')
-  ('printmaking', '#C47A55', 'Craft')
-  ('literature', '#4A6B8A', 'Story')
-  ('photography', '#4A6B8A', 'Story')
-  ('art-history', '#4A6B8A', 'Story')
-  ('film', '#4A6B8A', 'Story')
-  ('oral-poetry', '#4A6B8A', 'Story')
-  ('music', '#7A4A8B', 'Sound')
-  ('dance', '#7A4A8B', 'Sound')
-  ('sound-healing', '#7A4A8B', 'Sound')
-  ('percussion', '#7A4A8B', 'Sound')
-  ('resistance', '#9B4A3A', 'Power')
-  ('diaspora', '#9B4A3A', 'Power')
-  ('decolonization', '#9B4A3A', 'Power')
-  ('land', '#9B4A3A', 'Power')
-  ('memory', '#9B4A3A', 'Power')
-  ('west-africa', '#5A9E6A', 'Place')
-  ('latin-america', '#5A9E6A', 'Place')
-  ('south-asia', '#5A9E6A', 'Place')
-  ('east-asia', '#5A9E6A', 'Place')
-  ('caribbean', '#5A9E6A', 'Place')
-  ('pacific', '#5A9E6A', 'Place')
-  ('middle-east', '#5A9E6A', 'Place')
-  ('ancestral', '#C49A3C', 'Time')
-  ('contemporary', '#C49A3C', 'Time')
-  ('speculative', '#C49A3C', 'Time')
-  ('solarpunk', '#4A8B8A', 'Future')
-  ('open-source', '#4A8B8A', 'Future')
-  ('biomimicry', '#4A8B8A', 'Future')
-  ('appropriate-tech', '#4A8B8A', 'Future')
-  ('community-infrastructure', '#4A8B8A', 'Future')
-on conflict (name) do update set constellation = excluded.constellation, color = excluded.color;
+insert into tags (name, color) values
+  ('philosophy',     '#8B4A2A'),
+  ('africa',         '#C47A55'),
+  ('diaspora',       '#DDB96A'),
+  ('fashion-history','#5A6B55'),
+  ('textiles',       '#8BA683'),
+  ('herbalism',      '#5A6B55'),
+  ('beauty-ritual',  '#C47A55'),
+  ('art-history',    '#4A6B8A'),
+  ('music',          '#7A4A8B'),
+  ('literature',     '#8B4A2A'),
+  ('architecture',   '#4A6B8A'),
+  ('spirituality',   '#DDB96A'),
+  ('science',        '#5A6B55'),
+  ('resistance',     '#9B4A3A'),
+  ('feminism',       '#C47A55'),
+  ('nature',         '#5A6B55')
+on conflict (name) do nothing;
 
 -- ── ARTICLES ──
 create table if not exists articles (
@@ -227,18 +196,3 @@ create policy "Tags are public" on tags for select using (true);
 -- ── SEED: Make Amelia a Librarian ──
 -- Run this AFTER you sign up with missameliava@gmail.com
 -- update profiles set role = 'librarian' where email = 'missameliava@gmail.com';
-
--- ── REFLECTIONS (quote annotations) ──
-create table if not exists reflections (
-  id uuid default gen_random_uuid() primary key,
-  user_id uuid references profiles(id) on delete cascade,
-  quote_id text not null,
-  text text,
-  is_public boolean default false,
-  created_at timestamptz default now(),
-  updated_at timestamptz default now(),
-  unique(user_id, quote_id)
-);
-alter table reflections enable row level security;
-create policy "Public reflections viewable by all" on reflections for select using (is_public = true or auth.uid() = user_id);
-create policy "Users manage own reflections" on reflections for all using (auth.uid() = user_id);
