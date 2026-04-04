@@ -1,7 +1,7 @@
 // ─────────────────────────────────────────────
 // nav.js — shared auth-aware nav for all pages
 // ─────────────────────────────────────────────
-import { getCurrentUser, signOut, ROLES } from './supabase.js'
+import { supabase, getCurrentUser, signOut, ROLES } from './supabase.js'
 
 export async function initNav(activePage) {
   const user = await getCurrentUser()
@@ -69,7 +69,11 @@ function injectLibrarianBadge() {
     align-items:center;
     gap:20px;
   `
-  bar.innerHTML = `<span>⬡ Librarian View</span>`
+  bar.innerHTML = `
+    <span>⬡ Librarian View</span>
+    <a href="admin.html" style="color:var(--sienna);text-decoration:none;border-bottom:1px solid rgba(139,74,42,0.3);padding-bottom:1px;">Review Submissions</a>
+    <a href="admin.html#tracks" style="color:var(--sienna);text-decoration:none;border-bottom:1px solid rgba(139,74,42,0.3);padding-bottom:1px;">Approve Tracks</a>
+  `
   const nav = document.querySelector('nav')
   if (nav) nav.after(bar)
 }

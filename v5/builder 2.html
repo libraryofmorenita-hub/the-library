@@ -4,10 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Magazine Builder · Library of Morenita</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Figtree:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css">
 <style>
 :root {
   --cream: #F7F3EE;
@@ -28,6 +25,7 @@
   --topbar-h: 52px;
 }
 
+* { margin:0; padding:0; box-sizing:border-box; }
 html,body { width:100%; height:100%; overflow:hidden; }
 
 body {
@@ -1089,28 +1087,28 @@ body {
         <div class="el-section-label" style="padding:2px;">Drag saved content onto page</div>
         <div style="margin-top:10px;">
           <div class="archive-item" draggable="true" ondragstart="startArchiveDrag(event,'ubuntu')">
-            <img class="archive-thumb" src="./images/photo_31.jpg">
+            <img class="archive-thumb" src="https://i.pinimg.com/736x/88/13/8e/88138ec559996abd49cf6eddd940a14d.jpg">
             <div class="archive-info">
               <div class="archive-name">Ubuntu — I am because we are</div>
               <div class="archive-meta">Article · Philosophy</div>
             </div>
           </div>
           <div class="archive-item" draggable="true" ondragstart="startArchiveDrag(event,'rosehip')">
-            <img class="archive-thumb" src="./images/photo_09.jpg">
+            <img class="archive-thumb" src="https://i.pinimg.com/1200x/a8/45/22/a84522cc1f06f171ca6e9c6fa6be6a6f.jpg">
             <div class="archive-info">
               <div class="archive-name">Rose hip & hibiscus pharmacopeia</div>
               <div class="archive-meta">Article · Herbalism</div>
             </div>
           </div>
           <div class="archive-item" draggable="true" ondragstart="startArchiveDrag(event,'harlem')">
-            <img class="archive-thumb" src="./images/photo_03.jpg">
+            <img class="archive-thumb" src="https://i.pinimg.com/736x/0d/91/d5/0d91d5db1188df9147f6c4f3d32771f4.jpg">
             <div class="archive-info">
               <div class="archive-name">Harlem Renaissance & self-determination</div>
               <div class="archive-meta">Article · Art History</div>
             </div>
           </div>
           <div class="archive-item" draggable="true" ondragstart="startArchiveDrag(event,'garment')">
-            <img class="archive-thumb" src="./images/photo_28.jpg">
+            <img class="archive-thumb" src="https://i.pinimg.com/1200x/8f/ef/59/8fef5951d62ade9664de8d332c62137f.jpg">
             <div class="archive-info">
               <div class="archive-name">The garment as living archive</div>
               <div class="archive-meta">Article · Fashion History</div>
@@ -1253,12 +1251,12 @@ body {
     <div class="modal-title">Choose an image</div>
     <input class="modal-input" type="text" id="modal-url-input" placeholder="Paste image URL…">
     <div class="modal-gallery" id="modal-gallery">
-      <img class="modal-img" src="./images/photo_11.jpg" onclick="selectModalImg(this)">
-      <img class="modal-img" src="./images/photo_21.jpg" onclick="selectModalImg(this)">
-      <img class="modal-img" src="./images/photo_33.jpg" onclick="selectModalImg(this)">
-      <img class="modal-img" src="./images/photo_34.jpg" onclick="selectModalImg(this)">
-      <img class="modal-img" src="./images/photo_39.jpg" onclick="selectModalImg(this)">
-      <img class="modal-img" src="./images/photo_19.jpg" onclick="selectModalImg(this)">
+      <img class="modal-img" src="https://i.pinimg.com/1200x/8f/ef/59/8fef5951d62ade9664de8d332c62137f.jpg" onclick="selectModalImg(this)">
+      <img class="modal-img" src="https://i.pinimg.com/1200x/a8/45/22/a84522cc1f06f171ca6e9c6fa6be6a6f.jpg" onclick="selectModalImg(this)">
+      <img class="modal-img" src="https://i.pinimg.com/736x/0d/91/d5/0d91d5db1188df9147f6c4f3d32771f4.jpg" onclick="selectModalImg(this)">
+      <img class="modal-img" src="https://i.pinimg.com/736x/88/13/8e/88138ec559996abd49cf6eddd940a14d.jpg" onclick="selectModalImg(this)">
+      <img class="modal-img" src="https://i.pinimg.com/1200x/8f/ef/59/8fef5951d62ade9664de8d332c62137f.jpg" onclick="selectModalImg(this)" style="filter:hue-rotate(20deg);">
+      <img class="modal-img" src="https://i.pinimg.com/1200x/a8/45/22/a84522cc1f06f171ca6e9c6fa6be6a6f.jpg" onclick="selectModalImg(this)" style="filter:saturate(0.7);">
     </div>
     <div class="modal-actions">
       <button class="modal-btn" onclick="closeImgModal()">Cancel</button>
@@ -1332,28 +1330,28 @@ const ARCHIVE_CONTENT = {
   ubuntu: {
     headline: 'Ubuntu\nI am because\nwe are',
     sub: 'The Nguni Bantu philosophy that places communal being at the center of personhood.',
-    src: './images/photo_31.jpg',
+    src: 'https://i.pinimg.com/736x/88/13/8e/88138ec559996abd49cf6eddd940a14d.jpg',
     quote: 'I am because we are, and since we are, therefore I am.',
     cite: '— Ubuntu philosophy'
   },
   rosehip: {
     headline: 'The Pharmacopeia\nof Grandmothers',
     sub: 'Rose hip, hibiscus, and the ancestral medicine cabinet.',
-    src: './images/photo_09.jpg',
+    src: 'https://i.pinimg.com/1200x/a8/45/22/a84522cc1f06f171ca6e9c6fa6be6a6f.jpg',
     quote: 'Caring for myself is not self-indulgence. It is self-preservation.',
     cite: '— Audre Lorde'
   },
   harlem: {
     headline: 'The Aesthetics\nof Self-Determination',
     sub: 'How Black artists in 1920s New York built a visual language of liberation.',
-    src: './images/photo_03.jpg',
+    src: 'https://i.pinimg.com/736x/0d/91/d5/0d91d5db1188df9147f6c4f3d32771f4.jpg',
     quote: 'Not everything that is faced can be changed, but nothing can be changed until it is faced.',
     cite: '— James Baldwin'
   },
   garment: {
     headline: 'The Garment\nas Living Archive',
     sub: 'West African textile traditions — weaving cosmology into cloth.',
-    src: './images/photo_28.jpg',
+    src: 'https://i.pinimg.com/1200x/8f/ef/59/8fef5951d62ade9664de8d332c62137f.jpg',
     quote: 'Before paper held memory, cloth did.',
     cite: '— Library of Morenita'
   },
@@ -1369,7 +1367,7 @@ const ARCHIVE_CONTENT = {
 function init() {
   blocks = [
     makeBlock('cover'),
-    makeBlock('hero-img', { src: './images/photo_09.jpg' }),
+    makeBlock('hero-img', { src: 'https://i.pinimg.com/1200x/a8/45/22/a84522cc1f06f171ca6e9c6fa6be6a6f.jpg' }),
     makeBlock('text'),
     makeBlock('quote'),
     makeBlock('divider'),
@@ -2081,8 +2079,35 @@ showPageProps();
 </script>
 
 <script type="module">
-import { initNav } from './nav.js'
-initNav('builder.html')
+import { supabase, getCurrentUser } from './supabase.js'
+const ROLE_LABELS = { librarian:'⬡ Librarian', curator:'◈ Curator', fellow:'✦ Fellow', reader:'◻ Reader' }
+async function initNav() {
+  const user = await getCurrentUser()
+  const profile = user?.profile
+  const navActions = document.getElementById('nav-actions')
+  if (!navActions) return
+  if (user && profile) {
+    const rl = ROLE_LABELS[profile.role] || '◻ Reader'
+    const dn = profile.display_name || profile.email
+    navActions.innerHTML = `
+      <span style="font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-faint);">${rl}</span>
+      <span style="font-size:13px;color:var(--ink-muted);font-family:'EB Garamond',serif;">${dn}</span>
+      <button class="btn-solid" id="so-btn">Sign Out</button>
+    `
+    document.getElementById('so-btn').onclick = async () => {
+      await supabase.auth.signOut(); location.href = 'index.html'
+    }
+    if (profile.role === 'librarian' || profile.role === 'curator') {
+      const bar = document.createElement('div')
+      bar.style.cssText = 'background:rgba(139,74,42,0.06);border-bottom:1px solid rgba(139,74,42,0.12);padding:7px 40px;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--sienna);display:flex;align-items:center;gap:24px;'
+      bar.innerHTML = '<span>⬡ Librarian View</span>'
+      document.querySelector('nav').after(bar)
+    }
+  } else {
+    if (navActions) navActions.innerHTML = '<a href="auth.html" class="btn-ghost">Sign In</a><a href="auth.html" class="btn-solid">Join</a>'
+  }
+}
+initNav()
 </script>
 </body>
 </html>

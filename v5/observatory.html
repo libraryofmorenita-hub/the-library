@@ -4,12 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Morenita Observatory · Library of Morenita</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Figtree:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css">
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Figtree:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
 <style>
+:root{--cream:#F7F3EE;--parchment:#EDE8E0;--ink:#1C1A17;--ink-muted:#5C5750;--ink-faint:#9B968D;--sienna:#8B4A2A;--sienna-light:#C47A55;--sage:#5A6B55;--sage-light:#8BA683;--gold:#C49A3C;--border:rgba(28,26,23,0.12);--border-strong:rgba(28,26,23,0.25);--void:#0C0B09;}
+*{margin:0;padding:0;box-sizing:border-box;}html{scroll-behavior:smooth;}
 body{font-family:'Figtree',sans-serif;background:var(--void);color:var(--cream);overflow-x:hidden;}
 .grid-banner{position:fixed;top:0;left:0;right:0;background:rgba(14,13,11,0.95);backdrop-filter:blur(8px);border-bottom:1px solid rgba(247,243,238,0.06);color:rgba(247,243,238,0.45);font-size:10px;letter-spacing:0.08em;text-transform:uppercase;padding:7px 32px;display:flex;align-items:center;justify-content:space-between;z-index:300;}
 .grid-dot{width:6px;height:6px;border-radius:50%;background:#5A9E6A;display:inline-block;margin-right:8px;}
@@ -236,31 +235,33 @@ nav{position:fixed;top:31px;left:0;right:0;background:rgba(14,13,11,0.95);backdr
 <div class="toast" id="toast"></div>
 
 <script type="module">
-import { supabase, getCurrentUser, CONSTELLATIONS, CONSTELLATION_COLORS, ALL_STARS } from './supabase.js'
-import { initNav } from './nav.js'
+import { supabase, getCurrentUser } from './supabase.js'
+const CONSTELLATIONS = {"Knowing": ["oral-tradition", "indigenous-science", "mysticism", "philosophy", "cosmology"], "Body": ["herbalism", "beauty-ritual", "food-sovereignty", "ancestral-medicine", "ecology"], "Craft": ["textiles", "ceramics", "architecture", "natural-dye", "printmaking"], "Story": ["literature", "photography", "art-history", "film", "oral-poetry"], "Sound": ["music", "dance", "sound-healing", "percussion"], "Power": ["resistance", "diaspora", "decolonization", "land", "memory"], "Place": ["west-africa", "latin-america", "south-asia", "east-asia", "caribbean", "pacific", "middle-east"], "Time": ["ancestral", "contemporary", "speculative"], "Future": ["solarpunk", "open-source", "biomimicry", "appropriate-tech", "community-infrastructure"]}
+const CONSTELLATION_COLORS = {"Knowing": "#DDB96A", "Body": "#8BA683", "Craft": "#C47A55", "Story": "#4A6B8A", "Sound": "#7A4A8B", "Power": "#9B4A3A", "Place": "#5A9E6A", "Time": "#C49A3C", "Future": "#4A8B8A"}
+const ALL_STARS = ["oral-tradition", "indigenous-science", "mysticism", "philosophy", "cosmology", "herbalism", "beauty-ritual", "food-sovereignty", "ancestral-medicine", "ecology", "textiles", "ceramics", "architecture", "natural-dye", "printmaking", "literature", "photography", "art-history", "film", "oral-poetry", "music", "dance", "sound-healing", "percussion", "resistance", "diaspora", "decolonization", "land", "memory", "west-africa", "latin-america", "south-asia", "east-asia", "caribbean", "pacific", "middle-east", "ancestral", "contemporary", "speculative", "solarpunk", "open-source", "biomimicry", "appropriate-tech", "community-infrastructure"]
 const TC={article:'#C47A55',quote:'#DDB96A',image:'#8BA683',tag:'rgba(247,243,238,0.07)'}
 const TR={article:9,quote:7,image:8,tag:22}
 const FB=[
-  {id:'f1',type:'article',title:'Ubuntu — I am because we are',excerpt:'The Nguni Bantu philosophy that places communal being at the center of personhood.',tags:['philosophy','cosmology','diaspora','ancestral'],read_time:'8 min',cover_image:'./images/photo_31.jpg'},
-  {id:'f2',type:'article',title:'The garment as living archive',excerpt:'West African textile traditions — aso-oke, kente, bogolanfini — encoding cosmology in cloth.',tags:['textiles','natural-dye','west-africa','art-history','resistance'],read_time:'11 min',cover_image:'./images/photo_28.jpg'},
-  {id:'f3',type:'article',title:'Rose hip, hibiscus & the pharmacopeia of grandmothers',excerpt:'Before the apothecary, there was the kitchen windowsill.',tags:['herbalism','beauty-ritual','ecology','ancestral-medicine','body'],read_time:'12 min',cover_image:'./images/photo_09.jpg'},
-  {id:'f4',type:'article',title:'The Harlem Renaissance and self-determination',excerpt:'How Black artists in 1920s New York built a visual language of liberation.',tags:['art-history','diaspora','resistance','literature','memory'],read_time:'15 min',cover_image:'./images/photo_03.jpg'},
-  {id:'f5',type:'article',title:'Indigo — the color that crossed oceans',excerpt:'From Yoruba adire to Japanese shibori, indigo as shared human inheritance.',tags:['textiles','natural-dye','west-africa','ecology','ancestral'],read_time:'9 min',cover_image:'./images/photo_22.jpg'},
-  {id:'f6',type:'article',title:'Sacred geometry in Moroccan architecture',excerpt:'The zellige, the muqarnas — pattern as spiritual practice.',tags:['architecture','west-africa','cosmology','art-history','philosophy'],read_time:'13 min',cover_image:'./images/photo_33.jpg'},
-  {id:'f7',type:'article',title:'Octavia Butler and the speculative Black imagination',excerpt:'Science fiction as a tool of liberation.',tags:['literature','speculative','resistance','diaspora','decolonization'],read_time:'14 min',cover_image:'./images/photo_26.jpg'},
-  {id:'f8',type:'article',title:'Decolonizing the botanical',excerpt:'Who gets credited for knowing? A history of stolen plant science.',tags:['herbalism','indigenous-science','decolonization','ecology','food-sovereignty'],read_time:'16 min',cover_image:'./images/photo_06.jpg'},
+  {id:'f1',type:'article',title:'Ubuntu — I am because we are',excerpt:'The Nguni Bantu philosophy that places communal being at the center of personhood.',tags:['philosophy','cosmology','diaspora','ancestral'],read_time:'8 min',cover_image:'https://i.pinimg.com/736x/88/13/8e/88138ec559996abd49cf6eddd940a14d.jpg'},
+  {id:'f2',type:'article',title:'The garment as living archive',excerpt:'West African textile traditions — aso-oke, kente, bogolanfini — encoding cosmology in cloth.',tags:['textiles','natural-dye','west-africa','art-history','resistance'],read_time:'11 min',cover_image:'https://i.pinimg.com/1200x/8f/ef/59/8fef5951d62ade9664de8d332c62137f.jpg'},
+  {id:'f3',type:'article',title:'Rose hip, hibiscus & the pharmacopeia of grandmothers',excerpt:'Before the apothecary, there was the kitchen windowsill.',tags:['herbalism','beauty-ritual','ecology','ancestral-medicine','body'],read_time:'12 min',cover_image:'https://i.pinimg.com/1200x/a8/45/22/a84522cc1f06f171ca6e9c6fa6be6a6f.jpg'},
+  {id:'f4',type:'article',title:'The Harlem Renaissance and self-determination',excerpt:'How Black artists in 1920s New York built a visual language of liberation.',tags:['art-history','diaspora','resistance','literature','memory'],read_time:'15 min',cover_image:'https://i.pinimg.com/736x/0d/91/d5/0d91d5db1188df9147f6c4f3d32771f4.jpg'},
+  {id:'f5',type:'article',title:'Indigo — the color that crossed oceans',excerpt:'From Yoruba adire to Japanese shibori, indigo as shared human inheritance.',tags:['textiles','natural-dye','west-africa','ecology','ancestral'],read_time:'9 min'},
+  {id:'f6',type:'article',title:'Sacred geometry in Moroccan architecture',excerpt:'The zellige, the muqarnas — pattern as spiritual practice.',tags:['architecture','west-africa','cosmology','art-history','philosophy'],read_time:'13 min'},
+  {id:'f7',type:'article',title:'Octavia Butler and the speculative Black imagination',excerpt:'Science fiction as a tool of liberation.',tags:['literature','speculative','resistance','diaspora','decolonization'],read_time:'14 min'},
+  {id:'f8',type:'article',title:'Decolonizing the botanical',excerpt:'Who gets credited for knowing? A history of stolen plant science.',tags:['herbalism','indigenous-science','decolonization','ecology','food-sovereignty'],read_time:'16 min'},
   {id:'q1',type:'quote',title:'The function of art is to imagine what is possible',excerpt:'',tags:['art-history','literature','resistance','decolonization'],author:'bell hooks'},
   {id:'q2',type:'quote',title:'Not everything that is faced can be changed, but nothing can be changed until it is faced',excerpt:'',tags:['resistance','diaspora','philosophy','memory'],author:'James Baldwin'},
   {id:'q3',type:'quote',title:'Caring for myself is not self-indulgence, it is self-preservation',excerpt:'',tags:['beauty-ritual','ancestral-medicine','resistance','ecology'],author:'Audre Lorde'},
   {id:'q4',type:'quote',title:'The earth has music for those who listen',excerpt:'',tags:['ecology','cosmology','sound-healing','philosophy'],author:'George Santayana'},
-  {id:'i1',type:'image',title:'Indigo & Resistance',excerpt:'Textile work exploring the politics of natural dye.',tags:['textiles','resistance','art-history','west-africa'],medium:'Textile · 2025',cover_image:'./images/photo_21.jpg'},
-  {id:'i2',type:'image',title:'Botanical Grimoire Vol. I',excerpt:'Mixed media collage — herbarium meets magical text.',tags:['herbalism','ecology','beauty-ritual','cosmology'],medium:'Mixed media · 2025',cover_image:'./images/photo_34.jpg'},
-  {id:'i3',type:'image',title:'Roots & Ritual',excerpt:'Photography exploring ancestral beauty practices.',tags:['beauty-ritual','diaspora','decolonization','ecology'],medium:'Photography · 2024',cover_image:'./images/photo_32.jpg'},
+  {id:'i1',type:'image',title:'Indigo & Resistance',excerpt:'Textile work exploring the politics of natural dye.',tags:['textiles','resistance','art-history','west-africa'],medium:'Textile · 2025',cover_image:'https://i.pinimg.com/736x/88/13/8e/88138ec559996abd49cf6eddd940a14d.jpg'},
+  {id:'i2',type:'image',title:'Botanical Grimoire Vol. I',excerpt:'Mixed media collage — herbarium meets magical text.',tags:['herbalism','ecology','beauty-ritual','cosmology'],medium:'Mixed media · 2025',cover_image:'https://i.pinimg.com/1200x/a8/45/22/a84522cc1f06f171ca6e9c6fa6be6a6f.jpg'},
+  {id:'i3',type:'image',title:'Roots & Ritual',excerpt:'Photography exploring ancestral beauty practices.',tags:['beauty-ritual','diaspora','decolonization','ecology'],medium:'Photography · 2024',cover_image:'https://i.pinimg.com/736x/0d/91/d5/0d91d5db1188df9147f6c4f3d32771f4.jpg'},
 ]
-let items=[],nodes=[],links=[],sim,svg,g,nG,labG,nEls,lEls,tHalos,tLabs,cu=null,aN=null,refs={}
+let items=[],nodes=[],links=[],sim,svg,g,nEls,lEls,tHalos,tLabs,cu=null,aN=null,refs={}
 
 async function init(){
-  cu=await getCurrentUser(); initNav('observatory.html')
+  cu=await getCurrentUser(); navUI()
   let d=FB
   try{const r=await supabase.from('articles').select('id,title,excerpt,type,tags,read_time,cover_image,status').eq('status','published');if(!r.error&&r.data?.length>0)d=r.data}catch(e){}
   items=d
@@ -290,7 +291,7 @@ function buildObs(){
   items.forEach(it=>(it.tags||[]).forEach(t=>{
     if(usedStars.includes(t)) links.push({source:it.id,target:'S-'+t,strength:0.5})
   }))
-  sNodes.forEach(s=>{if(s.parentConst!=='C-')links.push({source:s.id,target:s.parentConst,strength:0.15})})
+  sNodes.forEach(s=>links.push({source:s.id,target:s.parentConst,strength:0.15}))
 
   document.getElementById('loading').style.display='none'
   const cv=document.getElementById('web-canvas');cv.style.display='block'
@@ -328,7 +329,7 @@ function initD3(cv){
     .attr('r',Math.random()*0.9).attr('fill','rgba(247,243,238,'+(Math.random()*0.14+0.02)+')'))
 
   g=svg.append('g')
-  const lG=g.append('g');nG=g.append('g');labG=g.append('g')
+  const lG=g.append('g'), nG=g.append('g'), labG=g.append('g')
 
   // Links
   lEls=lG.selectAll('line').data(links).join('line')
@@ -607,24 +608,14 @@ function drg(){return d3.drag().on('start',(e,d)=>{if(!e.active&&sim)sim.alphaTa
 
 // MAGAZINE
 function buildMag(){
+  const tags=[...new Set(items.flatMap(i=>i.tags||[]))]
   const f=document.getElementById('mag-filter')
-  Object.entries(CONSTELLATIONS).forEach(([name,stars])=>{
-    if(!items.some(i=>(i.tags||[]).some(t=>stars.includes(t)))) return
-    const color=CONSTELLATION_COLORS[name]||'#C47A55'
-    const b=document.createElement('button')
-    b.className='mf-btn'
-    b.style.cssText='display:flex;align-items:center;gap:6px;'
-    b.innerHTML=`<span style="width:6px;height:6px;border-radius:50%;background:${color};flex-shrink:0;display:inline-block;"></span>${name}`
-    b.onclick=()=>filterMag(name,b)
-    f.appendChild(b)
-  })
+  tags.forEach(t=>{const b=document.createElement('button');b.className='mf-btn';b.textContent=t;b.onclick=()=>filterMag(t,b);f.appendChild(b)})
   renderGrid(items)
 }
-window.filterMag=function(constellation,btn){
+window.filterMag=function(tag,btn){
   document.querySelectorAll('.mf-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active')
-  if(!constellation){renderGrid(items);return}
-  const stars=CONSTELLATIONS[constellation]||[]
-  renderGrid(items.filter(i=>(i.tags||[]).some(t=>stars.includes(t))))
+  renderGrid(tag?items.filter(i=>(i.tags||[]).includes(tag)):items)
 }
 function renderGrid(it){
   const grid=document.getElementById('mag-grid')
@@ -725,6 +716,11 @@ window.setView=function(v){
   else{wv.style.display='none';mv.classList.add('active');document.body.style.overflow='auto';document.documentElement.style.overflow='auto'}
 }
 
+// NAV
+function navUI(){
+  const na=document.getElementById('nav-actions'),p=cu?.profile
+  if(cu&&p){const RL={librarian:'⬡ Librarian',curator:'◈ Curator',fellow:'✦ Fellow',reader:'◻ Reader'};na.innerHTML=`<span style="font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:rgba(247,243,238,0.28);">${RL[p.role]||'◻ Reader'}</span><span style="font-size:12px;color:rgba(247,243,238,0.5);font-family:'EB Garamond',serif;">${p.display_name||p.email}</span><button class="btn-solid" id="so">Sign Out</button>`;document.getElementById('so').onclick=async()=>{await supabase.auth.signOut();location.href='index.html'}}
+}
 
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400)}
 window.showToast=toast

@@ -4,13 +4,28 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Idea Web · Library of Morenita</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Figtree:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css">
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Figtree:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
 <style>
-  :root { --void: #0E0D0B; --star: #F7F3EE; }
+  :root {
+    --cream: #F7F3EE;
+    --parchment: #EDE8E0;
+    --ink: #1C1A17;
+    --ink-muted: #5C5750;
+    --ink-faint: #9B968D;
+    --sienna: #8B4A2A;
+    --sienna-light: #C47A55;
+    --sage: #5A6B55;
+    --sage-light: #8BA683;
+    --gold: #C49A3C;
+    --gold-light: #DDB96A;
+    --border: rgba(28,26,23,0.12);
+    --border-strong: rgba(28,26,23,0.25);
+    --void: #0E0D0B;
+    --star: #F7F3EE;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
   html, body { width: 100%; height: 100%; overflow: hidden; }
 
   body {
@@ -329,10 +344,6 @@
     <li><a href="builder.html">Create</a></li>
     <li><a href="profile.html">Profile</a></li>
   </ul>
-  <div class="nav-actions" id="nav-actions">
-    <a href="auth.html" class="btn-ghost">Sign In</a>
-    <a href="auth.html" class="btn-solid">Join</a>
-  </div>
 </nav>
 
 <div id="web-search">
@@ -1006,8 +1017,35 @@ window.addEventListener('resize', () => {
 </script>
 
 <script type="module">
-import { initNav } from './nav.js'
-initNav('idea-web.html')
+import { supabase, getCurrentUser } from './supabase.js'
+const ROLE_LABELS = { librarian:'⬡ Librarian', curator:'◈ Curator', fellow:'✦ Fellow', reader:'◻ Reader' }
+async function initNav() {
+  const user = await getCurrentUser()
+  const profile = user?.profile
+  const navActions = document.getElementById('nav-actions')
+  if (!navActions) return
+  if (user && profile) {
+    const rl = ROLE_LABELS[profile.role] || '◻ Reader'
+    const dn = profile.display_name || profile.email
+    navActions.innerHTML = `
+      <span style="font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-faint);">${rl}</span>
+      <span style="font-size:13px;color:var(--ink-muted);font-family:'EB Garamond',serif;">${dn}</span>
+      <button class="btn-solid" id="so-btn">Sign Out</button>
+    `
+    document.getElementById('so-btn').onclick = async () => {
+      await supabase.auth.signOut(); location.href = 'index.html'
+    }
+    if (profile.role === 'librarian' || profile.role === 'curator') {
+      const bar = document.createElement('div')
+      bar.style.cssText = 'background:rgba(139,74,42,0.06);border-bottom:1px solid rgba(139,74,42,0.12);padding:7px 40px;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--sienna);display:flex;align-items:center;gap:24px;'
+      bar.innerHTML = '<span>⬡ Librarian View</span>'
+      document.querySelector('nav').after(bar)
+    }
+  } else {
+    if (navActions) navActions.innerHTML = '<a href="auth.html" class="btn-ghost">Sign In</a><a href="auth.html" class="btn-solid">Join</a>'
+  }
+}
+initNav()
 </script>
 </body>
 </html>

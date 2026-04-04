@@ -4,11 +4,28 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Academy & Study Space · Library of Morenita</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Figtree:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css">
 <style>
+:root {
+  --cream: #F7F3EE;
+  --parchment: #EDE8E0;
+  --ink: #1C1A17;
+  --ink-muted: #5C5750;
+  --ink-faint: #9B968D;
+  --sienna: #8B4A2A;
+  --sienna-light: #C47A55;
+  --sage: #5A6B55;
+  --sage-light: #8BA683;
+  --gold: #C49A3C;
+  --gold-light: #DDB96A;
+  --border: rgba(28,26,23,0.12);
+  --border-strong: rgba(28,26,23,0.25);
+  --void: #0C0B09;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+
 body {
   font-family: 'Figtree', sans-serif;
   background: var(--cream);
@@ -17,6 +34,48 @@ body {
   line-height: 1.7;
   cursor: default;
 }
+
+/* ── GRID BANNER ── */
+.grid-banner {
+  background: var(--ink);
+  color: rgba(247,243,238,0.7);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 7px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.grid-dot { width:6px;height:6px;border-radius:50%;background:#5A9E6A;display:inline-block;margin-right:7px; }
+
+/* ── NAV ── */
+nav {
+  background: var(--cream);
+  border-bottom: 1px solid var(--border);
+  padding: 0 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 60px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.nav-logo {
+  font-family:'EB Garamond',serif;
+  font-size:17px;
+  color:var(--ink);
+  text-decoration:none;
+  letter-spacing:0.03em;
+}
+.nav-logo em { font-style:italic; color:var(--sienna); }
+.nav-links { display:flex; gap:28px; list-style:none; }
+.nav-links a {
+  font-size:11px; letter-spacing:0.08em; text-transform:uppercase;
+  color:var(--ink-muted); text-decoration:none; transition:color 0.2s;
+}
+.nav-links a:hover, .nav-links a.active { color:var(--ink); }
 
 /* ── TAB SYSTEM ── */
 .tab-bar {
@@ -1030,10 +1089,6 @@ body {
     <li><a href="builder.html">Create</a></li>
     <li><a href="profile.html">Profile</a></li>
   </ul>
-  <div class="nav-actions" id="nav-actions">
-    <a href="auth.html" class="btn-ghost">Sign In</a>
-    <a href="auth.html" class="btn-solid">Join</a>
-  </div>
 </nav>
 
 <div class="tab-bar">
@@ -1086,7 +1141,7 @@ body {
 
       <div class="track-card" onclick="openTrack('fashion')">
         <div class="track-cover" style="">
-          <div class="track-cover-bg" style="background-image:url('./images/photo_28.jpg');"></div>
+          <div class="track-cover-bg" style="background-image:url('https://i.pinimg.com/1200x/8f/ef/59/8fef5951d62ade9664de8d332c62137f.jpg');"></div>
           <div class="track-cover-overlay" style="background:linear-gradient(135deg,rgba(139,74,42,0.7),rgba(28,26,23,0.8));"></div>
           <div class="track-num">I</div>
           <div class="track-cover-content">
@@ -1117,7 +1172,7 @@ body {
 
       <div class="track-card" onclick="openTrack('herbalism')">
         <div class="track-cover">
-          <div class="track-cover-bg" style="background-image:url('./images/photo_23.jpg');"></div>
+          <div class="track-cover-bg" style="background-image:url('https://i.pinimg.com/1200x/a8/45/22/a84522cc1f06f171ca6e9c6fa6be6a6f.jpg');"></div>
           <div class="track-cover-overlay" style="background:linear-gradient(135deg,rgba(90,107,85,0.75),rgba(28,26,23,0.8));"></div>
           <div class="track-num">II</div>
           <div class="track-cover-content">
@@ -1148,7 +1203,7 @@ body {
 
       <div class="track-card" onclick="openTrack('philosophy')">
         <div class="track-cover">
-          <div class="track-cover-bg" style="background-image:url('./images/photo_31.jpg');"></div>
+          <div class="track-cover-bg" style="background-image:url('https://i.pinimg.com/736x/88/13/8e/88138ec559996abd49cf6eddd940a14d.jpg');"></div>
           <div class="track-cover-overlay" style="background:linear-gradient(135deg,rgba(28,26,23,0.6),rgba(28,26,23,0.85));"></div>
           <div class="track-num">III</div>
           <div class="track-cover-content">
@@ -1179,7 +1234,7 @@ body {
 
       <div class="track-card" onclick="openTrack('art')">
         <div class="track-cover">
-          <div class="track-cover-bg" style="background-image:url('./images/photo_03.jpg');"></div>
+          <div class="track-cover-bg" style="background-image:url('https://i.pinimg.com/736x/0d/91/d5/0d91d5db1188df9147f6c4f3d32771f4.jpg');"></div>
           <div class="track-cover-overlay" style="background:linear-gradient(135deg,rgba(74,107,138,0.7),rgba(28,26,23,0.8));"></div>
           <div class="track-num">IV</div>
           <div class="track-cover-content">
@@ -1952,8 +2007,35 @@ function resetTimer() {
 </script>
 
 <script type="module">
-import { initNav } from './nav.js'
-initNav('academy.html')
+import { supabase, getCurrentUser } from './supabase.js'
+const ROLE_LABELS = { librarian:'⬡ Librarian', curator:'◈ Curator', fellow:'✦ Fellow', reader:'◻ Reader' }
+async function initNav() {
+  const user = await getCurrentUser()
+  const profile = user?.profile
+  const navActions = document.getElementById('nav-actions')
+  if (!navActions) return
+  if (user && profile) {
+    const rl = ROLE_LABELS[profile.role] || '◻ Reader'
+    const dn = profile.display_name || profile.email
+    navActions.innerHTML = `
+      <span style="font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-faint);">${rl}</span>
+      <span style="font-size:13px;color:var(--ink-muted);font-family:'EB Garamond',serif;">${dn}</span>
+      <button class="btn-solid" id="so-btn">Sign Out</button>
+    `
+    document.getElementById('so-btn').onclick = async () => {
+      await supabase.auth.signOut(); location.href = 'index.html'
+    }
+    if (profile.role === 'librarian' || profile.role === 'curator') {
+      const bar = document.createElement('div')
+      bar.style.cssText = 'background:rgba(139,74,42,0.06);border-bottom:1px solid rgba(139,74,42,0.12);padding:7px 40px;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--sienna);display:flex;align-items:center;gap:24px;'
+      bar.innerHTML = '<span>⬡ Librarian View</span>'
+      document.querySelector('nav').after(bar)
+    }
+  } else {
+    if (navActions) navActions.innerHTML = '<a href="auth.html" class="btn-ghost">Sign In</a><a href="auth.html" class="btn-solid">Join</a>'
+  }
+}
+initNav()
 </script>
 </body>
 </html>

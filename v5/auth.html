@@ -4,11 +4,23 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sign In · Library of Morenita</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Figtree:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css">
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Figtree:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
+:root {
+  --cream: #F7F3EE;
+  --parchment: #EDE8E0;
+  --ink: #1C1A17;
+  --ink-muted: #5C5750;
+  --ink-faint: #9B968D;
+  --sienna: #8B4A2A;
+  --sienna-light: #C47A55;
+  --sage: #5A6B55;
+  --gold: #C49A3C;
+  --border: rgba(28,26,23,0.12);
+  --border-strong: rgba(28,26,23,0.25);
+  --void: #0C0B09;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
 html, body { height:100%; }
 body {
   font-family:'Figtree',sans-serif;
@@ -291,8 +303,6 @@ body {
 }
 .msg.error { background:rgba(155,74,58,0.1); border:1px solid rgba(155,74,58,0.3); color:#7A3020; display:block; }
 .msg.success { background:rgba(90,107,85,0.1); border:1px solid rgba(90,107,85,0.3); color:#3A5030; display:block; }
-.forgot-link { display:block; text-align:right; margin-top:6px; font-size:12px; color:var(--ink-faint); text-decoration:none; transition:color 0.2s; }
-.forgot-link:hover { color:var(--sienna-light); }
 
 /* Loading */
 .spinner {
@@ -353,7 +363,6 @@ body {
       <div class="field">
         <label>Password</label>
         <input type="password" id="signin-password" placeholder="••••••••">
-        <a href="#" class="forgot-link" onclick="showForgotForm(event)">Forgot password?</a>
       </div>
 
       <button class="submit-btn" id="signin-btn" onclick="handleSignIn()">Sign In</button>
@@ -363,25 +372,6 @@ body {
         <div class="google-icon"></div>
         Continue with Google
       </button>
-    </div>
-
-    <!-- ── FORGOT PASSWORD ── -->
-    <div id="form-reset" class="auth-form">
-      <div class="form-title">Reset your <em>password</em></div>
-      <div class="form-sub">We'll send a reset link to your email.</div>
-
-      <div id="reset-msg" class="msg"></div>
-
-      <div class="field">
-        <label>Email</label>
-        <input type="email" id="reset-email" placeholder="your@email.com">
-      </div>
-
-      <button class="submit-btn" id="reset-btn" onclick="handleForgotPassword()">Send Reset Link</button>
-
-      <div style="text-align:center;margin-top:16px;">
-        <a href="#" class="forgot-link" onclick="backToSignIn(event)">← Back to sign in</a>
-      </div>
     </div>
 
     <!-- ── JOIN ── -->
@@ -555,49 +545,6 @@ function routeByRole(role) {
 // ── CHECK IF ALREADY LOGGED IN ──
 const { data: { user } } = await supabase.auth.getUser()
 if (user) routeByRole(null)
-
-// ── FORGOT PASSWORD ──
-window.showForgotForm = function(e) {
-  e.preventDefault()
-  document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'))
-  document.getElementById('form-reset').classList.add('active')
-  document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'))
-  const email = document.getElementById('signin-email').value.trim()
-  if (email) document.getElementById('reset-email').value = email
-}
-
-window.backToSignIn = function(e) {
-  e.preventDefault()
-  document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'))
-  document.getElementById('form-signin').classList.add('active')
-  document.querySelectorAll('.auth-tab')[0].classList.add('active')
-}
-
-window.handleForgotPassword = async function() {
-  const email = document.getElementById('reset-email').value.trim()
-  const btn = document.getElementById('reset-btn')
-  const msg = document.getElementById('reset-msg')
-
-  if (!email) { showMsg(msg, 'Please enter your email.', 'error'); return }
-
-  btn.disabled = true
-  btn.innerHTML = '<span class="spinner"></span>Sending…'
-
-  const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: window.location.origin + '/auth.html'
-  })
-
-  if (error) {
-    showMsg(msg, error.message, 'error')
-    btn.disabled = false
-    btn.textContent = 'Send Reset Link'
-    return
-  }
-
-  showMsg(msg, 'Check your inbox — a reset link is on its way.', 'success')
-  btn.disabled = false
-  btn.textContent = 'Send Reset Link'
-}
 
 // ── UTILS ──
 function showMsg(el, text, type) {
