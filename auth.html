@@ -384,6 +384,25 @@ body {
       </div>
     </div>
 
+    <!-- ── SET NEW PASSWORD (after clicking reset link in email) ── -->
+    <div id="form-update-password" class="auth-form">
+      <div class="form-title">Set new <em>password</em></div>
+      <div class="form-sub">Choose a new password for your account.</div>
+
+      <div id="update-msg" class="msg"></div>
+
+      <div class="field">
+        <label>New Password</label>
+        <input type="password" id="update-password" placeholder="8+ characters">
+      </div>
+      <div class="field">
+        <label>Confirm Password</label>
+        <input type="password" id="update-password-confirm" placeholder="Repeat password">
+      </div>
+
+      <button class="submit-btn" id="update-btn" onclick="handleUpdatePassword()">Set New Password</button>
+    </div>
+
     <!-- ── JOIN ── -->
     <div id="form-join" class="auth-form">
       <div class="form-title">Join the <em>library</em></div>
@@ -533,7 +552,7 @@ window.handleJoin = async function() {
 window.handleGoogle = async function() {
   await supabase.auth.signInWithOAuth({
     provider: 'google',
-    options: { redirectTo: window.location.origin + '/index.html' }
+    options: { redirectTo: new URL('index.html', window.location.href).href }
   })
 }
 
@@ -552,9 +571,71 @@ function routeByRole(role) {
   }
 }
 
-// ── CHECK IF ALREADY LOGGED IN ──
-const { data: { user } } = await supabase.auth.getUser()
-if (user) routeByRole(null)
+// ── HANDLE RECOVERY TOKEN (from password reset email) ──
+// Supabase puts #access_token=...&type=recovery in the URL when the user clicks the reset link.
+// We must detect this BEFORE routing logged-in users away, otherwise they get bounced
+// to index.html before they can set a new password.
+const hash = window.location.hash
+if (hash.includes('type=recovery') || hash.includes('type=signup')) {
+  // Let Supabase parse the token from the hash into a session
+  const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+  if (session) {
+    // Hide tabs (they're not relevant in recovery mode) and show the update form
+    document.querySelector('.auth-tabs').style.display = 'none'
+    document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'))
+    document.getElementById('form-update-password').classList.add('active')
+    // Clear the hash so it doesn't linger
+    history.replaceState(null, '', window.location.pathname)
+  } else {
+    // Token expired or invalid — send them back to forgot password
+    document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'))
+    document.getElementById('form-reset').classList.add('active')
+    document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'))
+    const msg = document.getElementById('reset-msg')
+    showMsg(msg, 'Your reset link expired. Please request a new one.', 'error')
+  }
+} else {
+  // Normal page load — route already-logged-in users to the right place
+  const { data: { user } } = await supabase.auth.getUser()
+  if (user) routeByRole(null)
+}
+
+// ── UPDATE PASSWORD ──
+window.handleUpdatePassword = async function() {
+  const password = document.getElementById('update-password').value
+  const confirm = document.getElementById('update-password-confirm').value
+  const btn = document.getElementById('update-btn')
+  const msg = document.getElementById('update-msg')
+
+  if (!password || !confirm) { showMsg(msg, 'Please fill in both fields.', 'error'); return }
+  if (password.length < 8) { showMsg(msg, 'Password must be at least 8 characters.', 'error'); return }
+  if (password !== confirm) { showMsg(msg, 'Passwords do not match.', 'error'); return }
+
+  btn.disabled = true
+  btn.innerHTML = '<span class="spinner"></span>Updating…'
+  msg.className = 'msg'
+
+  const { error } = await supabase.auth.updateUser({ password })
+
+  if (error) {
+    showMsg(msg, error.message, 'error')
+    btn.disabled = false
+    btn.textContent = 'Set New Password'
+    return
+  }
+
+  showMsg(msg, 'Password updated! Signing you in…', 'success')
+  btn.disabled = false
+  btn.textContent = 'Set New Password'
+
+  setTimeout(async () => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user) {
+      const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
+      routeByRole(profile?.role)
+    }
+  }, 1200)
+}
 
 // ── FORGOT PASSWORD ──
 window.showForgotForm = function(e) {
@@ -584,7 +665,7 @@ window.handleForgotPassword = async function() {
   btn.innerHTML = '<span class="spinner"></span>Sending…'
 
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: window.location.origin + '/auth.html'
+    redirectTo: new URL('auth.html', window.location.href).href
   })
 
   if (error) {
